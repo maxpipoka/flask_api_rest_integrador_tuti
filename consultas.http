@@ -1,0 +1,12 @@
+### Consulta para crear un alumno
+POST http://127.0.0.1:5000/alumnos
+Content-Type: application/json
+
+{
+    "dni": 12345678,
+    "names": "Juan",
+    "surnames": "Pérez",
+    "address": "Calle Principal, 123",
+    "email": "juan.perez@example.com",
+    "active": true
+}
