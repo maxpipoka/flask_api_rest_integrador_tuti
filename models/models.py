@@ -1,63 +1,120 @@
-from ..app import db
+from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
+from dataclasses import dataclass
 
+db = SQLAlchemy()
 
+@dataclass
+class Student(db.Model):
+    __tablename__ = 'students'
 
-class Student(db.model):
     id = db.Column(db.Integer, primary_key=True)
-    dni = db.Column(db.Integer, unique=True, nullable=False, blank=False)
-    names = db.Column(db.String(50), nullable=False, blank=False)
-    surnames = db.Column(db.String(50), nullable=False, blank=False)
-    address = db.Column(db.String(50), nullable=False, blank=False)
-    email = db.Column(db.String(50), nullable=False, blank=False)
-    tutors = db.relationship('Tutor', backref='student',lazy=True)
-    createdAt = db.Column(db.DateTime(), nullable=False, blank=False)
-    updatedAt = db.Column(db.DateTime(), nullable=True, blank=True)
+    dni = db.Column(db.Integer, unique=True, nullable=False)
+    names = db.Column(db.String(50), nullable=False)
+    surnames = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
+    # tutors = db.relationship('Tutor', backref='student',lazy=True)
+    createdAt = db.Column(db.DateTime(), nullable=False)
+    updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    def __init__(self, dni, names, surnames, address, email, active):
+        self.dni = dni
+        self.names = names
+        self.surnames = surnames
+        self.address = address
+        self.email = email
+        self.createdAt = datetime.now()
+        self.active = active
 
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
+    
+    # def __json__(self):
+    #     # Devuelve un diccionario que representa el objeto Student
+    #     return {"dni": self.dni, 
+    #             "names": self.names, 
+    #             "surnames": self.surnames, 
+    #             "address": self.address, 
+    #             "email": self.email, 
+    #             "createdAt": self.createdAt,
+    #             "updatedAt": self.updatedAt,
+    #             "active": self.active}
 
 
 class Tutor(db.Model):
+    __tablename__ = 'tutors'
+
     id = db.Column(db.Integer(), primary_key=True)
-    dni = db.Column(db.Integer, unique=True, nullable=False, blank=False)
-    names = db.Column(db.String(50), nullable=False, blank=False)
-    surnames = db.Column(db.String(50), nullable=False, blank=False)
-    address = db.Column(db.String(50), nullable=False, blank=False)
-    email = db.Column(db.String(50), nullable=False, blank=False)
-    student_id= db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=False, blank=False)
-    createdAt = db.Column(db.DateTime(), nullable=False, blank=False)
-    updatedAt = db.Column(db.DateTime(), nullable=True, blank=True)
+    dni = db.Column(db.Integer, unique=True, nullable=False)
+    names = db.Column(db.String(50), nullable=False)
+    surnames = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(50), nullable=False)
+    email = db.Column(db.String(50), nullable=False)
+    student_id= db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=False)
+    createdAt = db.Column(db.DateTime(), nullable=False)
+    updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    def __init__(self, **kwargs):
+        self.dni = kwargs.dni
+        self.names = kwargs.names
+        self.surnames = kwargs.surnames
+        self.address = kwargs.address
+        self.email = kwargs.email
+        self.student_id = kwargs.student_id
+        self.createdAt = datetime.now()
+        self.active = kwargs.active
 
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
 
 
 class Course(db.Model):
+    __tablename__ = 'courses'
+
     id = db.Column(db.Integer(), primary_key=True)
-    level = db.Column(db.Integer(), nullable=False, blank=False)
-    division = db.Column(db.String(1), nullable=False, blank=False)
-    year = db.Column(db.Integer, nullable=False, blank=False)
+    level = db.Column(db.Integer(), nullable=False)
+    division = db.Column(db.String(1), nullable=False)
+    year = db.Column(db.Integer, nullable=False)
     current = db.Column(db.Boolean(), default=True, nullable=False)
-    attendance = db.relationship('Attendance', backref='course', lazy=True)
-    createdAt = db.Column(db.DateTime(), nullable=False, blank=False)
-    updatedAt = db.Column(db.DateTime(), nullable=True, blank=True)
+    # attendance = db.relationship('Attendance', backref='course', lazy=True)
+    createdAt = db.Column(db.DateTime(), nullable=False)
+    updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    def __init__(self, **kwargs):
+        self.level = kwargs.level
+        self.division = kwargs.division
+        self.year = kwargs.year
+        self.current = kwargs.current
+        self.createdAt = datetime.now()
+        self.active = kwargs.active
 
     def __repr__(self):
         return f'{self.year} - {self.level} - {self.division}'
     
 
 class Attendance(db.Model):
+    __tablename__ = 'attendances'
+
     id = db.Column(db.Integer(), primary_key=True)
-    course_id = db.Column(db.Integer(), db.ForeignKey('course.id'), nullable=False, blank=False)
-    student_id = db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=False, blank=False)
-    day = db.Column(db.DateTime(), nullable=False, blank=False)
+    course_id = db.Column(db.Integer(), db.ForeignKey('course.id'), nullable=False)
+    student_id = db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=False)
+    day = db.Column(db.DateTime(), nullable=False)
     state = db.Column(db.Boolean(),  default=False, nullable=False)
-    createdAt = db.Column(db.DateTime(), nullable=False, blank=False)
-    updatedAt = db.Column(db.DateTime(), nullable=True, blank=True)
+    createdAt = db.Column(db.DateTime(), nullable=False)
+    updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    def __init__(self, **kwargs):
+        self.course_id = kwargs.course_id
+        self.student_id = kwargs.student_id
+        self.day = kwargs.day
+        self.state = kwargs.state
+        self.createdAt = datetime.now()
+        self.active = kwargs.active
 
     def __repr__(self):
         return f'{self.course_id} - {self.student_id} - {self.day}'
