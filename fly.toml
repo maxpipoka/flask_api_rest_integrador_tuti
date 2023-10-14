@@ -1,4 +1,7 @@
-# fly.toml file generated for integrador-flask-api on 2023-10-12T12:19:15-03:00
+# fly.toml app configuration file generated for integrador-flask-api on 2023-10-13T23:52:16-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = "integrador-flask-api"
 primary_region = "scl"
@@ -12,17 +15,12 @@ primary_region = "scl"
   DB_NAME= "wcfjjmav"
   DB_USER_NAME= "wcfjjmav"
   DB_PASSWORD= "0WMsyEdub8wgpfSR-3OCHQIxiuy_TY5O"
-  DB_URI= "postgresql://wcfjjmav:0WMsyEdub8wgpfSR-3OCHQIxiuy_TY5O@silly.db.elephantsql.com:5432/wcfjjmav"
-  FLASK_APP="app"
-  FLASK_DEBUG="1"
+  DB_URI = "postgresql://wcfjjmav:0WMsyEdub8wgpfSR-3OCHQIxiuy_TY5O@silly.db.elephantsql.com:5432/wcfjjmav"
 
 [http_service]
   internal_port = 8080
   force_https = true
-
-[checks]
-  [checks.alive]
-    type = "tcp"
-    interval = "15s"
-    timeout = "2s"
-    grace_period = "5s"
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
