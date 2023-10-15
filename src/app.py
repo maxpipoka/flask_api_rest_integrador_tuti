@@ -1,7 +1,6 @@
 import json
 from flask import Flask, Response, request, jsonify
 import os
-import psycopg2
 from dotenv import load_dotenv
 from flask_marshmallow import Marshmallow
 from sqlalchemy import select
