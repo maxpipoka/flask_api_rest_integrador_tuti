@@ -1,13 +1,16 @@
-import json
-from flask import Flask, Response, request, jsonify
 import os
-from dotenv import load_dotenv
+
+from flask import Flask, request, jsonify
 from flask_marshmallow import Marshmallow
+from dotenv import load_dotenv
+
 from sqlalchemy import select
 from dataclasses import dataclass
 
-from models.models import db
-from models.models import Student, Tutor, Course, Attendance
+from .models.models import db
+
+from .endpoints.alumnos import bp as alumnos_bp
+
 
 # Carga de las variables de entorno desde el .env
 load_dotenv()
@@ -18,43 +21,17 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
 
-db.init_app(app)
 
+db.init_app(app)
 ma = Marshmallow(app)
 
-## Definicion de un schema que realiza la serialización del modelo para mostrado
-class StudentSchema(ma.Schema):
-    class Meta:
-        fields = ('id', 'dni', 'names', 'surnames', 'address', 'email', 'tutors', 'createdAt', 'updatedAt', 'active')
-        
-
-# Definición de atajos de serializador
-student_schema = StudentSchema()
-students_schema = StudentSchema(many=True)
-
+app.register_blueprint(alumnos_bp)
 
 # Definicion endpoint del index
 @app.get('/')
 def index():
     return 'Hola Mundo'
 
-
-# Definicion endpoint obtiene todos los alumnos
-@app.route('/alumnos', methods=['GET'])
-def getAllAlumnos():
-    allStudents = db.session.query(Student).all()
-    print(allStudents)
-
-    serialized_students = students_schema.dump(allStudents)
-
-    response_data = json.dumps(serialized_students, ensure_ascii=False)
-
-    return Response(response_data, content_type='application/json; charset=utf-8'), 200
-
-# Definicion endpoint obtiene un solo alumno filtrado por id
-@app.route('/alumnos/<id>', methods=['GET'])
-def getOneAlumno(id):
-    return 'Un solo alumno'
 
 # Definicionn endpoint creacion alumno
 @app.route('/alumnos', methods=['POST'])
