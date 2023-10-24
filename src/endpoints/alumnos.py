@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import json
 
 from flask import Response, Blueprint, request, jsonify
@@ -71,8 +71,6 @@ def deteleOneAlumno(id):
     return Response(response_data, content_type='application/json; charset=utf-8'), 200
 
 
-#Para guardar objetos se usa add_all
-
 # Definicionn endpoint creacion alumno
 @bp.route('/alumnos', methods=['POST'])
 def createStudent():
@@ -127,29 +125,40 @@ def editOneAlumno(id):
         return Response({"message":"No hay información para actualizar el alumno"}), 404
     
     try:
+        updated = False
+
         if 'names' in data:
             foundStudent.names = data['names']
+            updated = True
 
         if 'surnames' in data:
             foundStudent.surnames = data['surnames']
+            updated = True
 
         if 'address' in data:
             foundStudent.address = data['address']
+            updated = True
 
-        if 'email' in data:
+        if 'email' in data and data['email']:
             foundStudent.email = data['email']
-            print("encontrado mail")
+            updated = True
 
         if 'active' in data:
             foundStudent.active = data['active']
+            updated = True
 
-        foundStudent.updatedAt = datetime.now()
+        if updated:
+            foundStudent.updatedAt = datetime.now()
 
         db.session.commit()
     except Exception as e:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return Response({"message": "Error al modificar los campos del alumno: " + str(e)}, status=543)
+        return Response({"message": "Error al modificar los campos del alumno: " + str(e)}, status=500)
     
-    return Response(status=204)
+    serialized_student = student_schema.dump(foundStudent)
+
+    response_data = json.dumps(serialized_student, ensure_ascii=False)
+
+    return Response(response_data, content_type='application/json; charset=utf-8'), 201
 
 
