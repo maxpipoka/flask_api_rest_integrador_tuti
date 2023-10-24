@@ -1,12 +1,28 @@
+###
+GET http://127.0.0.1:5000/alumnos
+
+###
+GET http://127.0.0.1:5000/alumnos/4
+
 ### Consulta para crear un alumno
 POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-    "dni": 12345678,
-    "names": "Juan",
-    "surnames": "Pérez",
+    "dni": 43234234,
+    "names": "Esteban",
+    "surnames": "Campusano",
     "address": "Calle Principal, 123",
-    "email": "juan.perez@example.com",
+    "email": "estaban.campuzano@example.com",
     "active": true
 }
+###
+DELETE  http://127.0.0.1:5000/alumnos/4
+
+###
+PATCH http://127.0.0.1:5000/alumnos/4
+Content-Type: application/json
+
+{
+    "email" : "carlos.lopez.lopez@gmail.com"
+    }
