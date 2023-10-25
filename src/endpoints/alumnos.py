@@ -23,7 +23,7 @@ def getAllAlumnos():
         return Response({"message":"No se pudieron obtener alumnos"}), 404
     
     if not allStudents:
-        return Response({"message":"No existen alumnos"}), 404
+        return Response({"message":"No se pueden obtener los alumnos"}), 400
 
     serialized_students = students_schema.dump(allStudents)
 

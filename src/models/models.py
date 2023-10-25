@@ -31,18 +31,6 @@ class Student(db.Model):
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
     
-    # def __json__(self):
-    #     # Devuelve un diccionario que representa el objeto Student
-    #     return {"dni": self.dni, 
-    #             "names": self.names, 
-    #             "surnames": self.surnames, 
-    #             "address": self.address, 
-    #             "email": self.email, 
-    #             "createdAt": self.createdAt,
-    #             "updatedAt": self.updatedAt,
-    #             "active": self.active}
-
-
 class Tutor(db.Model):
     __tablename__ = 'tutors'
 
