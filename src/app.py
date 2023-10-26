@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from .models.models import db
 
 from .endpoints.alumnos import bp as alumnos_bp
+from .endpoints.tutores import bp as tutores_bp
 
 
 # Carga de las variables de entorno desde el .env
@@ -20,13 +21,14 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
-app.config['SQLALCHEMY_ECHO'] = False
+app.config['SQLALCHEMY_ECHO'] = True
 
 
 db.init_app(app)
 ma = Marshmallow(app)
 
 app.register_blueprint(alumnos_bp)
+app.register_blueprint(tutores_bp)
 
 # Definicion endpoint del index
 @app.get('/')

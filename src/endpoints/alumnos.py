@@ -73,9 +73,12 @@ def deteleOneAlumno(id):
 
 # Definicionn endpoint creacion alumno
 @bp.route('/alumnos', methods=['POST'])
-def createStudent():
+def saveStudent():
 
     newStudent = None
+
+    if not request.json:
+        return jsonify({'message': 'JSON data is missing or invalid'}), 400
 
     try:
         newStudent = Student(
@@ -86,12 +89,11 @@ def createStudent():
             email = request.json['email'],
             active = request.json['active']
             )
-        print(newStudent)
 
     except KeyError as e:
         return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
     except Exception as e:
-        return jsonify({'messagedd': f'Error: {str(e)}'}), 400
+        return jsonify({'message': f'Error: {str(e)}'}), 400
     except:
         return jsonify({'message':'No se puede crear la instancia'}), 400
     
@@ -99,7 +101,7 @@ def createStudent():
     try:
        db.session.add(newStudent)
     except:
-        return jsonify({'message':'No se puede ADD'}), 400
+        return jsonify({'message':'No se pudo ADD alumno'}), 400
     
     try:
         # Confirmación de las operaciones creadas en la session
@@ -110,7 +112,7 @@ def createStudent():
 
 
 @bp.route('/alumnos/<id>', methods=['PATCH'])
-def editOneAlumno(id):
+def editAlumno(id):
     try:
         foundStudent = Student.query.get(id)
     except:

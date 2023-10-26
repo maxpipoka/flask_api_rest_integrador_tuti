@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from dataclasses import dataclass
+from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
 
@@ -14,7 +15,7 @@ class Student(db.Model):
     surnames = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    # tutors = db.relationship('Tutor', backref='student',lazy=True)
+    tutors = relationship('Tutor', secondary=students_tutors, back_populates='students')
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
@@ -31,29 +32,31 @@ class Student(db.Model):
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
     
+@dataclass    
 class Tutor(db.Model):
     __tablename__ = 'tutors'
 
-    id = db.Column(db.Integer(), primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
     dni = db.Column(db.Integer, unique=True, nullable=False)
     names = db.Column(db.String(50), nullable=False)
     surnames = db.Column(db.String(50), nullable=False)
     address = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
-    student_id= db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=False)
+    students = relationship('Student', secondary=students_tutors, back_populates='tutors')
+    student_id= db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=True)
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    def __init__(self, **kwargs):
-        self.dni = kwargs.dni
-        self.names = kwargs.names
-        self.surnames = kwargs.surnames
-        self.address = kwargs.address
-        self.email = kwargs.email
-        self.student_id = kwargs.student_id
+    def __init__(self, dni, names, surnames, address, email, student_id, active):
+        self.dni = dni
+        self.names = names
+        self.surnames = surnames
+        self.address = address
+        self.email = email
         self.createdAt = datetime.now()
-        self.active = kwargs.active
+        self.student_id = student_id
+        self.active = active
 
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
@@ -106,3 +109,11 @@ class Attendance(db.Model):
 
     def __repr__(self):
         return f'{self.course_id} - {self.student_id} - {self.day}'
+    
+
+# Tabla intermedia para la relación muchos a muchos
+students_tutors = db.Table(
+    'students_tutors',
+    db.Column('student_id', db.Integer, db.ForeignKey('students.id')),
+    db.Column('tutor_id', db.Integer, db.ForeignKey('tutors.id'))
+)

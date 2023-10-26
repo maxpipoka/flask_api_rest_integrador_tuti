@@ -1,10 +1,12 @@
-###
+#################### ALUMNOS ################
+
+### Obtencion de todos los alumnos
 GET http://127.0.0.1:5000/alumnos
 
-###
+### Obtencion un alumno
 GET http://127.0.0.1:5000/alumnos/4
 
-### Consulta para crear un alumno
+### Guardado de un alumno
 POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
@@ -16,13 +18,45 @@ Content-Type: application/json
     "email": "estaban.campuzano@example.com",
     "active": true
 }
-###
+### Borrado de un alumno
 DELETE  http://127.0.0.1:5000/alumnos/4
 
-###
+### Edicion de un alumno
 PATCH http://127.0.0.1:5000/alumnos/4
 Content-Type: application/json
 
+    {
+    "email" : "carlos.lopezdadf@gmail.com"
+    }
+
+#################### TUTORES ################
+
+### Obtencion de todos los tutores
+GET http://127.0.0.1:5000/tutores
+
+### Obtencion un tutor
+GET http://127.0.0.1:5000/tutores/4
+
+### Guardado de un tutor
+POST http://127.0.0.1:5000/tutores
+Content-Type: application/json
+
 {
+    "dni": 12000001,
+    "names": "PAPA Esteban",
+    "surnames": "Tomatote",
+    "address": "Calle Principal, 123",
+    "email": "papa.esteban.tomatote@example.com",
+    "student_id":1,
+    "active": true
+}
+### Borrado de un tutor
+DELETE  http://127.0.0.1:5000/tutores/4
+
+### Edicion de un tutor
+PATCH http://127.0.0.1:5000/tutores/4
+Content-Type: application/json
+
+    {
     "email" : "carlos.lopezdadf@gmail.com"
     }
