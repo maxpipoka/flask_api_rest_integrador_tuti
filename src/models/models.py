@@ -5,6 +5,13 @@ from sqlalchemy.orm import relationship
 
 db = SQLAlchemy()
 
+# Tabla intermedia para la relación muchos a muchos
+students_tutors = db.Table(
+    'students_tutors',
+    db.Column('student_id', db.Integer, db.ForeignKey('students.id')),
+    db.Column('tutor_id', db.Integer, db.ForeignKey('tutors.id'))
+)
+
 @dataclass
 class Student(db.Model):
     __tablename__ = 'students'
@@ -43,7 +50,7 @@ class Tutor(db.Model):
     address = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
     students = relationship('Student', secondary=students_tutors, back_populates='tutors')
-    student_id= db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=True)
+    student_id= db.Column(db.Integer(), db.ForeignKey('students.id'), nullable=True)
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
@@ -91,8 +98,8 @@ class Attendance(db.Model):
     __tablename__ = 'attendances'
 
     id = db.Column(db.Integer(), primary_key=True)
-    course_id = db.Column(db.Integer(), db.ForeignKey('course.id'), nullable=False)
-    student_id = db.Column(db.Integer(), db.ForeignKey('student.id'), nullable=False)
+    course_id = db.Column(db.Integer(), db.ForeignKey('courses.id'), nullable=False)
+    student_id = db.Column(db.Integer(), db.ForeignKey('students.id'), nullable=False)
     day = db.Column(db.DateTime(), nullable=False)
     state = db.Column(db.Boolean(),  default=False, nullable=False)
     createdAt = db.Column(db.DateTime(), nullable=False)
@@ -111,9 +118,3 @@ class Attendance(db.Model):
         return f'{self.course_id} - {self.student_id} - {self.day}'
     
 
-# Tabla intermedia para la relación muchos a muchos
-students_tutors = db.Table(
-    'students_tutors',
-    db.Column('student_id', db.Integer, db.ForeignKey('students.id')),
-    db.Column('tutor_id', db.Integer, db.ForeignKey('tutors.id'))
-)

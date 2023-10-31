@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, request, jsonify
 from flask_marshmallow import Marshmallow
+from flask_migrate import Migrate
 from dotenv import load_dotenv
 
 from sqlalchemy import select
@@ -26,6 +27,8 @@ app.config['SQLALCHEMY_ECHO'] = True
 
 db.init_app(app)
 ma = Marshmallow(app)
+
+migrate = Migrate(app, db)
 
 app.register_blueprint(alumnos_bp)
 app.register_blueprint(tutores_bp)
