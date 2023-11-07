@@ -13,21 +13,6 @@ bp = Blueprint('alumnos', __name__)
 student_schema = StudentSchema()
 students_schema = StudentSchema(many=True)
 
-#Funcion para serializar un alumno
-def student_to_dict(student):
-    return {
-        'id': student.id,
-        'dni': student.dni,
-        'names': student.names,
-        'surnames' : student.surnames,
-        'address': student.address,
-        'email': student.email,
-        'tutors': student.tutors,
-        'createdAt': student.createdAt,
-        'updatedAt': student.updatedAt,
-        'active': student.active
-    }
-
 # Definicion endpoint obtiene todos los alumnos
 @bp.route('/alumnos', methods=['GET'])
 def getAllAlumnos():
@@ -40,24 +25,13 @@ def getAllAlumnos():
     if not allStudents:
         return Response({"message":"No se pueden obtener los alumnos"}), 400
 
-    # serialized_students = students_schema.dump(allStudents)
-
-    serialized_students = [student_to_dict(student) for student in allStudents]
+    serialized_students = [student.as_dict() for student in allStudents]
     print('--------------------------------')
     print(serialized_students)
     print('--------------------------------')
 
-    students_to_json = json.dumps(serialized_students)
-    # print('--------------------------------B')
-    # print(students_to_json)
-    # print('--------------------------------B')
-
-    # response_data = json.dumps(serialized_students, ensure_ascii=False)
-    # response_data = jsonify(serialized_students), 200
-
-    # return Response(response_data, content_type='application/json; charset=utf-8'), 200
-    # return jsonify(serialized_students), 200
-    return Response({'alumnos':serialized_students, 'message':'success'}), 200
+    # students_to_json = json.dumps(serialized_students)
+    return jsonify(serialized_students), 200
 
 
 # Definicion endpoint obtiene un solo alumno filtrado por id

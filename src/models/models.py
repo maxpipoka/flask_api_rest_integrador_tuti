@@ -39,6 +39,24 @@ class Student(db.Model):
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
     
+    #Funcion para serializar un alumno
+    def as_dict(self):
+
+        tutors_list = [tutor.as_dict() for tutor in self.tutors]
+
+        return {
+            'id': self.id,
+            'dni': self.dni,
+            'names': self.names,
+            'surnames': self.surnames,
+            'address': self.address,
+            'email': self.email,
+            'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
+            'active': self.active,
+            'tutors': tutors_list
+        }
+    
 @dataclass    
 class Tutor(db.Model):
     __tablename__ = 'tutors'
@@ -67,6 +85,22 @@ class Tutor(db.Model):
 
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
+    
+    def as_dict(self):
+
+        # students_list = [student.as_dict() for student in self.students]
+        return {
+            'id': self.id,
+            'dni': self.dni,
+            'names': self.names,
+            'surnames': self.surnames,
+            'address': self.address,
+            'email': self.email,
+            # 'students': students_list,
+            'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
+            'active': self.active
+        }
 
 
 class Course(db.Model):

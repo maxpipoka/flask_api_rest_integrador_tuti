@@ -24,11 +24,10 @@ def getAllTutors():
     if not allTutors:
         return Response({"message": "No se pueden obtener los tutores"}), 400
     
-    serialized_tutors = tutors_schema.dump(allTutors)
+    serialized_tutors = [tutor.as_dict() for tutor in allTutors]
 
-    response_data = json.dumps(serialized_tutors, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 200
+    return jsonify(serialized_tutors), 200
 
 
 # Definición endpoint obtiene un solo alumno filtrado por id
