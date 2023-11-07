@@ -111,6 +111,8 @@ def saveTuror():
 def editTutor(id):
     try:
         foundTutor = Tutor.query.get(id)
+        print('-------tutor encontrado')
+        print(foundTutor)
     except:
         return Response({"message":"No se pudo obtener el tutor"}), 204
     
@@ -143,6 +145,10 @@ def editTutor(id):
 
         if 'active' in data:
             foundTutor.active = data['active']
+            updated = True
+
+        if 'student_id' in data:
+            foundTutor.student_id = data['student_id']
             updated = True
 
         if updated:

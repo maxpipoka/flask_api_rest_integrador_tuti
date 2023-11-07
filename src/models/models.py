@@ -50,7 +50,7 @@ class Tutor(db.Model):
     address = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
     students = relationship('Student', secondary=students_tutors, back_populates='tutors')
-    student_id= db.Column(db.Integer(), db.ForeignKey('students.id'), nullable=True)
+    # student_id= db.Column(db.Integer(), db.ForeignKey('students.id'), nullable=True)
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)

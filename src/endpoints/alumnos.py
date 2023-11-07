@@ -3,7 +3,7 @@ import json
 
 from flask import Response, Blueprint, request, jsonify
 
-from ..models.models import Student, db
+from ..models.models import Student, Tutor, db
 
 from .schemas import StudentSchema
 
@@ -12,6 +12,21 @@ bp = Blueprint('alumnos', __name__)
 # Definición de atajos de serializador
 student_schema = StudentSchema()
 students_schema = StudentSchema(many=True)
+
+#Funcion para serializar un alumno
+def student_to_dict(student):
+    return {
+        'id': student.id,
+        'dni': student.dni,
+        'names': student.names,
+        'surnames' : student.surnames,
+        'address': student.address,
+        'email': student.email,
+        'tutors': student.tutors,
+        'createdAt': student.createdAt,
+        'updatedAt': student.updatedAt,
+        'active': student.active
+    }
 
 # Definicion endpoint obtiene todos los alumnos
 @bp.route('/alumnos', methods=['GET'])
@@ -25,11 +40,24 @@ def getAllAlumnos():
     if not allStudents:
         return Response({"message":"No se pueden obtener los alumnos"}), 400
 
-    serialized_students = students_schema.dump(allStudents)
+    # serialized_students = students_schema.dump(allStudents)
 
-    response_data = json.dumps(serialized_students, ensure_ascii=False)
+    serialized_students = [student_to_dict(student) for student in allStudents]
+    print('--------------------------------')
+    print(serialized_students)
+    print('--------------------------------')
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 200
+    students_to_json = json.dumps(serialized_students)
+    # print('--------------------------------B')
+    # print(students_to_json)
+    # print('--------------------------------B')
+
+    # response_data = json.dumps(serialized_students, ensure_ascii=False)
+    # response_data = jsonify(serialized_students), 200
+
+    # return Response(response_data, content_type='application/json; charset=utf-8'), 200
+    # return jsonify(serialized_students), 200
+    return Response({'alumnos':serialized_students, 'message':'success'}), 200
 
 
 # Definicion endpoint obtiene un solo alumno filtrado por id
@@ -111,6 +139,7 @@ def saveStudent():
         return jsonify({'message':'No se puede commit'}), 400
 
 
+# Definicionn endpoint edicion alumno
 @bp.route('/alumnos/<id>', methods=['PATCH'])
 def editAlumno(id):
     try:
@@ -164,3 +193,26 @@ def editAlumno(id):
     return Response(response_data, content_type='application/json; charset=utf-8'), 201
 
 
+# Definición endpoint para asociar tutores al alumno
+@bp.route('/alumnos/<int:alumno_id>/tutores/<int:tutor_id>', methods=['POST'])
+def associate_tutor_with_student(alumno_id, tutor_id):
+    try:
+        # Buscar el estudiante y el tutor en la base de datos
+        student = Student.query.get(alumno_id)
+        tutor = Tutor.query.get(tutor_id)
+        
+        if not student or not tutor:
+            return Response("No se encontró el estudiante o el tutor", status=404)
+        
+        # Verificar si la relación ya existe
+        if tutor in student.tutors:
+            return Response("La relación entre el estudiante y el tutor ya existe", status=400)
+        
+        # Asociar el tutor con el estudiante
+        student.tutors.append(tutor)
+        db.session.commit()
+        
+        return Response("La relación entre el estudiante y el tutor se ha establecido con éxito", status=200)
+    
+    except Exception as e:
+        return Response(f"Error al asociar el tutor con el estudiante: {str(e)}", status=500)

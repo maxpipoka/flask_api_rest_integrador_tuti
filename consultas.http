@@ -42,7 +42,7 @@ POST http://127.0.0.1:5000/tutores
 Content-Type: application/json
 
 {
-    "dni": 12000001,
+    "dni": 12000002,
     "names": "PAPA Esteban",
     "surnames": "Tomatote",
     "address": "Calle Principal, 123",
@@ -54,9 +54,12 @@ Content-Type: application/json
 DELETE  http://127.0.0.1:5000/tutores/4
 
 ### Edicion de un tutor
-PATCH http://127.0.0.1:5000/tutores/4
+PATCH http://127.0.0.1:5000/tutores/1
 Content-Type: application/json
 
     {
-    "email" : "carlos.lopezdadf@gmail.com"
+    "student_id" : [1, 2]
     }
+
+### Asignacion de tutor a un alumno
+POST http://127.0.0.1:5000/alumnos/1/tutores/1
