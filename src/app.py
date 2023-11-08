@@ -12,6 +12,7 @@ from .models.models import db
 
 from .endpoints.alumnos import bp as alumnos_bp
 from .endpoints.tutores import bp as tutores_bp
+from .endpoints.courses import bp as courses_bp
 
 
 # Carga de las variables de entorno desde el .env
@@ -32,6 +33,7 @@ migrate = Migrate(app, db)
 
 app.register_blueprint(alumnos_bp)
 app.register_blueprint(tutores_bp)
+app.register_blueprint(courses_bp)
 
 # Definicion endpoint del index
 @app.get('/')

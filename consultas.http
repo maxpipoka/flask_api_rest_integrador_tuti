@@ -63,3 +63,36 @@ Content-Type: application/json
 
 ### Asignacion de tutor a un alumno
 POST http://127.0.0.1:5000/alumnos/1/tutores/1
+
+
+
+#################### CURSOS ################
+
+### Obtencion todos los cursos
+GET http://127.0.0.1:5000/cursos
+
+### Obtencion un curso por id
+GET http://127.0.0.1:5000/cursos/id
+
+### Guardado de un curso
+POST http://127.0.0.1:5000/cursos
+Content-Type: application/json
+
+{
+    "level": 1,
+    "division": "A",
+    "year": 2023,
+    "current": True,
+    "active": True
+}
+
+### Borrado de un curso
+DELETE http://127.0.0.1:5000/cursos/1
+
+### Edicion de un curso
+PATCH http://127.0.0.1:5000/cursos/1
+Content-Type: application/json
+
+{
+    "year": 2022
+}

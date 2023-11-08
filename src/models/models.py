@@ -127,6 +127,20 @@ class Course(db.Model):
     def __repr__(self):
         return f'{self.year} - {self.level} - {self.division}'
     
+    #Funcion para serializar un curso
+    def as_dict(self):
+
+        return {
+            'id': self.id,
+            'level': self.level,
+            'division': self.division,
+            'year': self.year,
+            'current': self.current,
+            'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'active': self.active
+        }
+    
 
 class Attendance(db.Model):
     __tablename__ = 'attendances'
@@ -150,5 +164,20 @@ class Attendance(db.Model):
 
     def __repr__(self):
         return f'{self.course_id} - {self.student_id} - {self.day}'
+    
+
+    #Funcion para serielizar una asistencia
+    def as_dict(self):
+        
+        return {
+            'id': self.id,
+            'course_id': self.course_id,
+            'student_id': self.student_id,
+            'day': self.day,
+            'state': self.state,
+            'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'updatedAt': self.updatedAtAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'active': self.active
+        }
     
 

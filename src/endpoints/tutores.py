@@ -47,7 +47,7 @@ def getOneTutor(id):
 
 # Definicion endpoint que borra un tutor, cambia el activo
 @bp.route('/tutores/<id>', methods=['DELETE'])
-def deleteOneTutor(id):
+def deleteTutor(id):
     try:
         foundedTutor = Tutor.query.get(id)
     except:
@@ -57,7 +57,9 @@ def deleteOneTutor(id):
         foundedTutor.active = False
         foundedTutor.updatedAt = datetime.now()
         db.session.commit()
+        
     except:
+        db.session.rollback()  # Revertir la transacción en caso de error
         return Response({"message":"No se pudo borrar el tutor"}), 400
     
     serialized_tutor = tutor_schema.dump(foundedTutor)

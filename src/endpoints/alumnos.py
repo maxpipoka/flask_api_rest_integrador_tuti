@@ -26,24 +26,21 @@ def getAllAlumnos():
         return Response({"message":"No se pueden obtener los alumnos"}), 400
 
     serialized_students = [student.as_dict() for student in allStudents]
-    print('--------------------------------')
-    print(serialized_students)
-    print('--------------------------------')
 
-    # students_to_json = json.dumps(serialized_students)
     return jsonify(serialized_students), 200
 
 
 # Definicion endpoint obtiene un solo alumno filtrado por id
 @bp.route('/alumnos/<id>', methods=['GET'])
 def getOneAlumno(id):
+    
     try:
         foundStudent = Student.query.get(id)
     except:
         return Response({"message":"No se pudo obtener el alumno"}), 404
     
     if not foundStudent:
-        return Response({"message":"El alumno no existe"}), 404
+        return Response({"message":"El alumno no existe"}), 400
 
     serialized_student = student_schema.dump(foundStudent)
 
@@ -54,7 +51,7 @@ def getOneAlumno(id):
 
 # Definicion endpoint 'borra' un alumno, cambia el activo
 @bp.route('/alumnos/<id>', methods=['DELETE'])
-def deteleOneAlumno(id):
+def deteleAlumno(id):
     try:
         foundStudent = Student.query.get(id)
     except:
@@ -62,15 +59,18 @@ def deteleOneAlumno(id):
     
     try:
         foundStudent.active = False
+        foundStudent.updatedAt = datetime.now
         db.session.commit()
+
     except:
+        db.session.rollback()  # Revertir la transacción en caso de error
         return Response({"message":"No se pudo modificar el alumno"}), 204
 
     serialized_student = student_schema.dump(foundStudent)
 
     response_data = json.dumps(serialized_student, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 200
+    return Response(response_data, content_type='application/json; charset=utf-8'), 201
 
 
 # Definicionn endpoint creacion alumno
@@ -80,7 +80,7 @@ def saveStudent():
     newStudent = None
 
     if not request.json:
-        return jsonify({'message': 'JSON data is missing or invalid'}), 400
+        return Response({'message': 'JSON data is missing or invalid'}), 400
 
     try:
         newStudent = Student(
@@ -108,9 +108,10 @@ def saveStudent():
     try:
         # Confirmación de las operaciones creadas en la session
         db.session.commit()
-        return jsonify({'message':'Success'}), 201
+        return Response({'message':'Success'}), 201
+    
     except:
-        return jsonify({'message':'No se puede commit'}), 400
+        return Response({'message':'No se puede commit'}), 400
 
 
 # Definicionn endpoint edicion alumno
