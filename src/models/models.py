@@ -27,6 +27,7 @@ class Student(db.Model):
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
+
     def __init__(self, dni, names, surnames, address, email, active):
         self.dni = dni
         self.names = names
@@ -116,13 +117,13 @@ class Course(db.Model):
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    def __init__(self, **kwargs):
-        self.level = kwargs.level
-        self.division = kwargs.division
-        self.year = kwargs.year
-        self.current = kwargs.current
+    def __init__(self, level, division, year, current, active):
+        self.level = level
+        self.division = division
+        self.year = year
+        self.current = current
         self.createdAt = datetime.now()
-        self.active = kwargs.active
+        self.active = active
 
     def __repr__(self):
         return f'{self.year} - {self.level} - {self.division}'
@@ -137,7 +138,7 @@ class Course(db.Model):
             'year': self.year,
             'current': self.current,
             'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
-            'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
             'active': self.active
         }
     
@@ -154,13 +155,13 @@ class Attendance(db.Model):
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    def __init__(self, **kwargs):
-        self.course_id = kwargs.course_id
-        self.student_id = kwargs.student_id
-        self.day = kwargs.day
-        self.state = kwargs.state
+    def __init__(self, course_id, student_id, day, state, active):
+        self.course_id = course_id
+        self.student_id = student_id
+        self.day = day
+        self.state = state
         self.createdAt = datetime.now()
-        self.active = kwargs.active
+        self.active = active
 
     def __repr__(self):
         return f'{self.course_id} - {self.student_id} - {self.day}'
@@ -176,7 +177,7 @@ class Attendance(db.Model):
             'day': self.day,
             'state': self.state,
             'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
-            'updatedAt': self.updatedAtAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'updatedAt': self.updatedAtAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
             'active': self.active
         }
     

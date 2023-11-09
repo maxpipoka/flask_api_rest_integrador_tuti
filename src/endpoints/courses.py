@@ -26,7 +26,7 @@ def getAllCourses():
 
 # Definicion endpoint obtiene un solo curso filtrado por id
 @bp.route('/cursos/<id>', methods=['GET'])
-def getOneCourse(id):
+def getCourse(id):
     
     try:
         foundCourse = Course.query.get(id)
@@ -83,8 +83,6 @@ def saveCourse():
             current = request.json['current'],
             active = request.json['active']
         )
-
-        print(newCourse)
 
     except KeyError as e:
         return jsonify({'message1': f'Missing field: {e.args[0]}'}), 400
