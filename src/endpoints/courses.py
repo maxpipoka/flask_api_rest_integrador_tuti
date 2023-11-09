@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Response, Blueprint, request, jsonify
 
-from ..models.models import Course, db
+from ..models.models import Course, Student, db
 
 bp = Blueprint('cursos', __name__)
 
@@ -43,7 +43,7 @@ def getCourse(id):
 
 
 # Definicion endpoint 'borra' un curso, cambio el activo
-@bp.route('/cursos/', methods=['DELETE'])
+@bp.route('/cursos/<int:id>', methods=['DELETE'])
 def deleteCourse(id):
 
     try:
@@ -65,6 +65,34 @@ def deleteCourse(id):
 
     return jsonify(serialized_course), 201
 
+
+# Definicion endpoint asignacion de alumno al curso
+@bp.route('/cursos/<int:course_id>/alumno/<int:student_id>', methods=['POST'])
+def asociateStudentToCourse(course_id, student_id):
+    
+    try:
+        # Busqueda de las instancias
+        student = Student.query.get(student_id)
+        course = Course.query.get(course_id)
+
+    except:
+        return Response({'message':'No se pueden encontrar las instancias'}), 400
+    
+    if not student or not course:
+        return Response({'message':'Student o Course son invalidos'}), 400
+    
+    if student in course.students:
+        return Response({'message':'El alumno ya se encuentra asignado'}), 400
+    
+    try:
+        # Asociación del alumno con el curso
+        course.students.append(student)
+        db.session.commit()
+
+    except:
+        return Response({'message':'No se pudo asignar el alumno al curso'}), 400
+    
+    return Response({'message':'La asociación del alumno con el curso se realizó con éxito'}), 200
 
 # Definicion endpoint creacion curso
 @bp.route('/cursos', methods=['POST'])

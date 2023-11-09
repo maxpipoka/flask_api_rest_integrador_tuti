@@ -87,7 +87,7 @@ Content-Type: application/json
 }
 
 ### Borrado de un curso
-DELETE http://127.0.0.1:5000/cursos/1
+DELETE http://127.0.0.1:5000/cursos/2
 
 ### Edicion de un curso
 PATCH http://127.0.0.1:5000/cursos/1
@@ -96,3 +96,6 @@ Content-Type: application/json
 {
     "year": 2022
 }
+
+### Asociar alumno a un curso
+POST http://127.0.0.1:5000/cursos/1/alumno/2
