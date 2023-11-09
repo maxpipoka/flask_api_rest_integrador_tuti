@@ -87,11 +87,11 @@ def saveCourse():
         print(newCourse)
 
     except KeyError as e:
-        return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
+        return jsonify({'message1': f'Missing field: {e.args[0]}'}), 400
     except Exception as e:
-        return jsonify({'message': f'Error: {str(e)}'}), 400
+        return jsonify({'message2': f'Error: {str(e)}'}), 400
     except:
-        return jsonify({'message':'No se puede crear la instancia'}), 400
+        return jsonify({'message3':'No se puede crear la instancia'}), 400
     
 
     try:

@@ -82,8 +82,8 @@ Content-Type: application/json
     "level": 1,
     "division": "A",
     "year": 2023,
-    "current": True,
-    "active": True
+    "current": true,
+    "active": true
 }
 
 ### Borrado de un curso
