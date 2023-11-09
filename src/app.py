@@ -10,8 +10,8 @@ from dataclasses import dataclass
 
 from .models.models import db
 
-from .endpoints.alumnos import bp as alumnos_bp
-from .endpoints.tutores import bp as tutores_bp
+from .endpoints.students import bp as alumnos_bp
+from .endpoints.tutors import bp as tutores_bp
 from .endpoints.courses import bp as courses_bp
 
 

@@ -18,7 +18,7 @@ students_schema = StudentSchema(many=True)
 def getAllAlumnos():
 
     try:
-        allStudents = Student.query.filter(Student.active == True)
+        allStudents = Student.query.filter(Student.active == True).order_by(Student.id)
     except:
         return Response({"message":"No se pudieron obtener alumnos"}), 404
     

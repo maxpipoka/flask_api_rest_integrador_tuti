@@ -4,16 +4,16 @@
 GET http://127.0.0.1:5000/alumnos
 
 ### Obtencion un alumno
-GET http://127.0.0.1:5000/alumnos/4
+GET http://127.0.0.1:5000/alumnos/2
 
 ### Guardado de un alumno
 POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-    "dni": 43234234,
+    "dni": 30000001,
     "names": "Esteban",
-    "surnames": "Campusano",
+    "surnames": "Quito",
     "address": "Calle Principal, 123",
     "email": "estaban.campuzano@example.com",
     "active": true
@@ -35,7 +35,7 @@ Content-Type: application/json
 GET http://127.0.0.1:5000/tutores
 
 ### Obtencion un tutor
-GET http://127.0.0.1:5000/tutores/4
+GET http://127.0.0.1:5000/tutores/3
 
 ### Guardado de un tutor
 POST http://127.0.0.1:5000/tutores

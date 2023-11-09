@@ -17,7 +17,7 @@ tutors_schema = TutorSchema(many=True)
 @bp.route('/tutores', methods=['GET'])
 def getAllTutors():
     try:
-        allTutors = Tutor.query.filter(Tutor.active == True)
+        allTutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
     except:
         return Response({"message": "No se puede obtener los tutores"}), 400
     

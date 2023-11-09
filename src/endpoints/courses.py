@@ -11,7 +11,7 @@ bp = Blueprint('cursos', __name__)
 def getAllCourses():
 
     try:
-        allCourses = Course.query.filter(Course.active == True)
+        allCourses = Course.query.filter(Course.active == True).order_by(Course.id)
 
     except:
         return Response({'message':'No se pudieron obtener los cursos'}), 404
