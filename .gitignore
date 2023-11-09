@@ -3,3 +3,10 @@ env
 /env
 /env/
 .vercel
+
+*/_pycache_
+src/__pycache__
+models/__pycache__
+
+
+
