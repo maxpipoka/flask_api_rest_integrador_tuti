@@ -26,7 +26,9 @@ class Student(db.Model):
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
-
+    # attendances = relationship('Attendance', back_populates='student')
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=True)
+    course = relationship('Course', back_populates='students')
 
     def __init__(self, dni, names, surnames, address, email, active):
         self.dni = dni
@@ -107,6 +109,8 @@ class Tutor(db.Model):
 class Course(db.Model):
     __tablename__ = 'courses'
 
+    
+
     id = db.Column(db.Integer(), primary_key=True)
     level = db.Column(db.Integer(), nullable=False)
     division = db.Column(db.String(1), nullable=False)
@@ -116,6 +120,8 @@ class Course(db.Model):
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+    # attendances = relationship('Attendance', back_populates='course')
+    students = relationship('Student', back_populates='course')
 
     def __init__(self, level, division, year, current, active):
         self.level = level
@@ -131,6 +137,8 @@ class Course(db.Model):
     #Funcion para serializar un curso
     def as_dict(self):
 
+        students_list = [student.as_dict() for student in self.students]
+
         return {
             'id': self.id,
             'level': self.level,
@@ -139,7 +147,8 @@ class Course(db.Model):
             'current': self.current,
             'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
             'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
-            'active': self.active
+            'active': self.active,
+            'students': students_list
         }
     
 
