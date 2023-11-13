@@ -15,9 +15,9 @@ tutors_schema = TutorSchema(many=True)
 
 # Definicion endpoint obtiene todos los tutores
 @bp.route('/tutores', methods=['GET'])
-def getAllTutors():
+def getTutors():
     try:
-        allTutors = Tutor.query.filter(Tutor.active == True)
+        allTutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
     except:
         return Response({"message": "No se puede obtener los tutores"}), 400
     
@@ -32,7 +32,7 @@ def getAllTutors():
 
 # Definición endpoint obtiene un solo alumno filtrado por id
 @bp.route('/tutores/<id>', methods=['GET'])
-def getOneTutor(id):
+def getTutorById(id):
     try:
         foundedTutor = Tutor.query.get(id)
     except:
@@ -109,7 +109,7 @@ def saveTuror():
     
 
 @bp.route('/tutores/<id>', methods=['PATCH'])
-def editTutor(id):
+def updateTutor(id):
     try:
         foundTutor = Tutor.query.get(id)
         print('-------tutor encontrado')
