@@ -1,12 +1,120 @@
-### Consulta para crear un alumno
+#################### ALUMNOS ################
+
+### Obtencion de todos los alumnos
+GET http://127.0.0.1:5000/alumnos
+
+### Obtencion un alumno
+GET http://127.0.0.1:5000/alumnos/2
+
+### Guardado de un alumno
 POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-    "dni": 12345678,
-    "names": "Juan",
-    "surnames": "Pérez",
+    "dni": 30000001,
+    "names": "Esteban",
+    "surnames": "Quito",
     "address": "Calle Principal, 123",
-    "email": "juan.perez@example.com",
+    "email": "estaban.campuzano@example.com",
+    "active": true
+}
+### Borrado de un alumno
+DELETE  http://127.0.0.1:5000/alumnos/4
+
+### Edicion de un alumno
+PATCH http://127.0.0.1:5000/alumnos/4
+Content-Type: application/json
+
+    {
+    "email" : "carlos.lopezdadf@gmail.com"
+    }
+
+#################### TUTORES ################
+
+### Obtencion de todos los tutores
+GET http://127.0.0.1:5000/tutores
+
+### Obtencion un tutor
+GET http://127.0.0.1:5000/tutores/3
+
+### Guardado de un tutor
+POST http://127.0.0.1:5000/tutores
+Content-Type: application/json
+
+{
+    "dni": 12000002,
+    "names": "PAPA Esteban",
+    "surnames": "Tomatote",
+    "address": "Calle Principal, 123",
+    "email": "papa.esteban.tomatote@example.com",
+    "student_id":1,
+    "active": true
+}
+### Borrado de un tutor
+DELETE  http://127.0.0.1:5000/tutores/4
+
+### Edicion de un tutor
+PATCH http://127.0.0.1:5000/tutores/1
+Content-Type: application/json
+
+    {
+    "student_id" : [1, 2]
+    }
+
+### Asignacion de tutor a un alumno
+POST http://127.0.0.1:5000/alumnos/1/tutores/1
+
+
+
+#################### CURSOS ################
+
+### Obtencion todos los cursos
+GET http://127.0.0.1:5000/cursos
+
+### Obtencion un curso por id
+GET http://127.0.0.1:5000/cursos/id
+
+### Guardado de un curso
+POST http://127.0.0.1:5000/cursos
+Content-Type: application/json
+
+{
+    "level": 1,
+    "division": "A",
+    "year": 2023,
+    "current": true,
+    "active": true
+}
+
+### Borrado de un curso
+DELETE http://127.0.0.1:5000/cursos/2
+
+### Edicion de un curso
+PATCH http://127.0.0.1:5000/cursos/1
+Content-Type: application/json
+
+{
+    "year": 2022
+}
+
+### Asociar alumno a un curso
+POST http://127.0.0.1:5000/cursos/1/alumno/2
+
+
+
+#################### ASISTENCIA ################
+
+### Obtener todas las asistencias
+GET http://127.0.0.1:5000/asistencias
+
+#### Definir endpoint para crear una asistencia
+
+POST http://127.0.0.1:5000/asistencias
+Content-Type: application/json
+
+{
+    "course_id": 1,
+    "student_id": 1,
+    "state": true,
     "active": true
 }
