@@ -25,7 +25,7 @@ def getAttendances():
 
 
 # Definicion endpoint obtencion una asistencia por id
-@bp.route('/asistencia/<int:id>', methods=['GET'])
+@bp.route('/asistencias/<int:id>', methods=['GET'])
 def getAttendanceById(id):
 
     try:
@@ -43,7 +43,7 @@ def getAttendanceById(id):
 
 
 # Definicion endpoint borrado de asistencia, cambio el activo
-@bp.route('/asistencia/<int:id>', methods=['DELETE'])
+@bp.route('/asistencias/<int:id>', methods=['DELETE'])
 def deleteAttendance(id):
 
     try:
@@ -67,21 +67,22 @@ def deleteAttendance(id):
 
 
 # Definicion endpoint creacion asistencia
-@bp.route('/asistencia', methods=['POST'])
+@bp.route('/asistencias', methods=['POST'])
 def saveAttendance():
 
     newAttendance = None
+    print(request.get_json())
 
     if not request.json:
         return Response({'message':'JSON data is missing of invalid'}), 400
     
     try:
-        newAttendance: Attendance(
+        newAttendance = Attendance(
             course_id = request.json['course_id'],
             student_id = request.json['student_id'],
-            day = datetime.now(),
             state = request.json['state'],
-            active = request.json['active']
+            active = request.json['active'],
+            day = datetime.now()
         )
 
     except KeyError as e:
@@ -107,7 +108,7 @@ def saveAttendance():
     
 
 # Definicion endpoint edicion asistencia
-@bp.route('/asistencia/<int:id>', methods=['PATCH'])
+@bp.route('/asistencias/<int:id>', methods=['PATCH'])
 def updateAttendance(id):
 
     try:

@@ -99,3 +99,22 @@ Content-Type: application/json
 
 ### Asociar alumno a un curso
 POST http://127.0.0.1:5000/cursos/1/alumno/2
+
+
+
+#################### ASISTENCIA ################
+
+### Obtener todas las asistencias
+GET http://127.0.0.1:5000/asistencias
+
+#### Definir endpoint para crear una asistencia
+
+POST http://127.0.0.1:5000/asistencias
+Content-Type: application/json
+
+{
+    "course_id": 1,
+    "student_id": 1,
+    "state": true,
+    "active": true
+}
