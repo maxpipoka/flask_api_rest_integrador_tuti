@@ -8,13 +8,13 @@ bp = Blueprint('cursos', __name__)
 
 # Definicion endpoint obtiene todos los cursos
 @bp.route('/cursos', methods=['GET'])
-def getAllCourses():
+def getCourses():
 
     try:
-        allCourses = Course.query.filter(Course.active == True)
+        allCourses = Course.query.filter(Course.active == True).order_by(Course.id)
 
     except:
-        return Response({'message':'No se pudieron obtener los cursos'}), 404
+        return Response({'message':'No se pueden obtener los cursos'}), 404
     
     if not allCourses:
         return Response({'message':'No se pueden obtener los cursos'}), 400
@@ -26,7 +26,7 @@ def getAllCourses():
 
 # Definicion endpoint obtiene un solo curso filtrado por id
 @bp.route('/cursos/<id>', methods=['GET'])
-def getCourse(id):
+def getCourseById(id):
     
     try:
         foundCourse = Course.query.get(id)
@@ -68,7 +68,7 @@ def deleteCourse(id):
 
 # Definicion endpoint asignacion de alumno al curso
 @bp.route('/cursos/<int:course_id>/alumno/<int:student_id>', methods=['POST'])
-def asociateStudentToCourse(course_id, student_id):
+def asociate_student_to_course(course_id, student_id):
     
     try:
         # Busqueda de las instancias
@@ -124,7 +124,7 @@ def saveCourse():
         db.session.add(newCourse)
 
     except:
-        return jsonify({'message':'No se pudo ADD curso'}), 400
+        return Response({'message':'No se pudo ADD curso'}), 400
     
     try:
         # Confirmacion de las operaciones creadas en la sesion
@@ -138,7 +138,7 @@ def saveCourse():
 
 # Definicion endpoint edicion curso
 @bp.route('/cursos/<id>', methods=['PATCH'])
-def editCourse(id):
+def updateCourse(id):
 
     try:
         foundCourse = Course.query.get(id)

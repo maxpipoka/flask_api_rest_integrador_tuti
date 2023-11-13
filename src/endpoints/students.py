@@ -15,10 +15,10 @@ students_schema = StudentSchema(many=True)
 
 # Definicion endpoint obtiene todos los alumnos
 @bp.route('/alumnos', methods=['GET'])
-def getAllAlumnos():
+def getStudents():
 
     try:
-        allStudents = Student.query.filter(Student.active == True)
+        allStudents = Student.query.filter(Student.active == True).order_by(Student.id)
     except:
         return Response({"message":"No se pudieron obtener alumnos"}), 404
     
@@ -32,7 +32,7 @@ def getAllAlumnos():
 
 # Definicion endpoint obtiene un solo alumno filtrado por id
 @bp.route('/alumnos/<id>', methods=['GET'])
-def getOneAlumno(id):
+def getStudentById(id):
     
     try:
         foundStudent = Student.query.get(id)
@@ -51,7 +51,7 @@ def getOneAlumno(id):
 
 # Definicion endpoint 'borra' un alumno, cambia el activo
 @bp.route('/alumnos/<id>', methods=['DELETE'])
-def deteleAlumno(id):
+def deteleStudent(id):
     try:
         foundStudent = Student.query.get(id)
     except:
@@ -116,7 +116,7 @@ def saveStudent():
 
 # Definicionn endpoint edicion alumno
 @bp.route('/alumnos/<id>', methods=['PATCH'])
-def editAlumno(id):
+def updateStudent(id):
     try:
         foundStudent = Student.query.get(id)
     except:
