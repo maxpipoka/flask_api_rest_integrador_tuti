@@ -37,7 +37,7 @@ def getCourseById(id):
     if not foundCourse:
         return Response({'message':'El curso no existe'}), 400
     
-    serialized_course = [foundCourse.as_dict()]
+    serialized_course = foundCourse.as_dict()
 
     return jsonify(serialized_course), 200
 
