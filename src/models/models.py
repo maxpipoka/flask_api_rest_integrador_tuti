@@ -185,7 +185,7 @@ class Attendance(db.Model):
             'student_id': self.student_id,
             'day': self.day.strftime('%Y-%m-%d'),
             'state': self.state,
-            'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'createdAt': self.createdAt.strftime('%d-%m-%Y') if self.createdAt else None,
             'updatedAt': self.updatedAtAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
             'active': self.active
         }

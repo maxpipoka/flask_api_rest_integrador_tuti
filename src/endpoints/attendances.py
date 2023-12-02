@@ -76,18 +76,16 @@ def saveAttendance():
     if not request.json:
         return Response({'message':'JSON data is missing of invalid'}), 400
     
-    # Fecha en formato "dd/mm/yyyy"
-    fecha_str = datetime.now()
-    formato_fecha = "%d/%m/%Y"
+    # # Fecha en formato "dd/mm/yyyy"
+    fecha_hora_actual = datetime.now()
 
-    # Convertir la cadena de fecha a un objeto datetime
-    fecha_obj = datetime.strptime(fecha_str, formato_fecha)
-    
+    fecha_actual = fecha_hora_actual.date()
+
     try:
-        foundedAttendance = Attendance.query.filter(Attendance.active == True).filter(Attendance.student_id == request.json['student_id']).filter(Attendance.course_id == request.json['course_id']).filter(Attendance.createdAt == fecha_obj)
+        foundedAttendance = Attendance.query.filter(Attendance.active == True).filter(Attendance.student_id == request.json['student_id']).filter(Attendance.course_id == request.json['course_id']).filter(Attendance.createdAt == fecha_actual)
 
         if foundedAttendance != None:
-            return Response({'message':'Asistencia ya registrada'}), 400
+            return Response({'message':'Asistencia ya registrada'}), 406
     except:
         pass
     
