@@ -82,7 +82,7 @@ def saveAttendance():
     fecha_actual = fecha_hora_actual.date()
 
     try:
-        foundedAttendance = Attendance.query.filter(Attendance.active == True).filter(Attendance.student_id == request.json['student_id']).filter(Attendance.course_id == request.json['course_id']).filter(Attendance.createdAt == fecha_actual)
+        foundedAttendance = Attendance.query.filter(Attendance.active == True).filter(Attendance.student_id == request.json['student_id']).filter(Attendance.course_id == request.json['course_id']).filter(Attendance.day == fecha_actual)
 
         if foundedAttendance != None:
             return Response({'message':'Asistencia ya registrada'}), 406
