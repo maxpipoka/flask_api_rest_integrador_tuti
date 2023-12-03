@@ -183,10 +183,10 @@ class Attendance(db.Model):
             'id': self.id,
             'course_id': self.course_id,
             'student_id': self.student_id,
-            'day': self.day.strftime('%Y-%m-%d'),
+            'day': self.day.strftime('%d-%m-%Y'),
             'state': self.state,
             'createdAt': self.createdAt.strftime('%d-%m-%Y') if self.createdAt else None,
-            'updatedAt': self.updatedAtAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
+            'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
             'active': self.active
         }
     
