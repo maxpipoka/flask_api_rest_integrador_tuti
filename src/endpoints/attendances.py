@@ -24,6 +24,24 @@ def getAttendances():
     return jsonify(serialized_attendances), 200
 
 
+# Definicion endpoint obtiene las asistencias inactivas
+@bp.route('/asistencias/inactivas', methods=['GET'])
+def getInactiveAttendances():
+    
+    try:
+        allAttendances = Attendance.query.filter(Attendance.active == False).order_by(Attendance.id)
+
+    except:
+        return Response({'message':'No se pueden obtener las asistencias'}), 400
+    
+    if not allAttendances:
+        return Response({'message':'No se pueden obtener las asistencias'}), 400
+    
+    serialized_attendances = [attendance.as_dict() for attendance in allAttendances]
+
+    return jsonify(serialized_attendances), 200
+
+
 # Definicion endpoint obtencion una asistencia por id
 @bp.route('/asistencias/<int:id>', methods=['GET'])
 def getAttendanceById(id):
@@ -71,20 +89,25 @@ def deleteAttendance(id):
 def saveAttendance():
 
     newAttendance = None
-    print(request.get_json())
+    foundedAttendance = None
 
     if not request.json:
         return Response({'message':'JSON data is missing of invalid'}), 400
     
-    # # Fecha en formato "dd/mm/yyyy"
-    fecha_hora_actual = datetime.now()
 
-    fecha_actual = fecha_hora_actual.date()
+    fecha_actual = datetime.now().date()
 
+    # Comprobación de no guardado de una asistencia para el mismo alumno
+    # mismo curso y mismo dia.
     try:
-        foundedAttendance = Attendance.query.filter(Attendance.active == True).filter(Attendance.student_id == request.json['student_id']).filter(Attendance.course_id == request.json['course_id']).filter(Attendance.day == fecha_actual)
+        foundedAttendance = Attendance.query.filter(
+            db.cast(Attendance.day, db.Date) == fecha_actual).filter(
+            Attendance.student_id == request.json['student_id']).filter(
+            Attendance.course_id == request.json['course_id'])
 
-        if foundedAttendance != None:
+        serialized_attendances = [attendance.as_dict() for attendance in foundedAttendance]
+        
+        if serialized_attendances:
             return Response({'message':'Asistencia ya registrada'}), 406
     except:
         pass

@@ -107,6 +107,12 @@ POST http://127.0.0.1:5000/cursos/1/alumno/2
 ### Obtener todas las asistencias
 GET http://127.0.0.1:5000/asistencias
 
+### Obtener todas las asistencias inactivas
+GET http://127.0.0.1:5000/asistencias/inactivas
+
+### Borrar asistencias por id
+DELETE http://127.0.0.1:5000/asistencias/1
+
 #### Definir endpoint para crear una asistencia
 
 POST http://127.0.0.1:5000/asistencias
@@ -114,7 +120,7 @@ Content-Type: application/json
 
 {
     "course_id": 1,
-    "student_id": 1,
+    "student_id": 2,
     "state": true,
     "active": true
 }
