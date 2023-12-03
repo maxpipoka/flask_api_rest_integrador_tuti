@@ -12,6 +12,13 @@ students_tutors = db.Table(
     db.Column('tutor_id', db.Integer, db.ForeignKey('tutors.id'))
 )
 
+# Tabla intermedia para la relación muchos a muchos
+students_courses = db.Table(
+    'students_courses',
+    db.Column('student_id', db.Integer, db.ForeignKey('students.id')),
+    db.Column('course_id', db.Integer, db.ForeignKey('courses.id'))
+)
+
 @dataclass
 class Student(db.Model):
     __tablename__ = 'students'
@@ -27,8 +34,8 @@ class Student(db.Model):
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
     # attendances = relationship('Attendance', back_populates='student')
-    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=True)
-    course = relationship('Course', back_populates='students')
+    # course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=True)
+    course = relationship('Course', secondary=students_courses, back_populates='students')
 
     def __init__(self, dni, names, surnames, address, email, active):
         self.dni = dni
@@ -76,14 +83,13 @@ class Tutor(db.Model):
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    def __init__(self, dni, names, surnames, address, email, student_id, active):
+    def __init__(self, dni, names, surnames, address, email, active):
         self.dni = dni
         self.names = names
         self.surnames = surnames
         self.address = address
         self.email = email
         self.createdAt = datetime.now()
-        self.student_id = student_id
         self.active = active
 
     def __repr__(self):
@@ -121,7 +127,7 @@ class Course(db.Model):
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
     # attendances = relationship('Attendance', back_populates='course')
-    students = relationship('Student', back_populates='course')
+    students = relationship('Student', secondary=students_courses, back_populates='course')
 
     def __init__(self, level, division, year, current, active):
         self.level = level

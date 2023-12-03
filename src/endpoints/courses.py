@@ -89,7 +89,10 @@ def asociate_student_to_course(course_id, student_id):
         course.students.append(student)
         db.session.commit()
 
-    except:
+
+    except Exception as e:
+        print(f"Error during transaction: {str(e)}")
+        db.session.rollback()
         return Response({'message':'No se pudo asignar el alumno al curso'}), 400
     
     return Response({'message':'La asociación del alumno con el curso se realizó con éxito'}), 200

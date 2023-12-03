@@ -11,22 +11,22 @@ POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-    "dni": 30000001,
-    "names": "Esteban",
-    "surnames": "Quito",
-    "address": "Calle Principal, 123",
-    "email": "estaban.campuzano@example.com",
-    "active": true
-}
+        "dni": 30010000,
+        "names": "Sofía",
+        "surnames": "1C Martínez",
+        "address": "Calle Flores, 456",
+        "email": "sofia.martinez@example.com",
+        "active": true
+    }
 ### Borrado de un alumno
 DELETE  http://127.0.0.1:5000/alumnos/4
 
 ### Edicion de un alumno
-PATCH http://127.0.0.1:5000/alumnos/4
+PATCH http://127.0.0.1:5000/alumnos/17
 Content-Type: application/json
 
     {
-    "email" : "carlos.lopezdadf@gmail.com"
+    "surnames":"1A Quito"
     }
 
 #################### TUTORES ################
@@ -98,7 +98,7 @@ Content-Type: application/json
 }
 
 ### Asociar alumno a un curso
-POST http://127.0.0.1:5000/cursos/1/alumno/2
+POST http://127.0.0.1:5000/cursos/1/alumno/4
 
 
 
