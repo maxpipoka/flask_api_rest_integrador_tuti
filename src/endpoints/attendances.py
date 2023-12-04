@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Response, Blueprint, request, jsonify
 
-from ..models.models import Attendance, db
+from ..models.models import Attendance, Course, db
 
 bp= Blueprint('asistencias', __name__)
 
@@ -41,6 +41,51 @@ def getInactiveAttendances():
 
     return jsonify(serialized_attendances), 200
 
+
+# Definicion endpoint para cerra asistencia de un curso en un dia
+@bp.route('/asistencias/cerrar/<int:id>', methods=['POST'])
+def closeAttendance(id):
+
+    current_date = datetime.now().date()
+    attendances_id = []
+
+    try:
+        foundedCourse = Course.query.get(id)
+        allAttendances = Attendance.query.filter(
+             db.cast(Attendance.day, db.Date) == current_date).filter(
+            Attendance.course_id==id
+            )
+        
+        for attendance in allAttendances:
+            attendances_id.append(attendance.student_id)
+        print(' ')
+        print(current_date)    
+        print(' ')
+        print('Attendances id')
+        print(attendances_id)
+        print(' ')
+    except:
+        return Response({'message':'No se pudo obtener el curso y asistencias'}), 400
+    
+    try:
+        for student in foundedCourse.students:
+            print(student)
+            if student.id not in attendances_id:
+                newAttendance = Attendance(
+                    course_id = id,
+                    student_id = student.id,
+                    state = False,
+                    active = True,
+                    day = current_date
+                )
+                print('Se agrega 1')
+
+                db.session.add(newAttendance)
+        
+        db.session.commit()
+        return Response({'message':'Asistencia cerrada'}), 200
+    except:
+        return Response({'message':'No se pudo comprobar la asistencia'}), 400
 
 # Definicion endpoint obtencion una asistencia por id
 @bp.route('/asistencias/<int:id>', methods=['GET'])
@@ -95,13 +140,13 @@ def saveAttendance():
         return Response({'message':'JSON data is missing of invalid'}), 400
     
 
-    fecha_actual = datetime.now().date()
+    current_date = datetime.now().date()
 
     # Comprobación de no guardado de una asistencia para el mismo alumno
     # mismo curso y mismo dia.
     try:
         foundedAttendance = Attendance.query.filter(
-            db.cast(Attendance.day, db.Date) == fecha_actual).filter(
+            db.cast(Attendance.day, db.Date) ==current_date).filter(
             Attendance.student_id == request.json['student_id']).filter(
             Attendance.course_id == request.json['course_id'])
 
