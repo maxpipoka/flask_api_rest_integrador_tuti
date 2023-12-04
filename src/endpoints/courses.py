@@ -80,15 +80,18 @@ def asociate_student_to_course(course_id, student_id):
     
     if not student or not course:
         return Response({'message':'Student o Course son invalidos'}), 400
-    
-    if student in course.students:
-        return Response({'message':'El alumno ya se encuentra asignado'}), 400
+    print(' ')
+    print(course.students)
+    print(' ')
+
+    for studentIn in course.students:
+        if student.id == studentIn.id:
+            return Response({'message':'El alumno ya se encuentra asignado'}), 400
     
     try:
         # Asociación del alumno con el curso
         course.students.append(student)
         db.session.commit()
-
 
     except Exception as e:
         print(f"Error during transaction: {str(e)}")

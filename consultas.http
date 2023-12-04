@@ -11,11 +11,11 @@ POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-        "dni": 30010000,
-        "names": "Sofía",
-        "surnames": "1C Martínez",
+        "dni": 31000002,
+        "names": "Patricio",
+        "surnames": "2A Estebanez",
         "address": "Calle Flores, 456",
-        "email": "sofia.martinez@example.com",
+        "email": "patricio.estebanez@example.com",
         "active": true
     }
 ### Borrado de un alumno
@@ -98,7 +98,7 @@ Content-Type: application/json
 }
 
 ### Asociar alumno a un curso
-POST http://127.0.0.1:5000/cursos/1/alumno/4
+POST http://127.0.0.1:5000/cursos/5/alumno/51
 
 
 
@@ -124,3 +124,6 @@ Content-Type: application/json
     "state": true,
     "active": true
 }
+
+### Cerrar asistencia del dia
+POST http://127.0.0.1:5000/asistencias/cerrar/1
