@@ -88,7 +88,28 @@ def closeAttendance(id):
         return Response({'message':'No se pudo comprobar la asistencia'}), 400
 
 # Definicion endpoint obtencion de asistencias de un dia y un curso
-@bp.route('/asistencias/')
+@bp.route('/asistencias/revision/', methods=['POST'])
+def getAttendaceByDayAndCourse():
+    course_id = request.json['course_id']
+    date_to_search = request.json['date_to_search']
+
+    if not course_id or not date_to_search:
+        return Response({'message': 'No se recibio course_id o date_to_search'}), 400
+    
+    try:
+        founded_attendances = Attendance.query.filter(
+            Attendance.course_id == course_id).filter(
+            db.cast(Attendance.day, db.Date) == date_to_search)
+        
+        
+        serialized_attendance = [attendance.as_dict() for attendance in founded_attendances]
+        print(serialized_attendance)
+
+        # return Response({'message':'algo'}), 200
+        return jsonify(serialized_attendance), 200
+    except:
+        return Response({'message':'No se pudo buscar las asistencias'}), 400
+
 
 # Definicion endpoint obtencion una asistencia por id
 @bp.route('/asistencias/<int:id>', methods=['GET'])
