@@ -127,3 +127,13 @@ Content-Type: application/json
 
 ### Cerrar asistencia del dia
 POST http://127.0.0.1:5000/asistencias/cerrar/1
+
+
+### Revision Asistencia de un curso un dia especifico
+POST http://127.0.0.1:5000/asistencias/revision
+Content-Type: application/json
+
+{
+    "course_id": 1,
+    "date_to_search":"2023/12/04"
+}
