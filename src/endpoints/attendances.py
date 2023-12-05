@@ -87,6 +87,9 @@ def closeAttendance(id):
     except:
         return Response({'message':'No se pudo comprobar la asistencia'}), 400
 
+# Definicion endpoint obtencion de asistencias de un dia y un curso
+@bp.route('/asistencias/')
+
 # Definicion endpoint obtencion una asistencia por id
 @bp.route('/asistencias/<int:id>', methods=['GET'])
 def getAttendanceById(id):
