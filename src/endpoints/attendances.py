@@ -2,7 +2,7 @@ from datetime import datetime
 
 from flask import Response, Blueprint, request, jsonify
 
-from ..models.models import Attendance, Course, db
+from ..models.models import Attendance, Course, Student, db
 
 bp= Blueprint('asistencias', __name__)
 
@@ -86,6 +86,41 @@ def closeAttendance(id):
         return Response({'message':'Asistencia cerrada'}), 200
     except:
         return Response({'message':'No se pudo comprobar la asistencia'}), 400
+
+# Definicion endpoint obtencion de asistencias de un dia y un curso
+@bp.route('/asistencias/revision/', methods=['POST'])
+def getAttendaceByDayAndCourse():
+    course_id = request.json['course_id']
+    date_to_search = request.json['date_to_search']
+    founded_attendances = None
+    attendances_response = []
+
+    if not course_id or not date_to_search:
+        return Response({'message': 'No se recibio course_id o date_to_search'}), 400
+    
+    try:
+        founded_attendances = Attendance.query.filter(
+            Attendance.course_id == course_id).filter(
+            db.cast(Attendance.day, db.Date) == date_to_search).all()
+
+    except:
+        return Response({'message':'No se pudo buscar las asistencias'}), 400
+    
+    if not founded_attendances:
+        return Response({'message':'No se obtuvieron asistencias'}), 400
+    
+    if founded_attendances:
+        for attendance in founded_attendances:
+            attendance_dict = {}
+            temp_student = Student.query.get(attendance.student_id)
+            attendance_dict['names'] = temp_student.names
+            attendance_dict['surnames'] = temp_student.surnames
+            attendance_dict['state'] = attendance.state
+
+            attendances_response.append(attendance_dict)
+
+    return jsonify(attendances_response), 200
+
 
 # Definicion endpoint obtencion una asistencia por id
 @bp.route('/asistencias/<int:id>', methods=['GET'])
