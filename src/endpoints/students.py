@@ -5,13 +5,16 @@ from flask import Response, Blueprint, request, jsonify
 
 from ..models.models import Student, Tutor, db
 
-from .schemas import StudentSchema
+from .schemas import StudentSchema, TutorSchema
 
 bp = Blueprint('alumnos', __name__)
 
 # Definición de atajos de serializador
 student_schema = StudentSchema()
 students_schema = StudentSchema(many=True)
+
+tutor_schema = TutorSchema()
+tutors_schema = TutorSchema(many=True)
 
 # Definicion endpoint obtiene todos los alumnos
 @bp.route('/alumnos', methods=['GET'])
@@ -37,16 +40,17 @@ def getStudentById(id):
     try:
         foundStudent = Student.query.get(id)
     except:
-        return Response({"message":"No se pudo obtener el alumno"}), 404
+        return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     if not foundStudent:
-        return Response({"message":"El alumno no existe"}), 400
+        return jsonify({"message":"El alumno no existe"}), 400
 
     serialized_student = student_schema.dump(foundStudent)
+    # serialized_student['tutors'] = tutor_schema.dump(foundStudent.tutors)
 
-    response_data = json.dumps(serialized_student, ensure_ascii=False)
+    # response_data = json.dumps(serialized_student, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 200
+    return jsonify(serialized_student), 200
 
 
 # Definicion endpoint 'borra' un alumno, cambia el activo
