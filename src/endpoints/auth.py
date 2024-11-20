@@ -4,12 +4,17 @@ from ..models.models import User, db
 
 bp = Blueprint('auth', __name__)
 
+#Definicion endpoint que realiza verificacion de existencia de la url
+@bp.route('/auth', methods=['GET'])
+def testAuth():
+    return Response({'message':'Endpoint de autenticación'}), 200
+
 #Definicion endpoint realiza la autenticación de un usuario
 @bp.route('/auth', methods=['POST'])
 def loginUser():
 
     try:
-        foundedUser = User.query.filter_by(User.username == request.json['username']).first()
+        foundedUser = User.query.filter(User.username == request.json['username']).first()
     except:
         return Response({'message':'No se pudo obtener el usuario'}), 401
     
@@ -30,7 +35,7 @@ def registerUser():
                        rol=request.json['rol'])
         db.session.add(newUser)
         db.session.commit()
-        
+
     except Exception as e:
         return jsonify({'message2': f'Error: {str(e)}'}), 400
     
