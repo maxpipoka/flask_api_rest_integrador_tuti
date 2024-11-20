@@ -137,3 +137,25 @@ Content-Type: application/json
     "course_id": 1,
     "date_to_search":"2023/12/04"
 }
+
+
+#################### USUARIOS ################
+
+POST http://127.0.0.1:5000/auth/register
+Content-Type: application/json
+
+{
+    "username": "martin",
+    "password": "passmartin",
+    "fullname": "Martin Cardozo",
+    "rol": "Secretario"
+}
+
+### Login
+POST http://127.0.0.1:5000/auth
+Content-Type: application/json
+
+{
+    "username": "martin",
+    "password": "passmartin"
+}
