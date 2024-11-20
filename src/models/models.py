@@ -197,3 +197,38 @@ class Attendance(db.Model):
         }
     
 
+class User(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer(), primary_key=True)
+    username = db.Column(db.String(50), nullable=False)
+    password = db.Column(db.String(50), nullable=False)
+    fullname = db.Column(db.String(50), nullable=False)
+    rol = db.Column(db.String(50), nullable=False)
+    createdAt = db.Column(db.DateTime(), nullable=False)
+    updatedAt = db.Column(db.DateTime(), nullable=True)
+    active = db.Column(db.Boolean(), default=True, nullable=False)
+
+    def __init__(self, username, password, fullname, rol):
+        self.username = username
+        self.password = password
+        self.fullname = fullname
+        self.rol = rol
+        self.createdAt = datetime.now()
+
+    
+    def __repr__(self):
+        return f'{self.username} - {self.fullname}'
+    
+    def as_dict(self):
+        
+        return {
+            'id': self.id,
+            'username': self.username,
+            'fullname': self.fullname,
+            'rol': self.rol,
+            'active': self.active,
+            'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
+            'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
+        }    
+
