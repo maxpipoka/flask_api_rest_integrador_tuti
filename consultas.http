@@ -11,9 +11,9 @@ POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-        "dni": 46479345,
-        "names": "CRISTIAN DANIEL",
-        "surnames": "YUCHESEN",
+        "dni": 45136672,
+        "names": "ELIZABETH",
+        "surnames": "GABRIELA",
         "address": "Calle Flores, 456",
         "email": "patricio.estebanez@example.com",
         "active": true
