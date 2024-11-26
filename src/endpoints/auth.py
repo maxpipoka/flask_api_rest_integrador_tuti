@@ -20,7 +20,7 @@ def loginUser():
     
     if foundedUser:
         if foundedUser.password == request.json['password']:
-            return Response({'message':'Usuario autenticado'}), 200
+            return jsonify({'message': 'Usuario autenticado', 'user_id': foundedUser.id}), 200
         else:
             return Response({'message':'Contraseña incorrecta'}), 401
         
@@ -32,7 +32,8 @@ def registerUser():
         newUser = User(username=request.json['username'], 
                        password=request.json['password'], 
                        fullname=request.json['fullname'], 
-                       rol=request.json['rol'])
+                       rol=request.json['rol'],
+                       access_level=request.json['access_level'])
         db.session.add(newUser)
         db.session.commit()
 

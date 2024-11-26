@@ -33,8 +33,6 @@ class Student(db.Model):
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
-    # attendances = relationship('Attendance', back_populates='student')
-    # course_id = db.Column(db.Integer, db.ForeignKey('courses.id'), nullable=True)
     course = relationship('Course', secondary=students_courses, back_populates='students')
 
     def __init__(self, dni, names, surnames, address, email, active):
@@ -78,7 +76,6 @@ class Tutor(db.Model):
     address = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), nullable=False)
     students = relationship('Student', secondary=students_tutors, back_populates='tutors')
-    # student_id= db.Column(db.Integer(), db.ForeignKey('students.id'), nullable=True)
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
@@ -105,7 +102,6 @@ class Tutor(db.Model):
             'surnames': self.surnames,
             'address': self.address,
             'email': self.email,
-            # 'students': students_list,
             'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
             'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
             'active': self.active
@@ -122,20 +118,20 @@ class Course(db.Model):
     division = db.Column(db.String(1), nullable=False)
     year = db.Column(db.Integer, nullable=False)
     current = db.Column(db.Boolean(), default=True, nullable=False)
-    # attendance = db.relationship('Attendance', backref='course', lazy=True)
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
-    # attendances = relationship('Attendance', back_populates='course')
     students = relationship('Student', secondary=students_courses, back_populates='course')
+    associated_user = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
 
-    def __init__(self, level, division, year, current, active):
+    def __init__(self, level, division, year, current, active, associated_user):
         self.level = level
         self.division = division
         self.year = year
         self.current = current
         self.createdAt = datetime.now()
         self.active = active
+        self.associated_user = associated_user
 
     def __repr__(self):
         return f'{self.year} - {self.level} - {self.division}'
@@ -208,12 +204,14 @@ class User(db.Model):
     createdAt = db.Column(db.DateTime(), nullable=False)
     updatedAt = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
+    access_level = db.Column(db.Integer(), nullable=False)
 
-    def __init__(self, username, password, fullname, rol):
+    def __init__(self, username, password, fullname, rol, access_level):
         self.username = username
         self.password = password
         self.fullname = fullname
         self.rol = rol
+        self.access_level = access_level
         self.createdAt = datetime.now()
 
     
@@ -227,6 +225,7 @@ class User(db.Model):
             'username': self.username,
             'fullname': self.fullname,
             'rol': self.rol,
+            'access_level': self.access_level,
             'active': self.active,
             'createdAt': self.createdAt.strftime('%Y-%m-%d %H:%M:%S') if self.createdAt else None,
             'updatedAt': self.updatedAt.strftime('%Y-%m-%d %H:%M:%S') if self.updatedAt else None,
