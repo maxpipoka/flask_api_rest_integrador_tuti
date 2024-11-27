@@ -24,6 +24,26 @@ def getCourses():
     return jsonify(serialized_courses), 200
 
 
+# Definicion endpoint que obtiene todos los cursos bajo el control
+# de un usuario específico (Preceptor)
+@bp.route('/cursos/preceptor/<int:preceptor_id>', methods=['GET'])
+def getCoursesByPreceptor(preceptor_id):
+    
+    try:
+        foundedCourses = Course.query.filter(Course.associated_user == preceptor_id).all()
+
+    except:
+        return Response({'message':'No se puede obtener los cursos'}), 404
+    
+    if not foundedCourses:
+        return Response({'message':'No se encontraron cursos'}), 400
+    
+    
+    serialized_courses = [course.as_dict() for course in foundedCourses]
+
+    return jsonify(serialized_courses), 200
+
+
 # Definicion endpoint obtiene un solo curso filtrado por id
 @bp.route('/cursos/<id>', methods=['GET'])
 def getCourseById(id):

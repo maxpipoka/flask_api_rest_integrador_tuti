@@ -145,10 +145,11 @@ POST http://127.0.0.1:5000/auth/register
 Content-Type: application/json
 
 {
-    "username": "martin",
-    "password": "passmartin",
-    "fullname": "Martin Cardozo",
-    "rol": "Secretario"
+    "username": "marcelo",
+    "password": "passmarcelo",
+    "fullname": "Marcelo Gomez",
+    "rol": "Preceptor",
+    "access_level": 3
 }
 
 ### Login
