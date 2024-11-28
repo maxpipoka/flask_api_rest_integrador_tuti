@@ -30,7 +30,7 @@ def getCourses():
 def getCoursesByPreceptor(preceptor_id):
     
     try:
-        foundedCourses = Course.query.filter(Course.associated_user == preceptor_id).filter(Course.active == True).order_by(Course.level, Course.year, Course.division)
+        foundedCourses = Course.query.filter(Course.associated_user == preceptor_id).filter(Course.active == True).filter(Course.current == True).order_by(Course.level, Course.year, Course.division)
 
     except:
         return Response({'message':'No se puede obtener los cursos'}), 404
@@ -62,7 +62,7 @@ def getCourseById(id):
     return jsonify(serialized_course), 200
 
 
-# Definicion endpoint 'borra' un curso, cambio el activo
+# Definicion endpoint 'borra' un curso, cambio del activo
 @bp.route('/cursos/<int:id>', methods=['DELETE'])
 def deleteCourse(id):
 
@@ -92,25 +92,23 @@ def asociate_student_to_course(course_id, student_id):
     
     try:
         # Busqueda de las instancias
-        student = Student.query.get(student_id)
-        course = Course.query.get(course_id)
+        foundedStudent = Student.query.get(student_id)
+        foundedCourse = Course.query.get(course_id)
 
     except:
         return Response({'message':'No se pueden encontrar las instancias'}), 400
     
-    if not student or not course:
-        return Response({'message':'Student o Course son invalidos'}), 400
-    print(' ')
-    print(course.students)
-    print(' ')
+    if not foundedStudent or not foundedCourse:
+        return Response({'message':'Estudiante o Curso son invalidos'}), 400
 
-    for studentIn in course.students:
-        if student.id == studentIn.id:
+
+    for studentIn in foundedCourse.students:
+        if foundedStudent.id == studentIn.id:
             return Response({'message':'El alumno ya se encuentra asignado'}), 400
     
     try:
         # Asociación del alumno con el curso
-        course.students.append(student)
+        foundedCourse.students.append(foundedStudent)
         db.session.commit()
 
     except Exception as e:
@@ -119,6 +117,7 @@ def asociate_student_to_course(course_id, student_id):
         return Response({'message':'No se pudo asignar el alumno al curso'}), 400
     
     return Response({'message':'La asociación del alumno con el curso se realizó con éxito'}), 200
+
 
 # Definicion endpoint creacion curso
 @bp.route('/cursos', methods=['POST'])
@@ -135,7 +134,8 @@ def saveCourse():
             division = request.json['division'],
             year = request.json['year'],
             current = request.json['current'],
-            active = request.json['active']
+            active = request.json['active'],
+            associated_user = request.json['associated_user']
         )
 
     except KeyError as e:
@@ -160,7 +160,6 @@ def saveCourse():
     except:
         return Response({'message': 'No se puede commit'}), 400
     
-
 
 # Definicion endpoint edicion curso
 @bp.route('/cursos/<id>', methods=['PATCH'])
@@ -202,6 +201,10 @@ def updateCourse(id):
 
         if 'active' in data:
             foundCourse.active = data['active']
+            updated = True
+
+        if 'associated_user' in data:
+            foundCourse.associated_user = data['associated_user']
             updated = True
 
         if updated:
