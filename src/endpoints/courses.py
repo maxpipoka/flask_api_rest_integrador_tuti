@@ -11,7 +11,7 @@ bp = Blueprint('cursos', __name__)
 def getCourses():
 
     try:
-        allCourses = Course.query.filter(Course.active == True).order_by(Course.id)
+        allCourses = Course.query.filter(Course.active == True).order_by(Course.level, Course.year, Course.division)
 
     except:
         return Response({'message':'No se pueden obtener los cursos'}), 404
@@ -30,7 +30,7 @@ def getCourses():
 def getCoursesByPreceptor(preceptor_id):
     
     try:
-        foundedCourses = Course.query.filter(Course.associated_user == preceptor_id).all()
+        foundedCourses = Course.query.filter(Course.associated_user == preceptor_id).filter(Course.active == True).order_by(Course.level, Course.year, Course.division)
 
     except:
         return Response({'message':'No se puede obtener los cursos'}), 404
