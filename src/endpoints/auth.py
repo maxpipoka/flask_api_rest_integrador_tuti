@@ -20,7 +20,7 @@ def loginUser():
     
     if foundedUser:
         if foundedUser.password == request.json['password']:
-            return jsonify({'message': 'Usuario autenticado', 'user_id': foundedUser.id, 'access_level': foundedUser.access_level}), 200
+            return jsonify({'message': 'Usuario autenticado', 'username': foundedUser.username, 'user_id': foundedUser.id, 'access_level': foundedUser.access_level}), 200
         else:
             return Response({'message':'Contraseña incorrecta'}), 401
         
