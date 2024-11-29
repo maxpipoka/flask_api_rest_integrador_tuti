@@ -11,9 +11,9 @@ POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-        "dni": 45136672,
-        "names": "ELIZABETH",
-        "surnames": "GABRIELA",
+        "dni": 28609012,
+        "names": "Chelo",
+        "surnames": "El Zeta",
         "address": "Calle Flores, 456",
         "email": "patricio.estebanez@example.com",
         "active": true
@@ -22,11 +22,11 @@ Content-Type: application/json
 DELETE  http://127.0.0.1:5000/alumnos/4
 
 ### Edicion de un alumno
-PATCH http://127.0.0.1:5000/alumnos/17
+PATCH http://127.0.0.1:5000/alumnos/151
 Content-Type: application/json
 
     {
-    "surnames":"1A Quito"
+    "surnames":"El Zeta pito dulce"
     }
 
 #################### TUTORES ################

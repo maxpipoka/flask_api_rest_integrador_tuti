@@ -22,6 +22,7 @@ def getStudents():
 
     try:
         allStudents = Student.query.filter(Student.active == True).order_by(Student.id)
+        
     except:
         return Response({"message":"No se pudieron obtener alumnos"}), 404
     
