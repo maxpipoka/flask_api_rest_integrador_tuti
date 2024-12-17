@@ -2,18 +2,20 @@
 
 ### Obtencion de todos los alumnos
 GET http://127.0.0.1:5000/alumnos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQzOTMwMjIsImV4cCI6MTczNDM5NjYyMiwidXNlciI6MX0.J-d8Cv5trT3slZD0V2R9CVIuLZWZ8nAOQv0rSj9J0_Y
 
 ### Obtencion un alumno
 GET http://127.0.0.1:5000/alumnos/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQzOTMwMjIsImV4cCI6MTczNDM5NjYyMiwidXNlciI6MX0.J-d8Cv5trT3slZD0V2R9CVIuLZWZ8nAOQv0rSj9J0_Y
 
 ### Guardado de un alumno
 POST http://127.0.0.1:5000/alumnos
 Content-Type: application/json
 
 {
-        "dni": 45136672,
-        "names": "ELIZABETH",
-        "surnames": "GABRIELA",
+        "dni": 28609012,
+        "names": "Chelo",
+        "surnames": "El Zeta",
         "address": "Calle Flores, 456",
         "email": "patricio.estebanez@example.com",
         "active": true
@@ -22,11 +24,11 @@ Content-Type: application/json
 DELETE  http://127.0.0.1:5000/alumnos/4
 
 ### Edicion de un alumno
-PATCH http://127.0.0.1:5000/alumnos/17
+PATCH http://127.0.0.1:5000/alumnos/151
 Content-Type: application/json
 
     {
-    "surnames":"1A Quito"
+    "surnames":"El Zeta pito dulce"
     }
 
 #################### TUTORES ################

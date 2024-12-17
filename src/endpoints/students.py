@@ -3,9 +3,11 @@ import json
 
 from flask import Response, Blueprint, request, jsonify
 
+from src.utils.decorators import token_required
+
 from ..models.models import Student, Tutor, db
 
-from .schemas import StudentSchema, TutorSchema
+from ..models.schemas import StudentSchema, TutorSchema
 
 bp = Blueprint('alumnos', __name__)
 
@@ -18,10 +20,12 @@ tutors_schema = TutorSchema(many=True)
 
 # Definicion endpoint obtiene todos los alumnos
 @bp.route('/alumnos', methods=['GET'])
+@token_required
 def getStudents():
 
     try:
         allStudents = Student.query.filter(Student.active == True).order_by(Student.id)
+        
     except:
         return Response({"message":"No se pudieron obtener alumnos"}), 404
     
@@ -35,6 +39,7 @@ def getStudents():
 
 # Definicion endpoint obtiene un solo alumno filtrado por id
 @bp.route('/alumnos/<id>', methods=['GET'])
+@token_required
 def getStudentById(id):
     
     try:
@@ -55,6 +60,7 @@ def getStudentById(id):
 
 # Definicion endpoint 'borra' un alumno, cambia el activo
 @bp.route('/alumnos/<id>', methods=['DELETE'])
+@token_required
 def deteleStudent(id):
     try:
         foundStudent = Student.query.get(id)
@@ -79,6 +85,7 @@ def deteleStudent(id):
 
 # Definicionn endpoint creacion alumno
 @bp.route('/alumnos', methods=['POST'])
+@token_required
 def saveStudent():
 
     newStudent = None
@@ -120,6 +127,7 @@ def saveStudent():
 
 # Definicionn endpoint edicion alumno
 @bp.route('/alumnos/<id>', methods=['PATCH'])
+@token_required
 def updateStudent(id):
     try:
         foundStudent = Student.query.get(id)
@@ -174,6 +182,7 @@ def updateStudent(id):
 
 # Definición endpoint para asociar tutores al alumno
 @bp.route('/alumnos/<int:alumno_id>/tutores/<int:tutor_id>', methods=['POST'])
+@token_required
 def associate_tutor_with_student(alumno_id, tutor_id):
     try:
         # Buscar el estudiante y el tutor en la base de datos
