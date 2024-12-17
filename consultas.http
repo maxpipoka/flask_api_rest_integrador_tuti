@@ -73,6 +73,9 @@ POST http://127.0.0.1:5000/alumnos/1/tutores/1
 ### Obtencion todos los cursos
 GET http://127.0.0.1:5000/cursos
 
+### Obtencion de listado de cursos para un usuario asignado específico
+GET http://127.0.0.1:5000/cursos/preceptor/2
+
 ### Obtencion un curso por id
 GET http://127.0.0.1:5000/cursos/3
 
