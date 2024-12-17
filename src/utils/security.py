@@ -10,7 +10,7 @@ def generate_token(userid = int) -> str:
     tz = pytz.timezone('America/Argentina/Buenos_Aires')
     payload = {
         'iat': datetime.datetime.now(tz=tz),
-        'exp': datetime.datetime.now(tz=tz) + datetime.timedelta(hours=1),
+        'exp': datetime.datetime.now(tz=tz) + datetime.timedelta(minutes=os.getenv('TOKEN_EXPIRATION_MINUTES')),
         'user': userid,
     }
 
@@ -20,6 +20,5 @@ def generate_token(userid = int) -> str:
 def decode_token(token: str) -> dict:
     
     splited_token = token.split(' ')[1]
-    print(splited_token)
 
     return jwt.decode(splited_token, os.getenv('SECRET_JWT_KEY'), algorithms=['HS256'])
