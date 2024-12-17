@@ -44,11 +44,12 @@ def getStudentById(id):
     
     try:
         foundStudent = Student.query.get(id)
+
+        if not foundStudent:
+            return jsonify({"message":"Alumno no encontrado"}), 404
+    
     except:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
-    
-    if not foundStudent:
-        return jsonify({"message":"El alumno no existe"}), 400
 
     serialized_student = student_schema.dump(foundStudent)
 
