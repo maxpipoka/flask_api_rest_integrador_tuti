@@ -132,7 +132,7 @@ def updateStudent(id):
     try:
         foundStudent = Student.query.get(id)
     except:
-        return Response({"message":"No se pudo obtener el alumno"}), 204
+        return Response({"message":"No se pudo obtener el alumno"}), 404
     
     if not foundStudent:
         return Response({"message":"No se pudo obtener el alumno"}), 404

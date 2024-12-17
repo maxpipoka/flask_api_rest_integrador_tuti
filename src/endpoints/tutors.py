@@ -22,7 +22,7 @@ def getTutors():
     try:
         allTutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
     except:
-        return Response({"message": "No se puede obtener los tutores"}), 400
+        return Response({"message": "No se puede obtener los tutores"}), 404
     
     if not allTutors:
         return Response({"message": "No se pueden obtener los tutores"}), 400
@@ -56,7 +56,7 @@ def deleteTutor(id):
     try:
         foundedTutor = Tutor.query.get(id)
     except:
-        return Response({"message": "No se puede obtener el tutor"}), 400
+        return Response({"message": "No se puede obtener el tutor"}), 404
     
     try:
         foundedTutor.active = False
@@ -122,7 +122,7 @@ def updateTutor(id):
         print('-------tutor encontrado')
         print(foundTutor)
     except:
-        return Response({"message":"No se pudo obtener el tutor"}), 204
+        return Response({"message":"No se pudo obtener el tutor"}), 404
     
     if not foundTutor:
         return Response({"message":"No se pudo obtener el tutor"}), 404
@@ -130,7 +130,7 @@ def updateTutor(id):
     try:
         data = request.get_json()
     except:
-        return Response({"message":"No hay información para actualizar el tutor"}), 404
+        return Response({"message":"No hay información para actualizar el tutor"}), 400
     
     try:
         updated = False

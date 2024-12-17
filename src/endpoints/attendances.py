@@ -17,7 +17,7 @@ def getAttendances():
         allAttendances = Attendance.query.filter(Attendance.active == True).order_by(Attendance.id)
 
     except:
-        return Response({'message':'No se pueden obtener las asistencias'}), 400
+        return Response({'message':'No se pueden obtener las asistencias'}), 404
     
     if not allAttendances:
         return Response({'message':'No se pueden obtener las asistencias'}), 400
@@ -36,7 +36,7 @@ def getInactiveAttendances():
         allAttendances = Attendance.query.filter(Attendance.active == False).order_by(Attendance.id)
 
     except:
-        return Response({'message':'No se pueden obtener las asistencias'}), 400
+        return Response({'message':'No se pueden obtener las asistencias'}), 404
     
     if not allAttendances:
         return Response({'message':'No se pueden obtener las asistencias'}), 400
@@ -70,7 +70,7 @@ def closeAttendance(id):
         print(attendances_id)
         print(' ')
     except:
-        return Response({'message':'No se pudo obtener el curso y asistencias'}), 400
+        return Response({'message':'No se pudo obtener el curso y asistencias'}), 404
     
     try:
         for student in foundedCourse.students:
@@ -137,7 +137,7 @@ def getAttendanceById(id):
         foundAttendance = Attendance.query.get(id)
 
     except:
-        return Response({'message':'No se pudo obtener la asistencia'}), 400
+        return Response({'message':'No se pudo obtener la asistencia'}), 404
     
     if not foundAttendance:
         return Response({'message':'No se pudo obtener la asistencia'}), 400
@@ -156,7 +156,7 @@ def deleteAttendance(id):
         foundAttendance = Attendance.query.get(id)
 
     except:
-        return Response({'message':'No se pudo obtener la asistencia'}), 400
+        return Response({'message':'No se pudo obtener la asistencia'}), 404
     
     try:
         foundAttendance.active = False
@@ -241,7 +241,7 @@ def updateAttendance(id):
         foundAttendance = Attendance.query.get(id)
 
     except:
-        return Response({'message': 'No se puede obtener la asistencia'}), 400
+        return Response({'message': 'No se puede obtener la asistencia'}), 404
     
     if not foundAttendance:
         return Response({'message': 'No se puede obtener el curso'}), 400

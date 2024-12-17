@@ -40,7 +40,7 @@ def getCoursesByPreceptor(preceptor_id):
         return Response({'message':'No se puede obtener los cursos'}), 404
     
     if not foundedCourses:
-        return Response({'message':'No se encontraron cursos'}), 400
+        return Response({'message':'No se encontraron cursos'}), 404
     
     
     serialized_courses = [course.as_dict() for course in foundedCourses]
@@ -60,7 +60,7 @@ def getCourseById(id):
         return Response({'message': 'No se pudo obtener el curso'}), 404
     
     if not foundCourse:
-        return Response({'message':'El curso no existe'}), 400
+        return Response({'message':'El curso no existe'}), 404
     
     serialized_course = foundCourse.as_dict()
 
@@ -103,10 +103,10 @@ def asociate_student_to_course(course_id, student_id):
         foundedCourse = Course.query.get(course_id)
 
     except:
-        return Response({'message':'No se pueden encontrar las instancias'}), 400
+        return Response({'message':'No se pueden encontrar las instancias'}), 404
     
     if not foundedStudent or not foundedCourse:
-        return Response({'message':'Estudiante o Curso son invalidos'}), 400
+        return Response({'message':'Estudiante o Curso son invalidos'}), 404
 
 
     for studentIn in foundedCourse.students:
@@ -178,10 +178,10 @@ def updateCourse(id):
         foundCourse = Course.query.get(id)
 
     except:
-        return Response({'message': 'No se puede obtener el curso'}), 400
+        return Response({'message': 'No se puede obtener el curso'}), 404
     
     if not foundCourse:
-        return Response({'message': 'No se puede obtener el curso'}), 400
+        return Response({'message': 'No se puede obtener el curso'}), 404
     
     try:
         data = request.get_json()
