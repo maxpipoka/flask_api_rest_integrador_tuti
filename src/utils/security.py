@@ -20,5 +20,6 @@ def generate_token(userid = int) -> str:
 def decode_token(token: str) -> dict:
     
     splited_token = token.split(' ')[1]
+    print(splited_token)
 
-    return splited_token.decode(token, os.getenv('SECRET_JWT_KEY'), algorithms=['HS256'])
+    return jwt.decode(splited_token, os.getenv('SECRET_JWT_KEY'), algorithms=['HS256'])

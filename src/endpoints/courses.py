@@ -2,6 +2,8 @@ from datetime import datetime
 
 from flask import Response, Blueprint, request, jsonify
 
+from src.utils.decorators import token_required
+
 from ..models.models import Course, Student, db
 
 bp = Blueprint('cursos', __name__)
@@ -46,6 +48,7 @@ def getCoursesByPreceptor(preceptor_id):
 
 # Definicion endpoint obtiene un solo curso filtrado por id
 @bp.route('/cursos/<id>', methods=['GET'])
+@token_required
 def getCourseById(id):
     
     try:
@@ -64,6 +67,7 @@ def getCourseById(id):
 
 # Definicion endpoint 'borra' un curso, cambio del activo
 @bp.route('/cursos/<int:id>', methods=['DELETE'])
+@token_required
 def deleteCourse(id):
 
     try:
@@ -88,6 +92,7 @@ def deleteCourse(id):
 
 # Definicion endpoint asignacion de alumno al curso
 @bp.route('/cursos/<int:course_id>/alumno/<int:student_id>', methods=['POST'])
+@token_required
 def asociate_student_to_course(course_id, student_id):
     
     try:
@@ -121,6 +126,7 @@ def asociate_student_to_course(course_id, student_id):
 
 # Definicion endpoint creacion curso
 @bp.route('/cursos', methods=['POST'])
+@token_required
 def saveCourse():
 
     newCourse = None
@@ -163,6 +169,7 @@ def saveCourse():
 
 # Definicion endpoint edicion curso
 @bp.route('/cursos/<id>', methods=['PATCH'])
+@token_required
 def updateCourse(id):
 
     try:

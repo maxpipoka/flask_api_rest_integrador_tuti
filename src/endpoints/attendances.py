@@ -2,12 +2,15 @@ from datetime import datetime
 
 from flask import Response, Blueprint, request, jsonify
 
+from src.utils.decorators import token_required
+
 from ..models.models import Attendance, Course, Student, db
 
 bp= Blueprint('asistencias', __name__)
 
 # Definicion endpoint obtiene las asistencias
 @bp.route('/asistencias', methods=['GET'])
+@token_required
 def getAttendances():
     
     try:
@@ -26,6 +29,7 @@ def getAttendances():
 
 # Definicion endpoint obtiene las asistencias inactivas
 @bp.route('/asistencias/inactivas', methods=['GET'])
+@token_required
 def getInactiveAttendances():
     
     try:
@@ -44,6 +48,7 @@ def getInactiveAttendances():
 
 # Definicion endpoint para cerra asistencia de un curso en un dia
 @bp.route('/asistencias/cerrar/<int:id>', methods=['POST'])
+@token_required
 def closeAttendance(id):
 
     current_date = datetime.now().date()
@@ -89,6 +94,7 @@ def closeAttendance(id):
 
 # Definicion endpoint obtencion de asistencias de un dia y un curso
 @bp.route('/asistencias/revision/', methods=['POST'])
+@token_required
 def getAttendaceByDayAndCourse():
     course_id = request.json['course_id']
     date_to_search = request.json['date_to_search']
@@ -124,6 +130,7 @@ def getAttendaceByDayAndCourse():
 
 # Definicion endpoint obtencion una asistencia por id
 @bp.route('/asistencias/<int:id>', methods=['GET'])
+@token_required
 def getAttendanceById(id):
 
     try:
@@ -142,6 +149,7 @@ def getAttendanceById(id):
 
 # Definicion endpoint borrado de asistencia, cambio el activo
 @bp.route('/asistencias/<int:id>', methods=['DELETE'])
+@token_required
 def deleteAttendance(id):
 
     try:
@@ -166,6 +174,7 @@ def deleteAttendance(id):
 
 # Definicion endpoint creacion asistencia
 @bp.route('/asistencias', methods=['POST'])
+@token_required
 def saveAttendance():
 
     newAttendance = None
@@ -225,6 +234,7 @@ def saveAttendance():
 
 # Definicion endpoint edicion asistencia
 @bp.route('/asistencias/<int:id>', methods=['PATCH'])
+@token_required
 def updateAttendance(id):
 
     try:

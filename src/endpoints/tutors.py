@@ -3,9 +3,11 @@ import json
 
 from flask import Response, Blueprint, request, jsonify
 
+from src.utils.decorators import token_required
+
 from ..models.models import Tutor, db
 
-from .schemas import TutorSchema
+from ..models.schemas import TutorSchema
 
 bp = Blueprint('tutores', __name__)
 
@@ -15,6 +17,7 @@ tutors_schema = TutorSchema(many=True)
 
 # Definicion endpoint obtiene todos los tutores
 @bp.route('/tutores', methods=['GET'])
+@token_required
 def getTutors():
     try:
         allTutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
@@ -32,6 +35,7 @@ def getTutors():
 
 # Definición endpoint obtiene un solo alumno filtrado por id
 @bp.route('/tutores/<id>', methods=['GET'])
+@token_required
 def getTutorById(id):
     try:
         foundedTutor = Tutor.query.get(id)
@@ -47,6 +51,7 @@ def getTutorById(id):
 
 # Definicion endpoint que borra un tutor, cambia el activo
 @bp.route('/tutores/<id>', methods=['DELETE'])
+@token_required
 def deleteTutor(id):
     try:
         foundedTutor = Tutor.query.get(id)
@@ -71,6 +76,7 @@ def deleteTutor(id):
 
 # Definicion endpoint creacion tutor
 @bp.route('/tutores', methods=['POST'])
+@token_required
 def saveTuror():
     newTutor = None
 
@@ -109,6 +115,7 @@ def saveTuror():
     
 
 @bp.route('/tutores/<id>', methods=['PATCH'])
+@token_required
 def updateTutor(id):
     try:
         foundTutor = Tutor.query.get(id)

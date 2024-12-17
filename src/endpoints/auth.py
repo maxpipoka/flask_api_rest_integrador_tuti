@@ -1,5 +1,7 @@
 from flask import Response, Blueprint, jsonify, request
 
+from src.utils.decorators import token_required
+
 from ..models.models import User, db
 
 from ..utils.security import generate_token
@@ -32,6 +34,7 @@ def loginUser():
         
 #Definicion endpoint realiza el registro de un usuario
 @bp.route('/auth/register', methods=['POST'])
+@token_required
 def registerUser():
     
     try:

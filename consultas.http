@@ -2,9 +2,11 @@
 
 ### Obtencion de todos los alumnos
 GET http://127.0.0.1:5000/alumnos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQzOTMwMjIsImV4cCI6MTczNDM5NjYyMiwidXNlciI6MX0.J-d8Cv5trT3slZD0V2R9CVIuLZWZ8nAOQv0rSj9J0_Y
 
 ### Obtencion un alumno
 GET http://127.0.0.1:5000/alumnos/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQzOTMwMjIsImV4cCI6MTczNDM5NjYyMiwidXNlciI6MX0.J-d8Cv5trT3slZD0V2R9CVIuLZWZ8nAOQv0rSj9J0_Y
 
 ### Guardado de un alumno
 POST http://127.0.0.1:5000/alumnos
