@@ -19,8 +19,11 @@ def loginUser():
 
     try:
         foundedUser = User.query.filter(User.username == request.json['username']).first()
-    except:
-        return jsonify({'message':'No se pudo obtener el usuario'}), 401
+    except Exception as e:
+        return jsonify({'message':'No se pudo obtener el usuario', 'error': str(e)}), 500
+    
+    if foundedUser is None:
+        return jsonify({'message':'Usuario no encontrado'}), 404
     
     if foundedUser:
         if foundedUser.password == request.json['password']:
