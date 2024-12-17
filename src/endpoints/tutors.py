@@ -93,7 +93,6 @@ def saveTuror():
             active=request.json['active'],
             student_id=request.json['student_id']
             )
-        print(request.json)
     except KeyError as e:
         return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
     except Exception as e:
@@ -119,8 +118,7 @@ def saveTuror():
 def updateTutor(id):
     try:
         foundTutor = Tutor.query.get(id)
-        print('-------tutor encontrado')
-        print(foundTutor)
+        
     except:
         return jsonify({"message":"No se pudo obtener el tutor"}), 404
     

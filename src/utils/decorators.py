@@ -12,8 +12,7 @@ def token_required(f):
             return jsonify({'message':'Token is missing!'}), 401
         
         try:
-            print(token)
-            print(decode_token(token))
+            decode_token(token)
         except:
             return jsonify({'message':'Token invalid!'}), 401
         
