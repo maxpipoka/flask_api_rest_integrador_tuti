@@ -10,6 +10,7 @@ bp = Blueprint('cursos', __name__)
 
 # Definicion endpoint obtiene todos los cursos
 @bp.route('/cursos', methods=['GET'])
+@token_required
 def getCourses():
 
     try:
@@ -29,6 +30,7 @@ def getCourses():
 # Definicion endpoint que obtiene todos los cursos bajo el control
 # de un usuario específico (Preceptor)
 @bp.route('/cursos/preceptor/<int:preceptor_id>', methods=['GET'])
+@token_required
 def getCoursesByPreceptor(preceptor_id):
     
     try:
