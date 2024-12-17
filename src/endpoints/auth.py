@@ -1,6 +1,10 @@
 from flask import Response, Blueprint, jsonify, request
 
+from src.utils.decorators import token_required
+
 from ..models.models import User, db
+
+from ..utils.security import generate_token
 
 bp = Blueprint('auth', __name__)
 
@@ -20,12 +24,17 @@ def loginUser():
     
     if foundedUser:
         if foundedUser.password == request.json['password']:
-            return jsonify({'message': 'Usuario autenticado', 'username': foundedUser.username, 'user_id': foundedUser.id, 'access_level': foundedUser.access_level}), 200
+            token = generate_token(foundedUser.id)
+            print(token)
+            return jsonify({'message': 'Usuario autenticado', 'username': foundedUser.username, 'user_id': foundedUser.id, 'access_level': foundedUser.access_level, 'token': token}), 200
+            # return jsonify({'message': 'Usuario autenticado', 'username': foundedUser.username, 'user_id': foundedUser.id, 'access_level': foundedUser.access_level}), 200
         else:
             return Response({'message':'Contraseña incorrecta'}), 401
         
+        
 #Definicion endpoint realiza el registro de un usuario
 @bp.route('/auth/register', methods=['POST'])
+@token_required
 def registerUser():
     
     try:
