@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Response, Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify
 
 from src.utils.decorators import token_required
 
@@ -17,10 +17,10 @@ def getCourses():
         allCourses = Course.query.filter(Course.active == True).order_by(Course.level, Course.year, Course.division)
 
     except:
-        return Response({'message':'No se pueden obtener los cursos'}), 404
+        return jsonify({'message':'No se pueden obtener los cursos'}), 404
     
     if not allCourses:
-        return Response({'message':'No se pueden obtener los cursos'}), 400
+        return jsonify({'message':'No se pueden obtener los cursos'}), 400
     
     serialized_courses = [course.as_dict() for course in allCourses]
 
@@ -37,10 +37,10 @@ def getCoursesByPreceptor(preceptor_id):
         foundedCourses = Course.query.filter(Course.associated_user == preceptor_id).filter(Course.active == True).filter(Course.current == True).order_by(Course.level, Course.year, Course.division)
 
     except:
-        return Response({'message':'No se puede obtener los cursos'}), 404
+        return jsonify({'message':'No se puede obtener los cursos'}), 404
     
     if not foundedCourses:
-        return Response({'message':'No se encontraron cursos'}), 404
+        return jsonify({'message':'No se encontraron cursos'}), 404
     
     
     serialized_courses = [course.as_dict() for course in foundedCourses]
@@ -57,10 +57,10 @@ def getCourseById(id):
         foundCourse = Course.query.get(id)
 
     except:
-        return Response({'message': 'No se pudo obtener el curso'}), 404
+        return jsonify({'message': 'No se pudo obtener el curso'}), 404
     
     if not foundCourse:
-        return Response({'message':'El curso no existe'}), 404
+        return jsonify({'message':'El curso no existe'}), 404
     
     serialized_course = foundCourse.as_dict()
 
@@ -76,7 +76,7 @@ def deleteCourse(id):
         foundCourse = Course.query.get(id)
 
     except:
-        return Response({'message':'No se pudo obtener el curso'}), 404
+        return jsonify({'message':'No se pudo obtener el curso'}), 404
     
     try:
         foundCourse.active = False
@@ -85,7 +85,7 @@ def deleteCourse(id):
 
     except:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return Response({'message':'No se pudo borrar el curso'}), 404
+        return jsonify({'message':'No se pudo borrar el curso'}), 404
     
     serialized_course = [foundCourse.as_dict()]
 
@@ -103,15 +103,15 @@ def asociate_student_to_course(course_id, student_id):
         foundedCourse = Course.query.get(course_id)
 
     except:
-        return Response({'message':'No se pueden encontrar las instancias'}), 404
+        return jsonify({'message':'No se pueden encontrar las instancias'}), 404
     
     if not foundedStudent or not foundedCourse:
-        return Response({'message':'Estudiante o Curso son invalidos'}), 404
+        return jsonify({'message':'Estudiante o Curso son invalidos'}), 404
 
 
     for studentIn in foundedCourse.students:
         if foundedStudent.id == studentIn.id:
-            return Response({'message':'El alumno ya se encuentra asignado'}), 400
+            return jsonify({'message':'El alumno ya se encuentra asignado'}), 400
     
     try:
         # Asociación del alumno con el curso
@@ -121,9 +121,9 @@ def asociate_student_to_course(course_id, student_id):
     except Exception as e:
         print(f"Error during transaction: {str(e)}")
         db.session.rollback()
-        return Response({'message':'No se pudo asignar el alumno al curso'}), 400
+        return jsonify({'message':'No se pudo asignar el alumno al curso'}), 400
     
-    return Response({'message':'La asociación del alumno con el curso se realizó con éxito'}), 200
+    return jsonify({'message':'La asociación del alumno con el curso se realizó con éxito'}), 200
 
 
 # Definicion endpoint creacion curso
@@ -134,7 +134,7 @@ def saveCourse():
     newCourse = None
 
     if not request.json:
-        return Response({'message':'JSON data is missing of invalid'}), 400
+        return jsonify({'message':'JSON data is missing of invalid'}), 400
     
     try:
         newCourse = Course(
@@ -147,26 +147,26 @@ def saveCourse():
         )
 
     except KeyError as e:
-        return jsonify({'message1': f'Missing field: {e.args[0]}'}), 400
+        return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
     except Exception as e:
-        return jsonify({'message2': f'Error: {str(e)}'}), 400
+        return jsonify({'message': f'Error: {str(e)}'}), 400
     except:
-        return jsonify({'message3':'No se puede crear la instancia'}), 400
+        return jsonify({'message':'No se puede crear la instancia'}), 400
     
 
     try:
         db.session.add(newCourse)
 
     except:
-        return Response({'message':'No se pudo ADD curso'}), 400
+        return jsonify({'message':'No se pudo agregar el curso'}), 400
     
     try:
         # Confirmacion de las operaciones creadas en la sesion
         db.session.commit()
-        return Response({'message': 'success'}), 201
+        return jsonify({'message': 'success'}), 201
 
     except:
-        return Response({'message': 'No se puede commit'}), 400
+        return jsonify({'message': 'No se puede commit'}), 400
     
 
 # Definicion endpoint edicion curso
@@ -178,16 +178,16 @@ def updateCourse(id):
         foundCourse = Course.query.get(id)
 
     except:
-        return Response({'message': 'No se puede obtener el curso'}), 404
+        return jsonify({'message': 'No se puede obtener el curso'}), 404
     
     if not foundCourse:
-        return Response({'message': 'No se puede obtener el curso'}), 404
+        return jsonify({'message': 'No se puede obtener el curso'}), 404
     
     try:
         data = request.get_json()
 
     except:
-        return Response({'message':'JSON data is missing or invalid'}), 400
+        return jsonify({'message':'JSON data is missing or invalid'}), 400
     
     try:
         updated = False
@@ -224,7 +224,7 @@ def updateCourse(id):
 
     except Exception as e:
         db.session.rollback() # Reversion transaccion
-        return Response({'message':'Error al modificar los campos del curso: ' + str(e)}), 500
+        return jsonify({'message':'Error al modificar los campos del curso: ' + str(e)}), 500
     
     serialized_course = foundCourse.as_dict()
 

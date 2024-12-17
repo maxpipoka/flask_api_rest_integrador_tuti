@@ -22,10 +22,10 @@ def getTutors():
     try:
         allTutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
     except:
-        return Response({"message": "No se puede obtener los tutores"}), 404
+        return jsonify({"message": "No se puede obtener los tutores"}), 404
     
     if not allTutors:
-        return Response({"message": "No se pueden obtener los tutores"}), 400
+        return jsonify({"message": "No se pueden obtener los tutores"}), 400
     
     serialized_tutors = [tutor.as_dict() for tutor in allTutors]
 
@@ -40,13 +40,13 @@ def getTutorById(id):
     try:
         foundedTutor = Tutor.query.get(id)
     except:
-        return Response({"message":"No se puede obtener el tutor"}), 400
+        return jsonify({"message":"No se puede obtener el tutor"}), 400
     
     serialized_tutor = tutor_schema.dump(foundedTutor)
 
     response_data = json.dumps(serialized_tutor, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 200
+    return jsonify(response_data), 200
 
 
 # Definicion endpoint que borra un tutor, cambia el activo
@@ -56,7 +56,7 @@ def deleteTutor(id):
     try:
         foundedTutor = Tutor.query.get(id)
     except:
-        return Response({"message": "No se puede obtener el tutor"}), 404
+        return jsonify({"message": "No se puede obtener el tutor"}), 404
     
     try:
         foundedTutor.active = False
@@ -65,13 +65,13 @@ def deleteTutor(id):
         
     except:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return Response({"message":"No se pudo borrar el tutor"}), 400
+        return jsonify({"message":"No se pudo borrar el tutor"}), 400
     
     serialized_tutor = tutor_schema.dump(foundedTutor)
 
     response_data = json.dumps(serialized_tutor, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 200
+    return jsonify(response_data), 200
 
 
 # Definicion endpoint creacion tutor
@@ -122,15 +122,15 @@ def updateTutor(id):
         print('-------tutor encontrado')
         print(foundTutor)
     except:
-        return Response({"message":"No se pudo obtener el tutor"}), 404
+        return jsonify({"message":"No se pudo obtener el tutor"}), 404
     
     if not foundTutor:
-        return Response({"message":"No se pudo obtener el tutor"}), 404
+        return jsonify({"message":"No se pudo obtener el tutor"}), 404
     
     try:
         data = request.get_json()
     except:
-        return Response({"message":"No hay información para actualizar el tutor"}), 400
+        return jsonify({"message":"No hay información para actualizar el tutor"}), 400
     
     try:
         updated = False
@@ -165,10 +165,10 @@ def updateTutor(id):
         db.session.commit()
     except Exception as e:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return Response({"message": "Error al modificar los campos del tutor: " + str(e)}, status=500)
+        return jsonify({"message": "Error al modificar los campos del tutor: " + str(e)}), 500
     
     serialized_tutor = tutor_schema.dump(foundTutor)
 
     response_data = json.dumps(serialized_tutor, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 201
+    return jsonify(response_data), 201
