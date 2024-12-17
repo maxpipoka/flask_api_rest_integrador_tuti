@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 
-from flask import Response, Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify
 
 from src.utils.decorators import token_required
 
@@ -27,10 +27,10 @@ def getStudents():
         allStudents = Student.query.filter(Student.active == True).order_by(Student.id)
         
     except:
-        return Response({"message":"No se pudieron obtener alumnos"}), 404
+        return jsonify({"message":"No se pudieron obtener alumnos"}), 404
     
     if not allStudents:
-        return Response({"message":"No se pueden obtener los alumnos"}), 400
+        return jsonify({"message":"No se pueden obtener los alumnos"}), 400
 
     serialized_students = [student.as_dict() for student in allStudents]
 
@@ -44,16 +44,14 @@ def getStudentById(id):
     
     try:
         foundStudent = Student.query.get(id)
+
+        if not foundStudent:
+            return jsonify({"message":"Alumno no encontrado"}), 404
+    
     except:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
-    
-    if not foundStudent:
-        return jsonify({"message":"El alumno no existe"}), 400
 
     serialized_student = student_schema.dump(foundStudent)
-    # serialized_student['tutors'] = tutor_schema.dump(foundStudent.tutors)
-
-    # response_data = json.dumps(serialized_student, ensure_ascii=False)
 
     return jsonify(serialized_student), 200
 
@@ -65,7 +63,7 @@ def deteleStudent(id):
     try:
         foundStudent = Student.query.get(id)
     except:
-        return Response({"message":"No se pudo obtener el alumno"}), 404
+        return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     try:
         foundStudent.active = False
@@ -74,13 +72,13 @@ def deteleStudent(id):
 
     except:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return Response({"message":"No se pudo modificar el alumno"}), 204
+        return jsonify({"message":"No se pudo modificar el alumno"}), 204
 
     serialized_student = student_schema.dump(foundStudent)
 
     response_data = json.dumps(serialized_student, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 201
+    return jsonify(response_data), 201
 
 
 # Definicionn endpoint creacion alumno
@@ -91,7 +89,7 @@ def saveStudent():
     newStudent = None
 
     if not request.json:
-        return Response({'message': 'JSON data is missing or invalid'}), 400
+        return jsonify({'message': 'JSON data is missing or invalid'}), 400
 
     try:
         newStudent = Student(
@@ -119,10 +117,10 @@ def saveStudent():
     try:
         # Confirmación de las operaciones creadas en la session
         db.session.commit()
-        return Response({'message':'Success'}), 201
+        return jsonify({'message':'Success'}), 201
     
     except:
-        return Response({'message':'No se puede commit'}), 400
+        return jsonify({'message':'No se puede commit'}), 400
 
 
 # Definicionn endpoint edicion alumno
@@ -132,15 +130,15 @@ def updateStudent(id):
     try:
         foundStudent = Student.query.get(id)
     except:
-        return Response({"message":"No se pudo obtener el alumno"}), 204
+        return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     if not foundStudent:
-        return Response({"message":"No se pudo obtener el alumno"}), 404
+        return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     try:
         data = request.get_json()
     except:
-        return Response({"message":"No hay información para actualizar el alumno"}), 404
+        return jsonify({"message":"No hay información para actualizar el alumno"}), 404
     
     try:
         updated = False
@@ -171,13 +169,13 @@ def updateStudent(id):
         db.session.commit()
     except Exception as e:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return Response({"message": "Error al modificar los campos del alumno: " + str(e)}, status=500)
+        return jsonify({"message": "Error al modificar los campos del alumno: " + str(e)}), 500
     
     serialized_student = student_schema.dump(foundStudent)
 
     response_data = json.dumps(serialized_student, ensure_ascii=False)
 
-    return Response(response_data, content_type='application/json; charset=utf-8'), 201
+    return jsonify(response_data), 201
 
 
 # Definición endpoint para asociar tutores al alumno
@@ -190,17 +188,17 @@ def associate_tutor_with_student(alumno_id, tutor_id):
         tutor = Tutor.query.get(tutor_id)
         
         if not student or not tutor:
-            return Response("No se encontró el estudiante o el tutor", status=404)
+            return jsonify({"message":"No se encontró el estudiante o el tutor"}), 404
         
         # Verificar si la relación ya existe
         if tutor in student.tutors:
-            return Response("La relación entre el estudiante y el tutor ya existe", status=400)
+            return jsonify({"message":"La relación entre el estudiante y el tutor ya existe"}), 400
         
         # Asociar el tutor con el estudiante
         student.tutors.append(tutor)
         db.session.commit()
         
-        return Response("La relación entre el estudiante y el tutor se ha establecido con éxito", status=200)
+        return jsonify({"message":"La relación entre el estudiante y el tutor se ha establecido con éxito"}), 200
     
     except Exception as e:
-        return Response(f"Error al asociar el tutor con el estudiante: {str(e)}", status=500)
+        return jsonify({"message": "Error al asociar el tutor con el estudiante: " + str(e)}), 500
