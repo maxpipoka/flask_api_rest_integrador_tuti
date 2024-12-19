@@ -192,6 +192,8 @@ def deleteAttendance(id):
 @token_required
 def saveAttendance():
 
+    print(request)
+
     newAttendance = None
     foundedAttendance = None
 
