@@ -199,6 +199,10 @@ def saveAttendance():
         print('400 - JSON data is missing or invalid')
         return jsonify({'message':'JSON data is missing of invalid'}), 400
     
+    if not request.is_json:
+        print('400 - JSON data is missing or invalid')
+        return jsonify({'message':'JSON data is missing of invalid'}), 400
+    
     if request.content_type != 'application/json':
         print('415 - Content-Type must be application/json')
         return jsonify({'message':'Content-Type must be application/json'}), 415
