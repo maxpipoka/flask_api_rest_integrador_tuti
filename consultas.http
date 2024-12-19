@@ -2,8 +2,7 @@
 
 ### Obtencion de todos los alumnos
 GET http://127.0.0.1:5000/alumnos
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQzOTMwMjIsImV4cCI6MTczNDM5NjYyMiwidXNlciI6MX0.J-d8Cv5trT3slZD0V2R9CVIuLZWZ8nAOQv0rSj9J0_Y
-
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQ1ODAyMTUsImV4cCI6MTczNDU4MDM5NSwidXNlciI6Mn0.xSt0YUpxLhMjOdipCWa4MYXEqKL8GSGZ8UIvpCCr1rA
 ### Obtencion un alumno
 GET http://127.0.0.1:5000/alumnos/1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQzOTMwMjIsImV4cCI6MTczNDM5NjYyMiwidXNlciI6MX0.J-d8Cv5trT3slZD0V2R9CVIuLZWZ8nAOQv0rSj9J0_Y
@@ -72,6 +71,7 @@ POST http://127.0.0.1:5000/alumnos/1/tutores/1
 
 ### Obtencion todos los cursos
 GET http://127.0.0.1:5000/cursos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQ1ODAyMTUsImV4cCI6MTczNDU4MDM5NSwidXNlciI6Mn0.xSt0YUpxLhMjOdipCWa4MYXEqKL8GSGZ8UIvpCCr1rA
 
 ### Obtencion de listado de cursos para un usuario asignado específico
 GET http://127.0.0.1:5000/cursos/preceptor/2
@@ -130,8 +130,22 @@ Content-Type: application/json
     "active": true
 }
 
+#### Definir endpoint para crear una asistencia Benitez Micaela 19-12-2024
+
+POST http://127.0.0.1:5000/asistencias
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQ1ODA0MTgsImV4cCI6MTczNDU4MDU5OCwidXNlciI6Mn0.OvcxwoUKVTVXOgYKcZPJ74no3URi3uHXkkrvu7jIuWo
+
+{
+    "course_id": 4,
+    "student_id": 39,
+    "state": true,
+    "active": true
+}
+
 ### Cerrar asistencia del dia
-POST http://127.0.0.1:5000/asistencias/cerrar/1
+POST http://127.0.0.1:5000/asistencias/cerrar/4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQ1ODA0MTgsImV4cCI6MTczNDU4MDU5OCwidXNlciI6Mn0.OvcxwoUKVTVXOgYKcZPJ74no3URi3uHXkkrvu7jIuWo
 
 
 ### Revision Asistencia de un curso un dia especifico
@@ -162,6 +176,6 @@ POST http://127.0.0.1:5000/auth
 Content-Type: application/json
 
 {
-    "username": "martin",
-    "password": "passmartin"
+    "username": "marcelo",
+    "password": "passmarcelo"
 }
