@@ -134,7 +134,7 @@ Content-Type: application/json
 
 POST http://127.0.0.1:5000/asistencias
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQ1ODA0MTgsImV4cCI6MTczNDU4MDU5OCwidXNlciI6Mn0.OvcxwoUKVTVXOgYKcZPJ74no3URi3uHXkkrvu7jIuWo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzUyNDc2NDMsImV4cCI6MTczNTI0NzgyMywidXNlciI6Mn0.WPwUfDZlu6eCp0XLnBe8zQLTQXsKvt6IhB_Jqwt3fT0
 
 {
     "course_id": 4,
@@ -145,16 +145,17 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQ1ODA0M
 
 ### Cerrar asistencia del dia
 POST http://127.0.0.1:5000/asistencias/cerrar/4
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzQ1ODA0MTgsImV4cCI6MTczNDU4MDU5OCwidXNlciI6Mn0.OvcxwoUKVTVXOgYKcZPJ74no3URi3uHXkkrvu7jIuWo
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzUyNDc2NDMsImV4cCI6MTczNTI0NzgyMywidXNlciI6Mn0.WPwUfDZlu6eCp0XLnBe8zQLTQXsKvt6IhB_Jqwt3fT0
 
 
 ### Revision Asistencia de un curso un dia especifico
 POST http://127.0.0.1:5000/asistencias/revision
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzUyNDc4NDcsImV4cCI6MTczNTI0ODAyNywidXNlciI6Mn0.Xp682GVDvqOHB0wXMN80Lr8OIMpX88k-ya6aG8L9z9g
 
 {
-    "course_id": 1,
-    "date_to_search":"2023/12/04"
+    "course_id": 4,
+    "date_to_search":"2024/12/26"
 }
 
 
