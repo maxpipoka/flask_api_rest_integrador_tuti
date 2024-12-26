@@ -200,17 +200,21 @@ def saveAttendance():
     if not request.json:
         print('400 - JSON data is missing or invalid')
         return jsonify({'message':'JSON data is missing of invalid'}), 400
+    print('Paso el if not request.json')
     
     if not request.is_json:
         print('400 - JSON data is missing or invalid')
         return jsonify({'message':'JSON data is missing of invalid'}), 400
+    print('Paso el if not request.is_json')
     
     if request.content_type != 'application/json':
         print('415 - Content-Type must be application/json')
         return jsonify({'message':'Content-Type must be application/json'}), 415
+    print('Paso el if request.content_type != application/json')
     
 
     current_date = datetime.now().date()
+    print('Paso el datetime.now().date()')
 
     # Comprobación de no guardado de una asistencia para el mismo alumno
     # mismo curso y mismo dia.
