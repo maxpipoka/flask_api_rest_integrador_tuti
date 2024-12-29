@@ -16,7 +16,6 @@ from .endpoints.courses import bp as courses_bp
 from .endpoints.attendances import bp as attendances_bp
 from .endpoints.auth import bp as auth_bp
 
-
 # Carga de las variables de entorno desde el .env
 load_dotenv()
 
@@ -25,7 +24,7 @@ app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
-app.config['SQLALCHEMY_ECHO'] = True
+app.config['SQLALCHEMY_ECHO'] = False
 
 
 db.init_app(app)

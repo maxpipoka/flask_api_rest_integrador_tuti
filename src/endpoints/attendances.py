@@ -191,9 +191,6 @@ def deleteAttendance(id):
 @bp.route('/asistencias', methods=['POST'])
 @token_required
 def saveAttendance():
-
-    print(request)
-
     newAttendance = None
     foundedAttendance = None
 
@@ -262,8 +259,8 @@ def saveAttendance():
         print('201 - Asistencia creada')
         return jsonify({'message': 'success'}), 201
     
-    except:
-        print('400 - No se puede commit')
+    except Exception as e:
+        print(f'400 - No se puede commit: {str(e)}')
         return jsonify({'message': 'No se puede commit'}), 400
     
 
@@ -306,6 +303,8 @@ def updateAttendance(id):
             foundAttendance.updatedAt = datetime.now()
 
         db.session.commit()
+        print('201 - Asistencia modificada')
+        return jsonify({'message': 'success'}), 201
 
     except Exception as e:
         db.session.rollback() # Reversion transaccion
