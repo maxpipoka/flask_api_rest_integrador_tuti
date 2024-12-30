@@ -33,7 +33,7 @@ def getTutors():
     return jsonify(serialized_tutors), 200
 
 
-# Definición endpoint obtiene un solo alumno filtrado por id
+# Definición endpoint obtiene un solo tutor filtrado por id
 @bp.route('/tutores/<id>', methods=['GET'])
 @token_required
 def getTutorById(id):
@@ -112,7 +112,7 @@ def saveTuror():
     except:
         return jsonify({'message':'No se puede commit'}), 400
     
-
+# Deficion endpoint edicion tutor
 @bp.route('/tutores/<id>', methods=['PATCH'])
 @token_required
 def updateTutor(id):

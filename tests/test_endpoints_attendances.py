@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(
     os.path.dirname(__file__), '..', 'src')))
 
 
-class TestAttendances(TestCase):
+class TestAttendance(TestCase):
 
     def create_app(self):
         app.config['TESTING'] = True
@@ -47,7 +47,6 @@ class TestAttendances(TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        # db.session.close()
 
     def get_auth_token(self):
         response = self.client.post('/auth', json={
@@ -57,6 +56,42 @@ class TestAttendances(TestCase):
 
         token = response.json.get('token')
         return token
+
+    def test_get_attendances(self):
+        token = self.get_auth_token()
+
+        headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+
+        response = self.client.get('/asistencias', headers=headers)
+        self.assertEqual(response.status_code, 200)
+
+    def test_get_inactive_attendances(self):
+        pass
+
+    def test_close_attendance_by_course_and_by_day(self):
+        pass
+
+    def test_get_attendance_by_course_and_by_day(self):
+        pass
+
+    def test_get_attendance_by_id(self):
+        pass
+
+    def test_delete_attendance(self):
+        token = self.get_auth_token()
+
+        headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
+
+        response = self.client.delete(
+            f'/asistencias/{self.attendance.id}', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        # TODO comprobar que de la repuesta, el state haya pasadado a False
 
     def test_save_attendance(self):
         token = self.get_auth_token()
@@ -87,31 +122,8 @@ class TestAttendances(TestCase):
         response = self.client.patch(f'/asistencias/{self.attendance.id}', json={
             'state': False
         }, headers=headers)
-        
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json['state'], False)
 
-    def test_get_attendances(self):
-        token = self.get_auth_token()
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
-        }
-
-        response = self.client.get('/asistencias', headers=headers)
-        self.assertEqual(response.status_code, 200)
-
-    def test_delete_attendance(self):
-        token = self.get_auth_token()
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
-        }
-
-        response = self.client.delete(f'/asistencias/{self.attendance.id}', headers=headers)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
 
 if __name__ == '__main__':

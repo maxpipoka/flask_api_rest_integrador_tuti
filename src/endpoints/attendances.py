@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 
 from src.utils.decorators import token_required
 
@@ -61,7 +61,7 @@ def closeAttendance(id):
     attendances_id = []
 
     try:
-        foundedCourse = Course.query.get(id)
+        foundedCourse = db.session.get(Course, id)
         allAttendances = Attendance.query.filter(
              db.cast(Attendance.day, db.Date) == current_date).filter(
             Attendance.course_id==id
@@ -126,7 +126,7 @@ def getAttendaceByDayAndCourse():
     if founded_attendances:
         for attendance in founded_attendances:
             attendance_dict = {}
-            temp_student = Student.query.get(attendance.student_id)
+            temp_student = db.session.get(Student, attendance.student_id)
             attendance_dict['names'] = temp_student.names
             attendance_dict['surnames'] = temp_student.surnames
             attendance_dict['state'] = attendance.state
@@ -143,7 +143,7 @@ def getAttendaceByDayAndCourse():
 def getAttendanceById(id):
 
     try:
-        foundAttendance = Attendance.query.get(id)
+        foundAttendance = db.session.get(Attendance, id)
 
     except:
         print('404 - No se pudo obtener la asistencia')
@@ -165,7 +165,7 @@ def getAttendanceById(id):
 def deleteAttendance(id):
 
     try:
-        foundAttendance = Attendance.query.get(id)
+        foundAttendance = db.session.get(Attendance, id)
 
     except:
         print('404 - No se pudo obtener la asistencia')
@@ -176,9 +176,9 @@ def deleteAttendance(id):
         foundAttendance.updatedAt = datetime.now()
         db.session.commit()
 
-    except:
+    except Exception as e:
         db.session.rollback() # Revertir la transacción en caso de error
-        print('400 - No se pudo borrar la asistencia')
+        print(f'400 - No se pudo borrar la asistencia - {str(e)}')
         return jsonify({'message':'No se pudo borrar la asistencia'}), 400
     
     serialized_attendance = [foundAttendance.as_dict()]
@@ -270,7 +270,7 @@ def saveAttendance():
 def updateAttendance(id):
 
     try:
-        foundAttendance = Attendance.query.get(id)
+        foundAttendance = db.session.get(Attendance, id)
 
     except:
         print('404 - No se puede obtener la asistencia')
