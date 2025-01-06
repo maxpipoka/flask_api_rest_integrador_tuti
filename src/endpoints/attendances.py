@@ -11,7 +11,7 @@ bp= Blueprint('asistencias', __name__)
 # Definicion endpoint obtiene las asistencias
 @bp.route('/asistencias', methods=['GET'])
 @token_required
-def getAttendances():
+def get_attendances():
     
     try:
         allAttendances = Attendance.query.filter(Attendance.active == True).order_by(Attendance.id)
