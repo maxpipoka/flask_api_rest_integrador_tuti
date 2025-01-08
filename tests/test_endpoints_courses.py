@@ -18,7 +18,13 @@ class TestCourse(TestCase):
         return app
 
     def setUp(self):
-        pass
+
+        token = self.get_auth_token()
+
+        self.headers = {
+            'Authorization': f'Bearer {token}',
+            'Content-Type': 'application/json'
+        }
 
     def tearDown(self):
         db.session.remove()

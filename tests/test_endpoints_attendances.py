@@ -71,14 +71,7 @@ class TestAttendance(TestCase):
         return token
 
     def test_get_all_attendances_with_active_field_in_true_status_code_200(self):
-        token = self.get_auth_token()
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
-        }
-
-        response = self.client.get('/asistencias', headers=headers)
+        response = self.client.get('/asistencias', headers=self.headers)
         self.assertEqual(response.status_code, 200)
 
     def test_get_inactive_attendances_checking_active_field_its_false(self):
@@ -108,50 +101,31 @@ class TestAttendance(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_get_attendance_by_id(self):
-        pass
+        request = self.client.get(f'/asistencias/{self.attendances[0].id}', headers=self.headers)
+
+        self.assertEqual(request.status_code, 200)
 
     def test_delete_attendance(self):
-        token = self.get_auth_token()
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
-        }
-
         response = self.client.delete(
-            f'/asistencias/{self.attendance.id}', headers=headers)
+            f'/asistencias/{self.attendance.id}', headers=self.headers)
         print(response.json)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json[0]['active'], False)
 
     def test_save_attendance(self):
-        token = self.get_auth_token()
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
-        }
-
         response = self.client.post('/asistencias', json={
             'state': True,
             'course_id': self.course.id,
             'student_id': self.student.id,
             'active': True
-        }, headers=headers)
+        }, headers=self.headers)
 
         self.assertEqual(response.status_code, 201)
 
     def test_update_attendance(self):
-        token = self.get_auth_token()
-
-        headers = {
-            'Authorization': f'Bearer {token}',
-            'Content-Type': 'application/json'
-        }
-
         response = self.client.patch(f'/asistencias/{self.attendance.id}', json={
             'state': False
-        }, headers=headers)
+        }, headers=self.headers)
 
         self.assertEqual(response.status_code, 201)
 
