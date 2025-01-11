@@ -18,6 +18,50 @@ class TestCourse(TestCase):
         return app
 
     def setUp(self):
+        db.create_all()
+
+        unique_dni= int(str(uuid.uuid4().int)[:8])  # Un entero de 8 dígitos
+
+        self.user = User(username='cristian', password='passcristian',
+                         fullname='Cristian Krutki', rol='Preceptor', access_level=2)
+        db.session.add(self.user)
+        db.session.commit()
+
+        self.courses = []
+
+        course = Course(level=1, division='A', year=2025,
+                        current=True, active=True, associated_user=self.user.id)
+        self.courses.append(course)
+        db.session.add(course)
+        course = Course(level=1, division='B', year=2025,
+                        current=True, active=True, associated_user=self.user.id)
+        self.courses.append(course)
+        db.session.add(course)
+        course = Course(level=2, division='A', year=2025,
+                        current=True, active=True, associated_user=self.user.id)
+        self.courses.append(course)
+        db.session.add(course)
+        course = Course(level=2, division='B', year=2025,
+                        current=True, active=True, associated_user=self.user.id)
+        self.courses.append(course)
+        db.session.add(course)
+        course = Course(level=3, division='A', year=2025,
+                        current=True, active=True, associated_user=self.user.id)
+        self.courses.append(course)
+        db.session.add(course)
+        course = Course(level=3, division='B', year=2025,
+                        current=True, active=True, associated_user=self.user.id)
+        self.courses.append(course)
+        db.session.add(course)
+        course = Course(level=4, division='A', year=2025,
+                        current=True, active=True, associated_user=2)
+        self.courses.append(course)
+        db.session.add(course)
+        course = Course(level=4, division='B', year=2025,
+                        current=True, active=True, associated_user=2)
+        self.courses.append(course)
+        db.session.add(course)
+        db.session.commit()
 
         token = self.get_auth_token()
 
