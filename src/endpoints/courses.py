@@ -105,8 +105,6 @@ def asociate_student_to_course(course_id, student_id):
     except:
         return jsonify({'message':'No se pueden encontrar las instancias'}), 404
     
-    print(foundedStudent)
-    print(foundedCourse)
     
     if not foundedStudent or not foundedCourse:
         return jsonify({'message':'Estudiante o Curso son invalidos'}), 404
