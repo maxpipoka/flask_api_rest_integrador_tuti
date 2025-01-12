@@ -54,7 +54,7 @@ def getCoursesByPreceptor(preceptor_id):
 def getCourseById(id):
     
     try:
-        foundCourse = Course.query.get(id)
+        foundCourse = db.session.get(Course, id)
 
     except:
         return jsonify({'message': 'No se pudo obtener el curso'}), 404
@@ -73,7 +73,7 @@ def getCourseById(id):
 def deleteCourse(id):
 
     try:
-        foundCourse = Course.query.get(id)
+        foundCourse = db.session.get(Course, id)
 
     except:
         return jsonify({'message':'No se pudo obtener el curso'}), 404
@@ -99,11 +99,14 @@ def asociate_student_to_course(course_id, student_id):
     
     try:
         # Busqueda de las instancias
-        foundedStudent = Student.query.get(student_id)
-        foundedCourse = Course.query.get(course_id)
+        foundedStudent = db.session.get(Student, student_id)
+        foundedCourse = db.session.get(Course, course_id)
 
     except:
         return jsonify({'message':'No se pueden encontrar las instancias'}), 404
+    
+    print(foundedStudent)
+    print(foundedCourse)
     
     if not foundedStudent or not foundedCourse:
         return jsonify({'message':'Estudiante o Curso son invalidos'}), 404
@@ -175,7 +178,7 @@ def saveCourse():
 def updateCourse(id):
 
     try:
-        foundCourse = Course.query.get(id)
+        foundCourse = db.session.get(Course, id)
 
     except:
         return jsonify({'message': 'No se puede obtener el curso'}), 404
