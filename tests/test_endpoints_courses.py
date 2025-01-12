@@ -25,6 +25,11 @@ class TestCourse(TestCase):
         self.user = User(username='cristian', password='passcristian',
                          fullname='Cristian Krutki', rol='Preceptor', access_level=2)
         db.session.add(self.user)
+
+        self.user2 = User(username='cristian2', password='passcristian2',
+                          fullname='Cristian Krutki2', rol='Preceptor', access_level=2)
+        db.session.add(self.user2)
+
         db.session.commit()
 
         self.courses = []
@@ -54,11 +59,11 @@ class TestCourse(TestCase):
         self.courses.append(course)
         db.session.add(course)
         course = Course(level=4, division='A', year=2025,
-                        current=True, active=True, associated_user=2)
+                        current=True, active=True, associated_user=self.user2.id)
         self.courses.append(course)
         db.session.add(course)
         course = Course(level=4, division='B', year=2025,
-                        current=True, active=True, associated_user=2)
+                        current=True, active=True, associated_user=self.user2.id)
         self.courses.append(course)
         db.session.add(course)
         db.session.commit()
@@ -84,13 +89,18 @@ class TestCourse(TestCase):
         return token
     
     def test_get_courses(self):
-        pass
+        response = self.client.get('/cursos', headers=self.headers)
+
+        self.assertEqual(response.status_code, 200)
 
     def test_get_courses_by_preceptor(self):
-        pass
+        response = self.client.get(f'/cursos/preceptor/{self.user.id}', headers=self.headers)
+        print(self.user.id)
+
+        self.assertEqual(response.status_code, 200)
 
     def test_get_course_by_id(self):
-        pass
+        response = self.client.get(f'/cursos/{self.courses[0].id}', headers=self.headers)
 
     def test_delete_course(self):
         pass
