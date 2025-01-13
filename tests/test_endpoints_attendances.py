@@ -22,9 +22,6 @@ class TestAttendance(TestCase):
     def setUp(self):
         db.create_all()
 
-
-        unique_dni = int(str(uuid.uuid4().int)[:8])  # Un entero de 8 dígitos
-
         # Agrega datos de prueba
         self.user = User(username='cristian', password='passcristian',
                          fullname='Cristian Krutki', rol='Preceptor', access_level=2)
@@ -34,18 +31,31 @@ class TestAttendance(TestCase):
         self.course = Course(level=1, division='A', year=2024,
                              current=True, active=True, associated_user=self.user.id)
         db.session.add(self.course)
+
+        self.course2 = Course(level=2, division='B', year=2024,
+                              current=True, active=True, associated_user=self.user.id)
+        db.session.add(self.course2)
         db.session.commit()
 
-        self.student = Student(dni=unique_dni, names='Roque Martín', surnames='Cardozo',
-                               address='Calle cas de Martin', email='martincardozo@gmail.com', active=True)
-        db.session.add(self.student)
+        self.students =  []
+
+        for i in range(5):
+            student = Student(dni=int(str(uuid.uuid4().int)[:8]), names='Juan Carlos', surnames='Perez',
+                              address='Calle cas de Martin', email= 'juancarlos@gmail.com', active=True)
+            self.students.append(student)
+            db.session.add(student)
+        db.session.commit()
+
+        self.student2 = Student(dni=int(str(uuid.uuid4().int)[:8]), names='Juan Carlos', surnames='Perez',
+                                address='Calle cas de Martin', email= 'juancarlos@gmail.com', active=True)
+        db.session.add(self.student2)
         db.session.commit()
 
         self.attendances = []
         for i in range(5):
             boolean_value = (i % 2 == 0)
             attendance = Attendance(
-            state=boolean_value, course_id=1, student_id=self.student.id, active=boolean_value, day=datetime.now().strftime('%d-%m-%Y'))
+            state=boolean_value, course_id=1, student_id=self.students[i].id, active=boolean_value, day=datetime.now().strftime('%Y-%m-%d'))
             self.attendances.append(attendance)
             db.session.add(attendance)
         db.session.commit()
@@ -95,7 +105,7 @@ class TestAttendance(TestCase):
     def test_get_attendance_by_course_and_by_day(self):
         response = self.client.post(f'/asistencias/revision/', json={
             'course_id': self.course.id,
-            'date_to_search': datetime.now().strftime('%d-%m-%Y')
+            'date_to_search': datetime.now().strftime('%Y-%m-%d')
         }, headers=self.headers)
         
         self.assertEqual(response.status_code, 200)
@@ -107,7 +117,7 @@ class TestAttendance(TestCase):
 
     def test_delete_attendance(self):
         response = self.client.delete(
-            f'/asistencias/{self.attendance.id}', headers=self.headers)
+            f'/asistencias/{self.attendances[0].id}', headers=self.headers)
         print(response.json)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json[0]['active'], False)
@@ -115,15 +125,15 @@ class TestAttendance(TestCase):
     def test_save_attendance(self):
         response = self.client.post('/asistencias', json={
             'state': True,
-            'course_id': self.course.id,
-            'student_id': self.student.id,
+            'course_id': self.course2.id,
+            'student_id': self.student2.id,
             'active': True
         }, headers=self.headers)
 
         self.assertEqual(response.status_code, 201)
 
     def test_update_attendance(self):
-        response = self.client.patch(f'/asistencias/{self.attendance.id}', json={
+        response = self.client.patch(f'/asistencias/{self.attendances[0].id}', json={
             'state': False
         }, headers=self.headers)
 
