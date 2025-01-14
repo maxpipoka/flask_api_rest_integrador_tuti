@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, request, jsonify, session
+from flask import Blueprint, request, jsonify
 
 from src.utils.decorators import token_required
 
@@ -14,17 +14,17 @@ bp= Blueprint('asistencias', __name__)
 def get_attendances():
     
     try:
-        allAttendances = Attendance.query.filter(Attendance.active == True).order_by(Attendance.id)
+        all_attendances = Attendance.query.filter(Attendance.active == True).order_by(Attendance.id)
 
     except:
         print('404 - No se pueden obtener las asistencias')
         return jsonify({'message':'No se pueden obtener las asistencias'}), 404
     
-    if not allAttendances:
+    if not all_attendances:
         print('400 - No se pueden obtener las asistencias')
         return jsonify({'message':'No se pueden obtener las asistencias'}), 400
     
-    serialized_attendances = [attendance.as_dict() for attendance in allAttendances]
+    serialized_attendances = [attendance.as_dict() for attendance in all_attendances]
 
     print('200 - Asistencias obtenidas')
     return jsonify(serialized_attendances), 200
@@ -33,20 +33,20 @@ def get_attendances():
 # Definicion endpoint obtiene las asistencias inactivas
 @bp.route('/asistencias/inactivas', methods=['GET'])
 @token_required
-def getInactiveAttendances():
+def get_inactive_attendances():
     
     try:
-        allAttendances = Attendance.query.filter(Attendance.active == False).order_by(Attendance.id)
+        all_attendances = Attendance.query.filter(Attendance.active == False).order_by(Attendance.id)
 
     except:
         print('404 - No se pueden obtener las asistencias')
         return jsonify({'message':'No se pueden obtener las asistencias'}), 404
     
-    if not allAttendances:
+    if not all_attendances:
         print('400 - No se pueden obtener las asistencias')	
         return jsonify({'message':'No se pueden obtener las asistencias'}), 400
     
-    serialized_attendances = [attendance.as_dict() for attendance in allAttendances]
+    serialized_attendances = [attendance.as_dict() for attendance in all_attendances]
 
     print('200 - Asistencias inactivas obtenidas')
     return jsonify(serialized_attendances), 200
@@ -55,19 +55,19 @@ def getInactiveAttendances():
 # Definicion endpoint para cerra asistencia de un curso en un dia
 @bp.route('/asistencias/cerrar/<int:id>', methods=['POST'])
 @token_required
-def closeAttendance(id):
+def close_attendance(id):
 
     current_date = datetime.now().date()
     attendances_id = []
 
     try:
-        foundedCourse = db.session.get(Course, id)
-        allAttendances = Attendance.query.filter(
+        founded_course = db.session.get(Course, id)
+        all_attendances = Attendance.query.filter(
              db.cast(Attendance.day, db.Date) == current_date).filter(
             Attendance.course_id==id
             )
         
-        for attendance in allAttendances:
+        for attendance in all_attendances:
             attendances_id.append(attendance.student_id)
 
     except:
@@ -75,9 +75,9 @@ def closeAttendance(id):
         return jsonify({'message':'No se pudo obtener el curso y asistencias'}), 404
     
     try:
-        for student in foundedCourse.students:
+        for student in founded_course.students:
             if student.id not in attendances_id:
-                newAttendance = Attendance(
+                new_attendance = Attendance(
                     course_id = id,
                     student_id = student.id,
                     state = False,
@@ -85,7 +85,7 @@ def closeAttendance(id):
                     day = current_date
                 )
 
-                db.session.add(newAttendance)
+                db.session.add(new_attendance)
         
         db.session.commit()
 
@@ -100,7 +100,7 @@ def closeAttendance(id):
 # Definicion endpoint obtencion de asistencias de un dia y un curso
 @bp.route('/asistencias/revision/', methods=['POST'])
 @token_required
-def getAttendaceByDayAndCourse():
+def get_attendace_by_day_and_course():
     course_id = request.json['course_id']
     date_to_search = request.json['date_to_search']
     founded_attendances = None
@@ -140,20 +140,20 @@ def getAttendaceByDayAndCourse():
 # Definicion endpoint obtencion una asistencia por id
 @bp.route('/asistencias/<int:id>', methods=['GET'])
 @token_required
-def getAttendanceById(id):
+def get_attendance_by_id(id):
 
     try:
-        foundAttendance = db.session.get(Attendance, id)
+        founded_attendance = db.session.get(Attendance, id)
 
     except:
         print('404 - No se pudo obtener la asistencia')
         return jsonify({'message':'No se pudo obtener la asistencia'}), 404
     
-    if not foundAttendance:
+    if not founded_attendance:
         print('400 - No se pudo obtener la asistencia')
         return jsonify({'message':'No se pudo obtener la asistencia'}), 400
     
-    serialized_attendance = [foundAttendance.as_dict()]
+    serialized_attendance = [founded_attendance.as_dict()]
 
     print('200 - Asistencia por id obtenida')
     return jsonify(serialized_attendance),200
@@ -162,18 +162,18 @@ def getAttendanceById(id):
 # Definicion endpoint borrado de asistencia, cambio el activo
 @bp.route('/asistencias/<int:id>', methods=['DELETE'])
 @token_required
-def deleteAttendance(id):
+def delete_attendance(id):
 
     try:
-        foundAttendance = db.session.get(Attendance, id)
+        founded_attendance = db.session.get(Attendance, id)
 
     except:
         print('404 - No se pudo obtener la asistencia')
         return jsonify({'message':'No se pudo obtener la asistencia'}), 404
     
     try:
-        foundAttendance.active = False
-        foundAttendance.updatedAt = datetime.now()
+        founded_attendance.active = False
+        founded_attendance.updatedAt = datetime.now()
         db.session.commit()
 
     except Exception as e:
@@ -181,7 +181,7 @@ def deleteAttendance(id):
         print(f'400 - No se pudo borrar la asistencia - {str(e)}')
         return jsonify({'message':'No se pudo borrar la asistencia'}), 400
     
-    serialized_attendance = [foundAttendance.as_dict()]
+    serialized_attendance = [founded_attendance.as_dict()]
 
     print('200 - Asistencia borrada')
     return jsonify(serialized_attendance), 200
@@ -190,9 +190,9 @@ def deleteAttendance(id):
 # Definicion endpoint creacion asistencia
 @bp.route('/asistencias', methods=['POST'])
 @token_required
-def saveAttendance():
-    newAttendance = None
-    foundedAttendance = None
+def save_attendance():
+    new_attendance = None
+    founded_attendance = None
 
     if not request.json:
         print('400 - JSON data is missing or invalid')
@@ -212,12 +212,12 @@ def saveAttendance():
     # Comprobación de no guardado de una asistencia para el mismo alumno
     # mismo curso y mismo dia.
     try:
-        foundedAttendance = Attendance.query.filter(
+        founded_attendance = Attendance.query.filter(
             db.cast(Attendance.day, db.Date) ==current_date).filter(
             Attendance.student_id == request.json['student_id']).filter(
             Attendance.course_id == request.json['course_id'])
 
-        serialized_attendances = [attendance.as_dict() for attendance in foundedAttendance]
+        serialized_attendances = [attendance.as_dict() for attendance in founded_attendance]
         
         if serialized_attendances:
             print('406 - Asistencia ya registrada')
@@ -226,7 +226,7 @@ def saveAttendance():
         pass
     
     try:
-        newAttendance = Attendance(
+        new_attendance = Attendance(
             course_id = request.json['course_id'],
             student_id = request.json['student_id'],
             state = request.json['state'],
@@ -247,7 +247,7 @@ def saveAttendance():
         return jsonify({'message3':'No se puede crear la instancia'}), 400
     
     try:
-        db.session.add(newAttendance)
+        db.session.add(new_attendance)
 
     except:
         print('400 - No se pudo ADD asistencia')
@@ -267,16 +267,16 @@ def saveAttendance():
 # Definicion endpoint edicion asistencia
 @bp.route('/asistencias/<int:id>', methods=['PATCH'])
 @token_required
-def updateAttendance(id):
+def update_attendance(id):
 
     try:
-        foundAttendance = db.session.get(Attendance, id)
+        founded_attendance = db.session.get(Attendance, id)
 
     except:
         print('404 - No se puede obtener la asistencia')
         return jsonify({'message': 'No se puede obtener la asistencia'}), 404
     
-    if not foundAttendance:
+    if not founded_attendance:
         print('400 - No se puede obtener la asistencia a editar')
         return jsonify({'message': 'No se puede obtener la asistencia a editar'}), 400
     
@@ -290,17 +290,17 @@ def updateAttendance(id):
         updated = False
 
         if 'state' in data:
-            foundAttendance.state = data['state']
+            founded_attendance.state = data['state']
             updated = True
         if 'day' in data:
-            foundAttendance.day = data['day']
+            founded_attendance.day = data['day']
             updated = True
         if 'active' in data:
-            foundAttendance.active = data['active']
+            founded_attendance.active = data['active']
             updated = True
 
         if updated:
-            foundAttendance.updatedAt = datetime.now()
+            founded_attendance.updatedAt = datetime.now()
 
         db.session.commit()
         print('201 - Asistencia modificada')
@@ -311,6 +311,6 @@ def updateAttendance(id):
         print('500 - Error al modificar los campos de la asistencia: ' + str(e))
         return jsonify({'message':'Error al modificar los campos de la asistencia: ' + str(e)}), 500
     
-    serialized_attendance = foundAttendance.as_dict()
+    serialized_attendance = founded_attendance.as_dict()
 
     return jsonify(serialized_attendance), 200

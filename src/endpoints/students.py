@@ -21,18 +21,18 @@ tutors_schema = TutorSchema(many=True)
 # Definicion endpoint obtiene todos los alumnos
 @bp.route('/alumnos', methods=['GET'])
 @token_required
-def getStudents():
+def get_students():
 
     try:
-        allStudents = Student.query.filter(Student.active == True).order_by(Student.id)
+        all_students = Student.query.filter(Student.active == True).order_by(Student.id)
         
     except:
         return jsonify({"message":"No se pudieron obtener alumnos"}), 404
     
-    if not allStudents:
+    if not all_students:
         return jsonify({"message":"No se pueden obtener los alumnos"}), 400
 
-    serialized_students = [student.as_dict() for student in allStudents]
+    serialized_students = [student.as_dict() for student in all_students]
 
     return jsonify(serialized_students), 200
 
@@ -40,18 +40,18 @@ def getStudents():
 # Definicion endpoint obtiene un solo alumno filtrado por id
 @bp.route('/alumnos/<id>', methods=['GET'])
 @token_required
-def getStudentById(id):
+def get_student_by_id(id):
     
     try:
-        foundStudent = db.session.get(Student, id)
+        founded_student = db.session.get(Student, id)
 
-        if not foundStudent:
+        if not founded_student:
             return jsonify({"message":"Alumno no encontrado"}), 404
     
     except:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
 
-    serialized_student = student_schema.dump(foundStudent)
+    serialized_student = student_schema.dump(founded_student)
 
     return jsonify(serialized_student), 200
 
@@ -59,22 +59,22 @@ def getStudentById(id):
 # Definicion endpoint 'borra' un alumno, cambia el activo
 @bp.route('/alumnos/<id>', methods=['DELETE'])
 @token_required
-def deteleStudent(id):
+def detele_student(id):
     try:
-        foundStudent = db.session.get(Student, id)
+        founded_student = db.session.get(Student, id)
     except:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     try:
-        foundStudent.active = False
-        foundStudent.updatedAt = datetime.now()
+        founded_student.active = False
+        founded_student.updatedAt = datetime.now()
         db.session.commit()
 
     except Exception as e:
         db.session.rollback()  # Revertir la transacción en caso de error
         return jsonify({"message":f"No se pudo modificar el alumno - {str(e)}"}), 204
 
-    serialized_student = student_schema.dump(foundStudent)
+    serialized_student = student_schema.dump(founded_student)
 
     response_data = json.dumps(serialized_student, ensure_ascii=False)
 
@@ -84,15 +84,15 @@ def deteleStudent(id):
 # Definicionn endpoint creacion alumno
 @bp.route('/alumnos', methods=['POST'])
 @token_required
-def saveStudent():
+def save_student():
 
-    newStudent = None
+    new_student = None
 
     if not request.json:
         return jsonify({'message': 'JSON data is missing or invalid'}), 400
 
     try:
-        newStudent = Student(
+        new_student = Student(
             dni= request.json['dni'],
             names= request.json['names'],
             surnames= request.json['surnames'],
@@ -110,7 +110,7 @@ def saveStudent():
     
     
     try:
-       db.session.add(newStudent)
+       db.session.add(new_student)
     except:
         return jsonify({'message':'No se pudo ADD alumno'}), 400
     
@@ -126,13 +126,13 @@ def saveStudent():
 # Definicionn endpoint edicion alumno
 @bp.route('/alumnos/<id>', methods=['PATCH'])
 @token_required
-def updateStudent(id):
+def update_student(id):
     try:
-        foundStudent = db.session.get(Student, id)
+        founded_student = db.session.get(Student, id)
     except:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
-    if not foundStudent:
+    if not founded_student:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     try:
@@ -144,34 +144,34 @@ def updateStudent(id):
         updated = False
 
         if 'names' in data:
-            foundStudent.names = data['names']
+            founded_student.names = data['names']
             updated = True
 
         if 'surnames' in data:
-            foundStudent.surnames = data['surnames']
+            founded_student.surnames = data['surnames']
             updated = True
 
         if 'address' in data:
-            foundStudent.address = data['address']
+            founded_student.address = data['address']
             updated = True
 
         if 'email' in data and data['email']:
-            foundStudent.email = data['email']
+            founded_student.email = data['email']
             updated = True
 
         if 'active' in data:
-            foundStudent.active = data['active']
+            founded_student.active = data['active']
             updated = True
 
         if updated:
-            foundStudent.updatedAt = datetime.now()
+            founded_student.updatedAt = datetime.now()
 
         db.session.commit()
     except Exception as e:
         db.session.rollback()  # Revertir la transacción en caso de error
         return jsonify({"message": "Error al modificar los campos del alumno: " + str(e)}), 500
     
-    serialized_student = student_schema.dump(foundStudent)
+    serialized_student = student_schema.dump(founded_student)
 
     response_data = json.dumps(serialized_student, ensure_ascii=False)
 
