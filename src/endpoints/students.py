@@ -43,7 +43,7 @@ def getStudents():
 def getStudentById(id):
     
     try:
-        foundStudent = Student.query.get(id)
+        foundStudent = db.session.get(Student, id)
 
         if not foundStudent:
             return jsonify({"message":"Alumno no encontrado"}), 404
@@ -61,18 +61,18 @@ def getStudentById(id):
 @token_required
 def deteleStudent(id):
     try:
-        foundStudent = Student.query.get(id)
+        foundStudent = db.session.get(Student, id)
     except:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     try:
         foundStudent.active = False
-        foundStudent.updatedAt = datetime.now
+        foundStudent.updatedAt = datetime.now()
         db.session.commit()
 
-    except:
+    except Exception as e:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return jsonify({"message":"No se pudo modificar el alumno"}), 204
+        return jsonify({"message":f"No se pudo modificar el alumno - {str(e)}"}), 204
 
     serialized_student = student_schema.dump(foundStudent)
 
@@ -128,7 +128,7 @@ def saveStudent():
 @token_required
 def updateStudent(id):
     try:
-        foundStudent = Student.query.get(id)
+        foundStudent = db.session.get(Student, id)
     except:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
@@ -184,8 +184,8 @@ def updateStudent(id):
 def associate_tutor_with_student(alumno_id, tutor_id):
     try:
         # Buscar el estudiante y el tutor en la base de datos
-        student = Student.query.get(alumno_id)
-        tutor = Tutor.query.get(tutor_id)
+        student = db.session.get(Student, alumno_id)
+        tutor = db.session.get(Tutor, tutor_id)
         
         if not student or not tutor:
             return jsonify({"message":"No se encontró el estudiante o el tutor"}), 404
