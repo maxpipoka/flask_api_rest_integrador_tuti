@@ -11,18 +11,18 @@ bp = Blueprint('cursos', __name__)
 # Definicion endpoint obtiene todos los cursos
 @bp.route('/cursos', methods=['GET'])
 @token_required
-def getCourses():
+def get_courses():
 
     try:
-        allCourses = Course.query.filter(Course.active == True).order_by(Course.level, Course.year, Course.division)
+        all_courses = Course.query.filter(Course.active == True).order_by(Course.level, Course.year, Course.division)
 
     except:
         return jsonify({'message':'No se pueden obtener los cursos'}), 404
     
-    if not allCourses:
+    if not all_courses:
         return jsonify({'message':'No se pueden obtener los cursos'}), 400
     
-    serialized_courses = [course.as_dict() for course in allCourses]
+    serialized_courses = [course.as_dict() for course in all_courses]
 
     return jsonify(serialized_courses), 200
 
@@ -31,19 +31,19 @@ def getCourses():
 # de un usuario específico (Preceptor)
 @bp.route('/cursos/preceptor/<int:preceptor_id>', methods=['GET'])
 @token_required
-def getCoursesByPreceptor(preceptor_id):
+def get_courses_by_preceptor(preceptor_id):
     
     try:
-        foundedCourses = Course.query.filter(Course.associated_user == preceptor_id).filter(Course.active == True).filter(Course.current == True).order_by(Course.level, Course.year, Course.division)
+        founded_courses = Course.query.filter(Course.associated_user == preceptor_id).filter(Course.active == True).filter(Course.current == True).order_by(Course.level, Course.year, Course.division)
 
     except:
         return jsonify({'message':'No se puede obtener los cursos'}), 404
     
-    if not foundedCourses:
+    if not founded_courses:
         return jsonify({'message':'No se encontraron cursos'}), 404
     
     
-    serialized_courses = [course.as_dict() for course in foundedCourses]
+    serialized_courses = [course.as_dict() for course in founded_courses]
 
     return jsonify(serialized_courses), 200
 
@@ -51,18 +51,18 @@ def getCoursesByPreceptor(preceptor_id):
 # Definicion endpoint obtiene un solo curso filtrado por id
 @bp.route('/cursos/<id>', methods=['GET'])
 @token_required
-def getCourseById(id):
+def get_course_by_id(id):
     
     try:
-        foundCourse = Course.query.get(id)
+        founded_course = db.session.get(Course, id)
 
     except:
         return jsonify({'message': 'No se pudo obtener el curso'}), 404
     
-    if not foundCourse:
+    if not founded_course:
         return jsonify({'message':'El curso no existe'}), 404
     
-    serialized_course = foundCourse.as_dict()
+    serialized_course = founded_course.as_dict()
 
     return jsonify(serialized_course), 200
 
@@ -70,24 +70,24 @@ def getCourseById(id):
 # Definicion endpoint 'borra' un curso, cambio del activo
 @bp.route('/cursos/<int:id>', methods=['DELETE'])
 @token_required
-def deleteCourse(id):
+def delete_course(id):
 
     try:
-        foundCourse = Course.query.get(id)
+        founded_course = db.session.get(Course, id)
 
     except:
         return jsonify({'message':'No se pudo obtener el curso'}), 404
     
     try:
-        foundCourse.active = False
-        foundCourse.updatedAt = datetime.now()
+        founded_course.active = False
+        founded_course.updatedAt = datetime.now()
         db.session.commit()
 
     except:
         db.session.rollback()  # Revertir la transacción en caso de error
         return jsonify({'message':'No se pudo borrar el curso'}), 404
     
-    serialized_course = [foundCourse.as_dict()]
+    serialized_course = [founded_course.as_dict()]
 
     return jsonify(serialized_course), 201
 
@@ -99,23 +99,24 @@ def asociate_student_to_course(course_id, student_id):
     
     try:
         # Busqueda de las instancias
-        foundedStudent = Student.query.get(student_id)
-        foundedCourse = Course.query.get(course_id)
+        founded_student = db.session.get(Student, student_id)
+        founded_course = db.session.get(Course, course_id)
 
     except:
         return jsonify({'message':'No se pueden encontrar las instancias'}), 404
     
-    if not foundedStudent or not foundedCourse:
+    
+    if not founded_student or not founded_course:
         return jsonify({'message':'Estudiante o Curso son invalidos'}), 404
 
 
-    for studentIn in foundedCourse.students:
-        if foundedStudent.id == studentIn.id:
+    for student_in in founded_course.students:
+        if founded_student.id == student_in.id:
             return jsonify({'message':'El alumno ya se encuentra asignado'}), 400
     
     try:
         # Asociación del alumno con el curso
-        foundedCourse.students.append(foundedStudent)
+        founded_course.students.append(founded_student)
         db.session.commit()
 
     except Exception as e:
@@ -129,15 +130,15 @@ def asociate_student_to_course(course_id, student_id):
 # Definicion endpoint creacion curso
 @bp.route('/cursos', methods=['POST'])
 @token_required
-def saveCourse():
+def save_course():
 
-    newCourse = None
+    new_course = None
 
     if not request.json:
         return jsonify({'message':'JSON data is missing of invalid'}), 400
     
     try:
-        newCourse = Course(
+        new_course = Course(
             level = request.json['level'],
             division = request.json['division'],
             year = request.json['year'],
@@ -155,7 +156,7 @@ def saveCourse():
     
 
     try:
-        db.session.add(newCourse)
+        db.session.add(new_course)
 
     except:
         return jsonify({'message':'No se pudo agregar el curso'}), 400
@@ -172,15 +173,15 @@ def saveCourse():
 # Definicion endpoint edicion curso
 @bp.route('/cursos/<id>', methods=['PATCH'])
 @token_required
-def updateCourse(id):
+def update_course(id):
 
     try:
-        foundCourse = Course.query.get(id)
+        founded_course = db.session.get(Course, id)
 
     except:
         return jsonify({'message': 'No se puede obtener el curso'}), 404
     
-    if not foundCourse:
+    if not founded_course:
         return jsonify({'message': 'No se puede obtener el curso'}), 404
     
     try:
@@ -193,31 +194,31 @@ def updateCourse(id):
         updated = False
 
         if 'level' in data:
-            foundCourse.level = data['level']
+            founded_course.level = data['level']
             updated = True
 
         if 'division' in data:
-            foundCourse.division = data['division']
+            founded_course.division = data['division']
             updated = True
 
         if 'year' in data:
-            foundCourse.year = data['year']
+            founded_course.year = data['year']
             updated = True
 
         if 'current' in data:
-            foundCourse.current = data['current']
+            founded_course.current = data['current']
             updated = True
 
         if 'active' in data:
-            foundCourse.active = data['active']
+            founded_course.active = data['active']
             updated = True
 
         if 'associated_user' in data:
-            foundCourse.associated_user = data['associated_user']
+            founded_course.associated_user = data['associated_user']
             updated = True
 
         if updated:
-            foundCourse.updatedAt = datetime.now()
+            founded_course.updatedAt = datetime.now()
 
 
         db.session.commit()
@@ -226,6 +227,6 @@ def updateCourse(id):
         db.session.rollback() # Reversion transaccion
         return jsonify({'message':'Error al modificar los campos del curso: ' + str(e)}), 500
     
-    serialized_course = foundCourse.as_dict()
+    serialized_course = founded_course.as_dict()
 
     return jsonify(serialized_course), 200
