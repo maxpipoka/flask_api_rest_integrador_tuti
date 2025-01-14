@@ -18,31 +18,31 @@ tutors_schema = TutorSchema(many=True)
 # Definicion endpoint obtiene todos los tutores
 @bp.route('/tutores', methods=['GET'])
 @token_required
-def getTutors():
+def get_tutors():
     try:
-        allTutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
+        all_tutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
     except:
         return jsonify({"message": "No se puede obtener los tutores"}), 404
     
-    if not allTutors:
+    if not all_tutors:
         return jsonify({"message": "No se pueden obtener los tutores"}), 400
     
-    serialized_tutors = [tutor.as_dict() for tutor in allTutors]
+    serialized_tutors = [tutor.as_dict() for tutor in all_tutors]
 
 
     return jsonify(serialized_tutors), 200
 
 
-# Definición endpoint obtiene un solo alumno filtrado por id
+# Definición endpoint obtiene un solo tutor filtrado por id
 @bp.route('/tutores/<id>', methods=['GET'])
 @token_required
-def getTutorById(id):
+def get_tutor_by_id(id):
     try:
-        foundedTutor = Tutor.query.get(id)
+        founded_tutor = db.session.get(Tutor, id)
     except:
         return jsonify({"message":"No se puede obtener el tutor"}), 400
     
-    serialized_tutor = tutor_schema.dump(foundedTutor)
+    serialized_tutor = tutor_schema.dump(founded_tutor)
 
     response_data = json.dumps(serialized_tutor, ensure_ascii=False)
 
@@ -52,22 +52,22 @@ def getTutorById(id):
 # Definicion endpoint que borra un tutor, cambia el activo
 @bp.route('/tutores/<id>', methods=['DELETE'])
 @token_required
-def deleteTutor(id):
+def delete_tutor(id):
     try:
-        foundedTutor = Tutor.query.get(id)
+        founded_tutor = db.session.get(Tutor, id)
     except:
         return jsonify({"message": "No se puede obtener el tutor"}), 404
     
     try:
-        foundedTutor.active = False
-        foundedTutor.updatedAt = datetime.now()
+        founded_tutor.active = False
+        founded_tutor.updatedAt = datetime.now()
         db.session.commit()
         
     except:
         db.session.rollback()  # Revertir la transacción en caso de error
         return jsonify({"message":"No se pudo borrar el tutor"}), 400
     
-    serialized_tutor = tutor_schema.dump(foundedTutor)
+    serialized_tutor = tutor_schema.dump(founded_tutor)
 
     response_data = json.dumps(serialized_tutor, ensure_ascii=False)
 
@@ -77,21 +77,20 @@ def deleteTutor(id):
 # Definicion endpoint creacion tutor
 @bp.route('/tutores', methods=['POST'])
 @token_required
-def saveTuror():
-    newTutor = None
+def save_turor():
+    new_tutor = None
 
     if not request.json:
         return jsonify({'message': 'JSON data is missing or invalid'}), 400
 
     try:
-        newTutor = Tutor(
+        new_tutor = Tutor(
             dni= request.json['dni'],
             names= request.json['names'],
             surnames= request.json['surnames'],
             address= request.json['address'],
             email= request.json['email'],
             active=request.json['active'],
-            student_id=request.json['student_id']
             )
     except KeyError as e:
         return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
@@ -101,7 +100,7 @@ def saveTuror():
         return jsonify({'message':'No se puede crear la instancia'}), 400
     
     try:
-        db.session.add(newTutor)
+        db.session.add(new_tutor)
     except:
         return jsonify({'message':'No se pudo ADD tutor'}), 400
     
@@ -112,17 +111,17 @@ def saveTuror():
     except:
         return jsonify({'message':'No se puede commit'}), 400
     
-
+# Deficion endpoint edicion tutor
 @bp.route('/tutores/<id>', methods=['PATCH'])
 @token_required
-def updateTutor(id):
+def update_tutor(id):
     try:
-        foundTutor = Tutor.query.get(id)
+        founded_tutor = db.session.get(Tutor, id)
         
     except:
         return jsonify({"message":"No se pudo obtener el tutor"}), 404
     
-    if not foundTutor:
+    if not founded_tutor:
         return jsonify({"message":"No se pudo obtener el tutor"}), 404
     
     try:
@@ -134,38 +133,38 @@ def updateTutor(id):
         updated = False
 
         if 'names' in data:
-            foundTutor.names = data['names']
+            founded_tutor.names = data['names']
             updated = True
 
         if 'surnames' in data:
-            foundTutor.surnames = data['surnames']
+            founded_tutor.surnames = data['surnames']
             updated = True
 
         if 'address' in data:
-            foundTutor.address = data['address']
+            founded_tutor.address = data['address']
             updated = True
 
         if 'email' in data and data['email']:
-            foundTutor.email = data['email']
+            founded_tutor.email = data['email']
             updated = True
 
         if 'active' in data:
-            foundTutor.active = data['active']
+            founded_tutor.active = data['active']
             updated = True
 
         if 'student_id' in data:
-            foundTutor.student_id = data['student_id']
+            founded_tutor.student_id = data['student_id']
             updated = True
 
         if updated:
-            foundTutor.updatedAt = datetime.now()
+            founded_tutor.updatedAt = datetime.now()
 
         db.session.commit()
     except Exception as e:
         db.session.rollback()  # Revertir la transacción en caso de error
         return jsonify({"message": "Error al modificar los campos del tutor: " + str(e)}), 500
     
-    serialized_tutor = tutor_schema.dump(foundTutor)
+    serialized_tutor = tutor_schema.dump(founded_tutor)
 
     response_data = json.dumps(serialized_tutor, ensure_ascii=False)
 
