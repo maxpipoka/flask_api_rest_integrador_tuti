@@ -109,9 +109,7 @@ class Tutor(db.Model):
 
 
 class Course(db.Model):
-    __tablename__ = 'courses'
-
-    
+    __tablename__ = 'courses'    
 
     id = db.Column(db.Integer(), primary_key=True)
     level = db.Column(db.Integer(), nullable=False)
