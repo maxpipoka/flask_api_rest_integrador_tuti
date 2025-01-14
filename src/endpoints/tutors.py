@@ -38,7 +38,7 @@ def getTutors():
 @token_required
 def getTutorById(id):
     try:
-        foundedTutor = Tutor.query.get(id)
+        foundedTutor = db.session.get(Tutor, id)
     except:
         return jsonify({"message":"No se puede obtener el tutor"}), 400
     
@@ -54,7 +54,7 @@ def getTutorById(id):
 @token_required
 def deleteTutor(id):
     try:
-        foundedTutor = Tutor.query.get(id)
+        foundedTutor = db.session.get(Tutor, id)
     except:
         return jsonify({"message": "No se puede obtener el tutor"}), 404
     
@@ -91,7 +91,6 @@ def saveTuror():
             address= request.json['address'],
             email= request.json['email'],
             active=request.json['active'],
-            student_id=request.json['student_id']
             )
     except KeyError as e:
         return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
@@ -117,7 +116,7 @@ def saveTuror():
 @token_required
 def updateTutor(id):
     try:
-        foundTutor = Tutor.query.get(id)
+        foundTutor = db.session.get(Tutor, id)
         
     except:
         return jsonify({"message":"No se pudo obtener el tutor"}), 404
