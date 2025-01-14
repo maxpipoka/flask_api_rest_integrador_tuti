@@ -50,4 +50,4 @@ def registerUser():
     except Exception as e:
         return jsonify({'message': f'Error: {str(e)}'}), 400
     
-    return jsonify({'message':'Usuario registrado'}), 200
+    return jsonify({'message':'Usuario registrado'}), 201

@@ -3,7 +3,6 @@ from src.app import app, db
 from flask_testing import TestCase
 import sys
 import os
-import unittest
 import uuid
 
 # Agregado del directorio 'src' al PYTHONPATH
