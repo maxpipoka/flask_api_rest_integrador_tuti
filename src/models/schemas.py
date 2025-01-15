@@ -15,8 +15,8 @@ class TutorSchema(ma.Schema):
                   'email',
                   'students', 
                   'student_id', 
-                  'createdAt', 
-                  'updatedAt', 
+                  'created_at', 
+                  'updated_at', 
                   'active')
         
 class StudentSchema(ma.Schema):
@@ -29,8 +29,8 @@ class StudentSchema(ma.Schema):
                   'address', 
                   'email',
                   'tutors', 
-                  'createdAt', 
-                  'updatedAt', 
+                  'created_at', 
+                  'updated_at', 
                   'active')
 
 
