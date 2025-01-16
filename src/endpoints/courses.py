@@ -80,7 +80,7 @@ def delete_course(id):
     
     try:
         founded_course.active = False
-        founded_course.updatedAt = datetime.now()
+        founded_course.updated_at = datetime.now()
         db.session.commit()
 
     except:
@@ -218,7 +218,7 @@ def update_course(id):
             updated = True
 
         if updated:
-            founded_course.updatedAt = datetime.now()
+            founded_course.updated_at = datetime.now()
 
 
         db.session.commit()

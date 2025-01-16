@@ -173,7 +173,7 @@ def delete_attendance(id):
     
     try:
         founded_attendance.active = False
-        founded_attendance.updatedAt = datetime.now()
+        founded_attendance.updated_at = datetime.now()
         db.session.commit()
 
     except Exception as e:
@@ -300,7 +300,7 @@ def update_attendance(id):
             updated = True
 
         if updated:
-            founded_attendance.updatedAt = datetime.now()
+            founded_attendance.updated_at = datetime.now()
 
         db.session.commit()
         print('201 - Asistencia modificada')
