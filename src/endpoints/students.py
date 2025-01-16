@@ -67,7 +67,7 @@ def detele_student(id):
     
     try:
         founded_student.active = False
-        founded_student.updatedAt = datetime.now()
+        founded_student.updated_at = datetime.now()
         db.session.commit()
 
     except Exception as e:
@@ -164,7 +164,7 @@ def update_student(id):
             updated = True
 
         if updated:
-            founded_student.updatedAt = datetime.now()
+            founded_student.updated_at = datetime.now()
 
         db.session.commit()
     except Exception as e:
