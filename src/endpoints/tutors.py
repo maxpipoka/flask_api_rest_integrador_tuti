@@ -60,7 +60,7 @@ def delete_tutor(id):
     
     try:
         founded_tutor.active = False
-        founded_tutor.updatedAt = datetime.now()
+        founded_tutor.updated_at = datetime.now()
         db.session.commit()
         
     except:
@@ -157,7 +157,7 @@ def update_tutor(id):
             updated = True
 
         if updated:
-            founded_tutor.updatedAt = datetime.now()
+            founded_tutor.updated_at = datetime.now()
 
         db.session.commit()
     except Exception as e:
