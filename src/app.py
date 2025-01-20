@@ -1,12 +1,10 @@
 import os
 
-from flask import Flask, request, jsonify
+from flask import Flask
+from flask_cors import CORS
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-
-from sqlalchemy import select
-from dataclasses import dataclass
 
 from .models.models import db
 
@@ -21,6 +19,12 @@ load_dotenv()
 
 # Generación instancia aplicacion de Flask
 app = Flask(__name__)
+
+# Permitir todas las orígenes (temporalmente para pruebas)
+CORS(app)
+
+# O permitir solo dominios específicos
+CORS(app, origins=[os.getenv('FRONTEND_URL')])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
