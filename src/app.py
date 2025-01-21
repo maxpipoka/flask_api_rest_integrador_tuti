@@ -24,7 +24,7 @@ app = Flask(__name__)
 CORS(app)
 
 # O permitir solo dominios específicos
-CORS(app, origins=[os.getenv('FRONTEND_URL')])
+# CORS(app, origins=[os.getenv('FRONTEND_URL')])
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DB_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']= False
