@@ -84,6 +84,11 @@ class TestAttendance(TestCase):
         response = self.client.get('/asistencias', headers=self.headers)
         self.assertEqual(response.status_code, 200)
 
+
+    def test_get_all_attendances_by_student_id(self):
+        response = self.client.get(f'/asistencias/alumno/{self.students[0].id}', headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+
     def test_get_inactive_attendances_checking_active_field_its_false(self):
         response = self.client.get('/asistencias/inactivas', 
                                              headers=self.headers)
