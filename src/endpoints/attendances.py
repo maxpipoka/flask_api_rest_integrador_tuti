@@ -79,7 +79,7 @@ def get_attendance_by_id(id):
 def get_attendances_by_student_id(id):
 
     try:
-        founded_attendances = Attendance.query.filter(Attendance.student_id == id).all()
+        founded_attendances = Attendance.query.filter(Attendance.student_id == id).all().orderby(Attendance.day).asc()
 
     except:
         print('404 - No se pudo obtener las asistencias')
