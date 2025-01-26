@@ -52,6 +52,48 @@ def get_inactive_attendances():
     return jsonify(serialized_attendances), 200
 
 
+# Definicion endpoint obtencion una asistencia por id
+@bp.route('/asistencias/<int:id>', methods=['GET'])
+@token_required
+def get_attendance_by_id(id):
+
+    try:
+        founded_attendance = db.session.get(Attendance, id)
+
+    except:
+        print('404 - No se pudo obtener la asistencia')
+        return jsonify({'message':'No se pudo obtener la asistencia'}), 404
+    
+    if not founded_attendance:
+        print('400 - No se pudo obtener la asistencia')
+        return jsonify({'message':'No se pudo obtener la asistencia'}), 400
+    
+    serialized_attendance = [founded_attendance.as_dict()]
+
+    print('200 - Asistencia por id obtenida')
+    return jsonify(serialized_attendance),200
+
+# Definicion endpoint obtencion de asistencias por id de alumno
+@bp.route('/asistencias/alumno/<int:id>', methods=['GET'])
+@token_required
+def get_attendances_by_student_id(id):
+
+    try:
+        founded_attendances = Attendance.query.filter(Attendance.student_id == id).all()
+
+    except:
+        print('404 - No se pudo obtener las asistencias')
+        return jsonify({'message':'No se pudo obtener las asistencias'}), 404
+    
+    if not founded_attendances:
+        print('400 - No se pudo obtener las asistencias')
+        return jsonify({'message':'No se pudo obtener las asistencias'}), 400
+    
+    serialized_attendances = [attendance.as_dict() for attendance in founded_attendances]
+
+    print('200 - Asistencias por id de alumno obtenidas')
+    return jsonify(serialized_attendances), 200
+
 # Definicion endpoint para cerra asistencia de un curso en un dia
 @bp.route('/asistencias/cerrar/<int:id>', methods=['POST'])
 @token_required
@@ -135,28 +177,6 @@ def get_attendace_by_day_and_course():
 
     print('200 - Asistencias de 1 dia y 1 curso obtenidas')
     return jsonify(attendances_response), 200
-
-
-# Definicion endpoint obtencion una asistencia por id
-@bp.route('/asistencias/<int:id>', methods=['GET'])
-@token_required
-def get_attendance_by_id(id):
-
-    try:
-        founded_attendance = db.session.get(Attendance, id)
-
-    except:
-        print('404 - No se pudo obtener la asistencia')
-        return jsonify({'message':'No se pudo obtener la asistencia'}), 404
-    
-    if not founded_attendance:
-        print('400 - No se pudo obtener la asistencia')
-        return jsonify({'message':'No se pudo obtener la asistencia'}), 400
-    
-    serialized_attendance = [founded_attendance.as_dict()]
-
-    print('200 - Asistencia por id obtenida')
-    return jsonify(serialized_attendance),200
 
 
 # Definicion endpoint borrado de asistencia, cambio el activo
