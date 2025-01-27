@@ -77,17 +77,34 @@ def get_attendance_by_id(id):
 @bp.route('/asistencias/alumno/<int:id>', methods=['GET'])
 @token_required
 def get_attendances_by_student_id(id):
+    # Obtener los parámetros de consulta 'start' y 'end'
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
 
     try:
-        founded_attendances = Attendance.query.filter(Attendance.student_id == id).order_by(Attendance.day.asc()).all()
+        # Construir la consulta base
+        query = Attendance.query.filter(Attendance.student_id == id)
 
-    except:
-        print('404 - No se pudo obtener las asistencias')
-        return jsonify({'message':'No se pudo obtener las asistencias'}), 404
+        # Filtrar por fecha de inicio si se proporciona
+        if start_date:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')  # Asegúrate de que el formato sea el correcto
+            query = query.filter(Attendance.day >= start_date)
+
+        # Filtrar por fecha de finalización si se proporciona
+        if end_date:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')  # Asegúrate de que el formato sea el correcto
+            query = query.filter(Attendance.day <= end_date)
+
+        # Obtener las asistencias filtradas
+        founded_attendances = query.order_by(Attendance.day.asc()).all()
+
+    except Exception as e:
+        print(f'404 - No se pudo obtener las asistencias: {e}')
+        return jsonify({'message': 'No se pudo obtener las asistencias'}), 404
     
     if not founded_attendances:
-        print('400 - No se pudo obtener las asistencias')
-        return jsonify({'message':'No se pudo obtener las asistencias'}), 400
+        print('400 - No se encontraron asistencias')
+        return jsonify({'message': 'No se encontraron asistencias'}), 400
     
     serialized_attendances = [attendance.as_dict() for attendance in founded_attendances]
 
