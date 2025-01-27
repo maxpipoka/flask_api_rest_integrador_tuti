@@ -81,22 +81,28 @@ def get_attendances_by_student_id(id):
     start_date = request.args.get('start')
     end_date = request.args.get('end')
 
+    print(f'Start date: {start_date}, End date: {end_date}')
+
     try:
         # Construir la consulta base
         query = Attendance.query.filter(Attendance.student_id == id)
+        print(query)
 
         # Filtrar por fecha de inicio si se proporciona
         if start_date:
             start_date = datetime.strptime(start_date, '%Y-%m-%d')  # Asegúrate de que el formato sea el correcto
             query = query.filter(Attendance.day >= start_date)
+            print(f'Query sin el start {query}')
 
         # Filtrar por fecha de finalización si se proporciona
         if end_date:
             end_date = datetime.strptime(end_date, '%Y-%m-%d')  # Asegúrate de que el formato sea el correcto
             query = query.filter(Attendance.day <= end_date)
+            print(f'Query sin el end {query}')
 
         # Obtener las asistencias filtradas
         founded_attendances = query.order_by(Attendance.day.asc()).all()
+        print(founded_attendances)
 
     except Exception as e:
         print(f'404 - No se pudo obtener las asistencias: {e}')
