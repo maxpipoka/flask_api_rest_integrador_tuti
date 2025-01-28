@@ -28,7 +28,11 @@ def login_user():
     if founded_user:
         if founded_user.password == request.json['password']:
             token = generate_token(founded_user.id)
-            return jsonify({'message': 'Usuario autenticado', 'username': founded_user.username, 'user_id': founded_user.id, 'access_level': founded_user.access_level, 'token': token}), 200
+            return jsonify({'message': 'Usuario autenticado', 
+                            'username': founded_user.username, 
+                            'user_id': founded_user.id, 
+                            'access_level': founded_user.access_level, 
+                            'token': token}), 200
         else:
             return jsonify({'message':'Contraseña incorrecta'}), 401
         
