@@ -26,8 +26,8 @@ def get_students():
     try:
         all_students = Student.query.filter(Student.active == True).order_by(Student.id)
         
-    except:
-        return jsonify({"message":"No se pudieron obtener alumnos"}), 404
+    except Exception as error:
+        return jsonify({"message":f"No se pudieron obtener alumnos - {str(error)}"}), 404
     
     if not all_students:
         return jsonify({"message":"No se pueden obtener los alumnos"}), 400
@@ -48,8 +48,8 @@ def get_student_by_id(id):
         if not founded_student:
             return jsonify({"message":"Alumno no encontrado"}), 404
     
-    except:
-        return jsonify({"message":"No se pudo obtener el alumno"}), 404
+    except Exception as error:
+        return jsonify({"message":f"No se pudo obtener el alumno - {str(error)}"}), 404
 
     serialized_student = student_schema.dump(founded_student)
 
@@ -60,19 +60,21 @@ def get_student_by_id(id):
 @bp.route('/alumnos/<id>', methods=['DELETE'])
 @token_required
 def detele_student(id):
+
     try:
         founded_student = db.session.get(Student, id)
-    except:
-        return jsonify({"message":"No se pudo obtener el alumno"}), 404
+
+    except Exception as error:
+        return jsonify({"message":f"No se pudo obtener el alumno - {str(error)}"}), 404
     
     try:
         founded_student.active = False
         founded_student.updated_at = datetime.now()
         db.session.commit()
 
-    except Exception as e:
+    except Exception as error:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return jsonify({"message":f"No se pudo modificar el alumno - {str(e)}"}), 204
+        return jsonify({"message":f"No se pudo modificar el alumno - {str(error)}"}), 204
 
     serialized_student = student_schema.dump(founded_student)
 
@@ -101,26 +103,25 @@ def save_student():
             active = request.json['active']
             )
 
-    except KeyError as e:
-        return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
-    except Exception as e:
-        return jsonify({'message': f'Error: {str(e)}'}), 400
-    except:
-        return jsonify({'message':'No se puede crear la instancia'}), 400
+    except KeyError as error:
+        return jsonify({'message': f'Missing field: {error.args[0]}'}), 400
+    
+    except Exception as error:
+        return jsonify({'message':f'No se puede crear la instancia - {str(error)}'}), 400
     
     
     try:
        db.session.add(new_student)
-    except:
-        return jsonify({'message':'No se pudo ADD alumno'}), 400
+    except Exception as error:
+        return jsonify({'message':f'No se pudo ADD alumno - {str(error)}'}), 400
     
     try:
         # Confirmación de las operaciones creadas en la session
         db.session.commit()
         return jsonify({'message':'Success'}), 201
     
-    except:
-        return jsonify({'message':'No se puede commit'}), 400
+    except Exception as error:
+        return jsonify({'message':f'No se puede commit - {str(error)}'}), 400
 
 
 # Definicionn endpoint edicion alumno
@@ -129,16 +130,16 @@ def save_student():
 def update_student(id):
     try:
         founded_student = db.session.get(Student, id)
-    except:
-        return jsonify({"message":"No se pudo obtener el alumno"}), 404
+    except Exception as error:
+        return jsonify({"message":f"No se pudo obtener el alumno - {str(error)}"}), 404
     
     if not founded_student:
         return jsonify({"message":"No se pudo obtener el alumno"}), 404
     
     try:
         data = request.get_json()
-    except:
-        return jsonify({"message":"No hay información para actualizar el alumno"}), 404
+    except Exception as error:
+        return jsonify({"message":f"No hay información para actualizar el alumno - {str(error)}"}), 404
     
     try:
         updated = False
@@ -167,9 +168,9 @@ def update_student(id):
             founded_student.updated_at = datetime.now()
 
         db.session.commit()
-    except Exception as e:
+    except Exception as error:
         db.session.rollback()  # Revertir la transacción en caso de error
-        return jsonify({"message": "Error al modificar los campos del alumno: " + str(e)}), 500
+        return jsonify({"message": "Error al modificar los campos del alumno: " + str(error)}), 500
     
     serialized_student = student_schema.dump(founded_student)
 
@@ -200,5 +201,5 @@ def associate_tutor_with_student(alumno_id, tutor_id):
         
         return jsonify({"message":"La relación entre el estudiante y el tutor se ha establecido con éxito"}), 200
     
-    except Exception as e:
-        return jsonify({"message": "Error al asociar el tutor con el estudiante: " + str(e)}), 500
+    except Exception as error:
+        return jsonify({"message": f"Error al asociar el tutor con el estudiante: {str(error)}"}), 500
