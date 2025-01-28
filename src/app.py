@@ -8,11 +8,12 @@ from dotenv import load_dotenv
 
 from .models.models import db
 
-from .endpoints.students import bp as alumnos_bp
-from .endpoints.tutors import bp as tutores_bp
+from .endpoints.students import bp as students_bp
+from .endpoints.tutors import bp as tutors_bp
 from .endpoints.courses import bp as courses_bp
 from .endpoints.attendances import bp as attendances_bp
 from .endpoints.auth import bp as auth_bp
+from .endpoints.users import bp as users_bp
 
 # Carga de las variables de entorno desde el .env
 load_dotenv()
@@ -36,10 +37,11 @@ ma = Marshmallow(app)
 
 migrate = Migrate(app, db)
 
-app.register_blueprint(alumnos_bp)
-app.register_blueprint(tutores_bp)
+app.register_blueprint(students_bp)
+app.register_blueprint(tutors_bp)
 app.register_blueprint(courses_bp)
 app.register_blueprint(attendances_bp)
+app.register_blueprint(users_bp)
 app.register_blueprint(auth_bp)
 
 # Definicion endpoint del index
