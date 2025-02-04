@@ -14,7 +14,7 @@ bp = Blueprint('cursos', __name__)
 def get_courses():
 
     try:
-        all_courses = Course.query.filter(Course.active == True).order_by(Course.level, Course.year, Course.division)
+        all_courses = Course.query.order_by(Course.level, Course.year, Course.division)
 
     except:
         return jsonify({'message':'No se pueden obtener los cursos'}), 404
