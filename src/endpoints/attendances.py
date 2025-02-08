@@ -370,7 +370,7 @@ def get_available_dates_by_course(course_id):
         unique_dates = list(set([attendance.day.date() for attendance in attendances]))
         
         # Ordenar las fechas de manera ascendente
-        unique_dates.sort()
+        unique_dates.sort(reverse=True)
         
         # Convertir las fechas a formato string para la respuesta JSON
         serialized_dates = [date.strftime('%Y-%m-%d') for date in unique_dates]
