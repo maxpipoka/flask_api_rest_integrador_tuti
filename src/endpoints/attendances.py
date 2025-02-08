@@ -357,3 +357,27 @@ def update_attendance(id):
     serialized_attendance = founded_attendance.as_dict()
 
     return jsonify(serialized_attendance), 200
+
+
+@bp.route('/asistencias/fechas/<int:course_id>', methods=['GET'])
+@token_required
+def get_available_dates_by_course(course_id):
+    try:
+        # Obtener todas las asistencias para el curso específico
+        attendances = Attendance.query.filter(Attendance.course_id == course_id).all()
+        
+        # Extraer las fechas únicas de las asistencias
+        unique_dates = list(set([attendance.day.date() for attendance in attendances]))
+        
+        # Ordenar las fechas de manera ascendente
+        unique_dates.sort()
+        
+        # Convertir las fechas a formato string para la respuesta JSON
+        serialized_dates = [date.strftime('%Y-%m-%d') for date in unique_dates]
+        
+        print('200 - Fechas disponibles obtenidas')
+        return jsonify(serialized_dates), 200
+    
+    except Exception as e:
+        print(f'500 - Error al obtener las fechas disponibles: {str(e)}')
+        return jsonify({'message': 'Error al obtener las fechas disponibles'}), 500
