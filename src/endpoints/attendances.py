@@ -2,6 +2,8 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify
 
+from sqlalchemy import func, Date, distinct
+
 from src.utils.decorators import token_required
 
 from ..models.models import Attendance, Course, Student, db
@@ -357,3 +359,30 @@ def update_attendance(id):
     serialized_attendance = founded_attendance.as_dict()
 
     return jsonify(serialized_attendance), 200
+
+
+# Definicion endpoint obtencion de fechas disponibles por curso
+@bp.route('/asistencias/fechas/<int:course_id>', methods=['GET'])
+@token_required
+def get_available_dates_by_course(course_id):
+    try:
+        # Obtener las fechas únicas directamente desde la base de datos
+        unique_dates = (
+            db.session.query(func.distinct(func.cast(Attendance.day, Date)))
+            .filter(Attendance.course_id == course_id)
+            .order_by(func.cast(Attendance.day, Date).desc())  # Orden descendente
+            .all()
+        )
+        
+        # Extraer las fechas de la tupla devuelta por la consulta
+        unique_dates = [date[0] for date in unique_dates]
+        
+        # Convertir las fechas a formato string para la respuesta JSON
+        serialized_dates = [date.strftime('%Y-%m-%d') for date in unique_dates]
+        
+        print('200 - Fechas disponibles obtenidas')
+        return jsonify(serialized_dates), 200
+    
+    except Exception as e:
+        print(f'500 - Error al obtener las fechas disponibles: {str(e)}')
+        return jsonify({'message': 'Error al obtener las fechas disponibles'}), 500
