@@ -18,13 +18,32 @@ students_schema = StudentSchema(many=True)
 tutor_schema = TutorSchema()
 tutors_schema = TutorSchema(many=True)
 
-# Definicion endpoint obtiene todos los alumnos
+# Definicion endpoint obtiene todos los alumnos ACTIVOS
 @bp.route('/alumnos', methods=['GET'])
 @token_required
 def get_students():
 
     try:
         all_students = Student.query.filter(Student.active == True).order_by(Student.id)
+        
+    except Exception as error:
+        return jsonify({"message":f"No se pudieron obtener alumnos - {str(error)}"}), 404
+    
+    if not all_students:
+        return jsonify({"message":"No se pueden obtener los alumnos"}), 400
+
+    serialized_students = [student.as_dict() for student in all_students]
+
+    return jsonify(serialized_students), 200
+
+
+# Definicion endpoint obtiene todos los alumnos, ACTIVOS e INACTIVOS
+@bp.route('/alumnos/todos', methods=['GET'])
+@token_required
+def get_all_students():
+    
+    try:
+        all_students = Student.query.order_by(Student.id)
         
     except Exception as error:
         return jsonify({"message":f"No se pudieron obtener alumnos - {str(error)}"}), 404
