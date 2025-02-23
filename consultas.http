@@ -180,3 +180,8 @@ Content-Type: application/json
     "username": "marcelo",
     "password": "passmarcelo"
 }
+
+### Obtencion listado fechas asistencias de un curso
+GET http://127.0.0.1:5000/asistencias/fechas/1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzkwNTc3NjgsImV4cCI6MTczOTA2MTM2OCwidXNlciI6Mn0.vTb6St3Wpq9uCJ4WGzRDK6ZBO7IxrPCCv83SoyoDrYY
