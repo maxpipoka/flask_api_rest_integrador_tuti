@@ -3,6 +3,9 @@ import json
 
 from flask import Blueprint, request, jsonify
 
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
+
 from src.utils.decorators import token_required
 
 from ..models.models import Student, Tutor, db
@@ -119,7 +122,7 @@ def save_student():
             surnames= request.json['surnames'],
             address= request.json['address'],
             email = request.json['email'],
-            active = request.json['active']
+            active = request.json.get('active')
             )
 
     except KeyError as error:
@@ -139,7 +142,15 @@ def save_student():
         db.session.commit()
         return jsonify({'message':'Success'}), 201
     
+    except IntegrityError as error:
+        db.session.rollback()
+        if isinstance(error.orig, UniqueViolation):
+            return jsonify({'message':'DNI ya existente en la base de datos'}), 400
+        
+        return jsonify({'message':f'Error de integridad - {str(error)}'}), 400
+    
     except Exception as error:
+        db.session.rollback()
         return jsonify({'message':f'No se puede commit - {str(error)}'}), 400
 
 
