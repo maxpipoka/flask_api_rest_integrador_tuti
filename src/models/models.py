@@ -35,7 +35,7 @@ class Student(db.Model):
     active = db.Column(db.Boolean(), default=True, nullable=False)
     course = relationship('Course', secondary=students_courses, back_populates='students')
 
-    def __init__(self, dni, names, surnames, address, email, active):
+    def __init__(self, dni, names, surnames, address, email, active=True):
         self.dni = dni
         self.names = names
         self.surnames = surnames
@@ -80,7 +80,7 @@ class Tutor(db.Model):
     updated_at = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    def __init__(self, dni, names, surnames, address, email, active):
+    def __init__(self, dni, names, surnames, address, email, active=True):
         self.dni = dni
         self.names = names
         self.surnames = surnames
@@ -122,7 +122,7 @@ class Course(db.Model):
     students = relationship('Student', secondary=students_courses, back_populates='course')
     associated_user = db.Column(db.Integer(), db.ForeignKey('users.id'), nullable=False)
 
-    def __init__(self, level, division, year, current, active, associated_user):
+    def __init__(self, level, division, year, current, associated_user, active=True):
         self.level = level
         self.division = division
         self.year = year
@@ -164,7 +164,7 @@ class Attendance(db.Model):
     updated_at = db.Column(db.DateTime(), nullable=True)
     active = db.Column(db.Boolean(), default=True, nullable=False)
 
-    def __init__(self, course_id, student_id, day, state, active):
+    def __init__(self, course_id, student_id, day, state, active=True):
         self.course_id = course_id
         self.student_id = student_id
         self.day = day
