@@ -15,7 +15,7 @@ bp = Blueprint('tutores', __name__)
 tutor_schema = TutorSchema()
 tutors_schema = TutorSchema(many=True)
 
-# Definicion endpoint obtiene todos los tutores
+# Definicion endpoint obtiene todos los tutores activos
 @bp.route('/tutores', methods=['GET'])
 @token_required
 def get_tutors():
@@ -42,11 +42,9 @@ def get_tutor_by_id(id):
     except:
         return jsonify({"message":"No se puede obtener el tutor"}), 400
     
-    serialized_tutor = tutor_schema.dump(founded_tutor)
+    serialized_tutor = founded_tutor.as_dict()
 
-    response_data = json.dumps(serialized_tutor, ensure_ascii=False)
-
-    return jsonify(response_data), 200
+    return jsonify(serialized_tutor), 200
 
 
 # Definicion endpoint que borra un tutor, cambia el activo
