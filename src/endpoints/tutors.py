@@ -164,6 +164,6 @@ def update_tutor(id):
     
     serialized_tutor = tutor_schema.dump(founded_tutor)
 
-    response_data = json.dumps(serialized_tutor, ensure_ascii=False)
+    # response_data = json.dumps(serialized_tutor, ensure_ascii=False)
 
-    return jsonify(response_data), 201
+    return jsonify(serialized_tutor), 201
