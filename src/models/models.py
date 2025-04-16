@@ -48,9 +48,9 @@ class Student(db.Model):
         return f'{self.dni} - {self.surnames} {self.names}'
     
     #Funcion para serializar un alumno
-    def as_dict(self):
+    def as_dict(self, include_tutors=True):
 
-        tutors_list = [tutor.as_dict() for tutor in self.tutors]
+        tutors_list = [tutor.as_dict(include_students=False) for tutor in self.tutors] if include_tutors else []
 
         return {
             'id': self.id,
