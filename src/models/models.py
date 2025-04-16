@@ -94,7 +94,8 @@ class Tutor(db.Model):
     
     def as_dict(self):
 
-        # students_list = [student.as_dict() for student in self.students]
+        students_list = [student.as_dict() for student in self.students]
+        
         return {
             'id': self.id,
             'dni': self.dni,
@@ -104,7 +105,8 @@ class Tutor(db.Model):
             'email': self.email,
             'created_at': self.created_at.strftime('%Y-%m-%d %H:%M:%S') if self.created_at else None,
             'updated_at': self.updated_at.strftime('%Y-%m-%d %H:%M:%S') if self.updated_at else None,
-            'active': self.active
+            'active': self.active,
+            'students': students_list
         }
 
 
