@@ -100,9 +100,9 @@ def detele_student(id):
 
     serialized_student = student_schema.dump(founded_student)
 
-    response_data = json.dumps(serialized_student, ensure_ascii=False)
+    # response_data = json.dumps(serialized_student, ensure_ascii=False)
 
-    return jsonify(response_data), 201
+    return jsonify(serialized_student), 201
 
 
 # Definicionn endpoint creacion alumno
@@ -204,9 +204,9 @@ def update_student(id):
     
     serialized_student = student_schema.dump(founded_student)
 
-    response_data = json.dumps(serialized_student, ensure_ascii=False)
+    # response_data = json.dumps(serialized_student, ensure_ascii=False)
 
-    return jsonify(response_data), 201
+    return jsonify(serialized_student), 201
 
 
 # Definición endpoint para asociar tutores al alumno
