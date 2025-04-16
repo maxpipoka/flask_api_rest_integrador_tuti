@@ -92,9 +92,9 @@ class Tutor(db.Model):
     def __repr__(self):
         return f'{self.dni} - {self.surnames} {self.names}'
     
-    def as_dict(self):
+    def as_dict(self, include_students=True):
 
-        students_list = [student.as_dict() for student in self.students]
+        students_list = [student.as_dict(include_tutors=False) for student in self.students] if include_students else []
         
         return {
             'id': self.id,
