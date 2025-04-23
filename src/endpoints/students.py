@@ -131,7 +131,6 @@ def save_student():
     except Exception as error:
         return jsonify({'message':f'No se puede crear la instancia - {str(error)}'}), 400
     
-    
     try:
        db.session.add(new_student)
     except Exception as error:

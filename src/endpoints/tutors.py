@@ -3,6 +3,9 @@ import json
 
 from flask import Response, Blueprint, request, jsonify
 
+from sqlalchemy.exc import IntegrityError
+from psycopg2.errors import UniqueViolation
+
 from src.utils.decorators import token_required
 
 from ..models.models import Tutor, db
@@ -88,26 +91,30 @@ def save_turor():
             surnames= request.json['surnames'],
             address= request.json['address'],
             email= request.json['email'],
-            active=request.json['active'],
+            active=request.json.get('active')
             )
-    except KeyError as e:
-        return jsonify({'message': f'Missing field: {e.args[0]}'}), 400
-    except Exception as e:
-        return jsonify({'message': f'Error: {str(e)}'}), 400
-    except:
-        return jsonify({'message':'No se puede crear la instancia'}), 400
+    except KeyError as error:
+        return jsonify({'message': f'Missing field: {error.args[0]}'}), 400
+
+    except Exception as error:
+        return jsonify({'message':f'No se puede crear la instancia - {str(error)}'}), 400
     
     try:
         db.session.add(new_tutor)
-    except:
-        return jsonify({'message':'No se pudo ADD tutor'}), 400
+    except Exception as error:
+        return jsonify({'message':f'No se pudo ADD tutor - {str(error)}'}), 400
     
     try:
         #Confirmacion de las operaciones creadas en la sesion
         db.session.commit()
         return jsonify({'message':'Success'}), 201
-    except:
-        return jsonify({'message':'No se puede commit'}), 400
+    
+    except IntegrityError as error:
+        db.session.rollback()
+        if isinstance(error.orig, UniqueViolation):
+            return jsonify({'message':'El DNI ya existe en la base de datos'}), 400
+        
+        return jsonify({'message':f'Error de integridad - {str(error)}'}), 400
     
 # Deficion endpoint edicion tutor
 @bp.route('/tutores/<id>', methods=['PATCH'])
