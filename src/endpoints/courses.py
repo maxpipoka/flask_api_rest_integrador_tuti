@@ -178,8 +178,8 @@ def update_course(id):
     try:
         founded_course = db.session.get(Course, id)
 
-    except:
-        return jsonify({'message': 'No se puede obtener el curso'}), 404
+    except Exception as error:
+        return jsonify({'message': f'No se puede obtener el curso - {str(error)}'}), 404
     
     if not founded_course:
         return jsonify({'message': 'No se puede obtener el curso'}), 404
@@ -187,8 +187,8 @@ def update_course(id):
     try:
         data = request.get_json()
 
-    except:
-        return jsonify({'message':'JSON data is missing or invalid'}), 400
+    except Exception as error:
+        return jsonify({'message':f'No hay informacipon para actualizar el curso - {str(error)}'}), 400
     
     try:
         updated = False
@@ -223,10 +223,10 @@ def update_course(id):
 
         db.session.commit()
 
-    except Exception as e:
+    except Exception as error:
         db.session.rollback() # Reversion transaccion
-        return jsonify({'message':'Error al modificar los campos del curso: ' + str(e)}), 500
+        return jsonify({'message':'Error al modificar los campos del curso: ' + str(error)}), 500
     
     serialized_course = founded_course.as_dict()
 
-    return jsonify(serialized_course), 200
+    return jsonify(serialized_course), 201
