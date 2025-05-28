@@ -254,21 +254,29 @@ def save_attendance():
 
     current_date = datetime.now().date()
 
-    # Comprobación de no guardado de una asistencia para el mismo alumno
-    # mismo curso y mismo dia.
+    # Toggle de estado de asistencia si ya exite para dia y alumno específicos
     try:
         founded_attendance = Attendance.query.filter(
-            db.cast(Attendance.day, db.Date) ==current_date).filter(
+            db.cast(Attendance.day, db.Date) == current_date).filter(
             Attendance.student_id == request.json['student_id']).filter(
-            Attendance.course_id == request.json['course_id'])
+            Attendance.course_id == request.json['course_id']).first()
 
-        serialized_attendances = [attendance.as_dict() for attendance in founded_attendance]
-        
-        if serialized_attendances:
-            print('406 - Asistencia ya registrada')
-            return jsonify({'message':'Asistencia ya registrada'}), 406
-    except:
-        pass
+        if founded_attendance:
+            print('Encontrada anterior')
+            print(founded_attendance.state)
+            
+            print('Cambiando!')
+            founded_attendance.state = request.json['state']
+            print(founded_attendance.state)
+
+            db.session.commit()
+
+            print('201 - Asistencia modificada')
+            print(founded_attendance)
+
+            return jsonify(founded_attendance.as_dict()), 201
+    except Exception as e:
+        print(f'Error en consulta: {str(e)}')
     
     try:
         new_attendance = Attendance(
@@ -276,7 +284,7 @@ def save_attendance():
             student_id = request.json['student_id'],
             state = request.json['state'],
             active = request.json['active'],
-            day = datetime.now()
+            day = current_date
         )
 
     except KeyError as e:
@@ -291,18 +299,13 @@ def save_attendance():
         print('400 - No se puede crear la instancia')
         return jsonify({'message3':'No se puede crear la instancia'}), 400
     
-    try:
-        db.session.add(new_attendance)
+    db.session.add(new_attendance)
 
-    except:
-        print('400 - No se pudo ADD asistencia')
-        return jsonify({'message':'No se pudo ADD asistencia'}), 400
-    
     try:
         # Confirmacion de las operaciones creadas en la sesion
         db.session.commit()
         print('201 - Asistencia creada')
-        return jsonify({'message': 'success'}), 201
+        return jsonify(new_attendance.as_dict()), 201
     
     except Exception as e:
         print(f'400 - No se puede commit: {str(e)}')

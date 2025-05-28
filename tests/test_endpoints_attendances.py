@@ -144,6 +144,95 @@ class TestAttendance(TestCase):
 
         self.assertEqual(response.status_code, 201)
 
+    
+    def test_toggle_attendance_from_present_to_absent(self):
+
+        initial_attendance = Attendance(
+            state=True,
+            course_id=self.course.id,
+            student_id=self.students[0].id,
+            active=True,
+            day=datetime.now().strftime('%Y-%m-%d')
+        )
+
+        db.session.add(initial_attendance)
+        db.session.commit()
+
+        initial_attendance_id = initial_attendance.id
+
+        response = self.client.post('/asistencias', json={
+            'state': False,
+            'course_id': self.course.id,
+            'student_id': self.students[0].id,
+            'active': True
+        }, headers=self.headers)
+
+        # Verificacion de respuesta exitosa
+        self.assertEqual(response.status_code, 201)
+
+        # Verificacion asistencia original este cambiada a AUSENTE
+        update_attendance = db.session.get(Attendance, initial_attendance_id)
+        self.assertIsNotNone(update_attendance)
+        print(update_attendance)
+        self.assertEqual(update_attendance.state, False)
+        TODO NO ESTA DEVOLVIENDO FALSE CUANDO DEBERIA HACERLO YA QUE EFECTIVAMENTE LO CAMBIA
+
+
+        # Verificación no se haya creado una nueva asistencia
+        attendances_count = Attendance.query.filter_by(
+            student_id = self.students[0].id,
+            course_id = self.course.id,
+            day=datetime.now().strftime('%Y-%m-%d')
+        ).count()
+        self.assertEqual(attendances_count, 1)
+
+        # Verificacion que respuesta tenga la asistencia actualizada
+        self.assertEqual(response.json['state'], False)
+        self.assertEqual(response.json['id'], initial_attendance_id)
+
+    
+    def test_toggle_attendance_from_absent_to_present(self):
+
+        initial_attendance = Attendance(
+            state=False,
+            course_id=self.course.id,
+            student_id=self.students[0].id,
+            active=True,
+            day=datetime.now().strftime('%Y-%m-%d')
+        )
+
+        db.session.add(initial_attendance)
+        db.session.commit()
+
+        initial_attendance_id = initial_attendance.id
+
+        response = self.client.post('/asistencias', json={
+            'state': True,
+            'course_id': self.course.id,
+            'student_id': self.students[0].id,
+            'active': True
+        }, headers=self.headers)
+
+        # Verificacion de respuesta exitosa
+        self.assertEqual(response.status_code, 201)
+
+        # Verificacion asistencia original este cambiada a AUSENTE
+        update_attendance = Attendance.query.get(initial_attendance_id)
+        self.assertIsNotNone(update_attendance)
+        self.assertEqual(update_attendance.state, True)
+
+        # Verificación no se haya creado una nueva asistencia
+        attendances_count = Attendance.query.filter_by(
+            student_id = self.students[0].id,
+            course_id = self.course.id,
+            day=datetime.now().strftime('%Y-%m-%d')
+        ).count()
+        self.assertEqual(attendances_count, 1)
+
+        # Verificacion que respuesta tenga la asistencia actualizada
+        self.assertEqual(response.json['state'], True)
+        self.assertEqual(response.json['id'], initial_attendance_id)
+
 
 if __name__ == '__main__':
     unittest.main()
