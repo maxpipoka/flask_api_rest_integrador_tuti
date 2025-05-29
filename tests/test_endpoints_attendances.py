@@ -171,13 +171,15 @@ class TestAttendance(TestCase):
         # Verificacion de respuesta exitosa
         self.assertEqual(response.status_code, 201)
 
-        # db.session.close()
         db.session.expire_all()
+        db.session.close()
 
         # Verificacion asistencia original este cambiada a AUSENTE
         update_attendance = db.session.query(Attendance).filter_by(id=initial_attendance_id).first()
         self.assertIsNotNone(update_attendance)
+        print('Consulta post actualizacion')
         print(update_attendance)
+        print(update_attendance.state)
         self.assertEqual(update_attendance.state, False)
         
         # Verificación no se haya creado una nueva asistencia
