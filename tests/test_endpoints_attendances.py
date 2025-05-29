@@ -147,7 +147,7 @@ class TestAttendance(TestCase):
     
     def test_toggle_attendance_from_present_to_absent(self):
 
-        today = datetime.combine(datetime.now().date(), datetime.min.time())
+        today = datetime.now().date()
 
         initial_attendance = Attendance(
             state=True,
@@ -171,16 +171,18 @@ class TestAttendance(TestCase):
         # Verificacion de respuesta exitosa
         self.assertEqual(response.status_code, 201)
 
-        db.session.expire_all()
-        db.session.close()
+        db.session.refresh(initial_attendance)
 
         # Verificacion asistencia original este cambiada a AUSENTE
-        update_attendance = db.session.query(Attendance).filter_by(id=initial_attendance_id).first()
-        self.assertIsNotNone(update_attendance)
+        update_attendance_after_change = db.session.query(Attendance).filter(
+            Attendance.id == initial_attendance_id).filter(
+                db.cast(Attendance.day, db.Date) == today).first()
+        
+        self.assertIsNotNone(update_attendance_after_change)
         print('Consulta post actualizacion')
-        print(update_attendance)
-        print(update_attendance.state)
-        self.assertEqual(update_attendance.state, False)
+        print(update_attendance_after_change)
+        print(update_attendance_after_change.state)
+        self.assertEqual(initial_attendance.state, False)
         
         # Verificación no se haya creado una nueva asistencia
         attendances_count = Attendance.query.filter_by(
