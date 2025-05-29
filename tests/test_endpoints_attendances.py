@@ -147,17 +147,18 @@ class TestAttendance(TestCase):
     
     def test_toggle_attendance_from_present_to_absent(self):
 
+        today = datetime.combine(datetime.now().date(), datetime.min.time())
+
         initial_attendance = Attendance(
             state=True,
             course_id=self.course.id,
             student_id=self.students[0].id,
             active=True,
-            day=datetime.now().strftime('%Y-%m-%d')
+            day=today
         )
 
         db.session.add(initial_attendance)
         db.session.commit()
-
         initial_attendance_id = initial_attendance.id
 
         response = self.client.post('/asistencias', json={
@@ -170,19 +171,20 @@ class TestAttendance(TestCase):
         # Verificacion de respuesta exitosa
         self.assertEqual(response.status_code, 201)
 
+        # db.session.close()
+        db.session.expire_all()
+
         # Verificacion asistencia original este cambiada a AUSENTE
-        update_attendance = db.session.get(Attendance, initial_attendance_id)
+        update_attendance = db.session.query(Attendance).filter_by(id=initial_attendance_id).first()
         self.assertIsNotNone(update_attendance)
         print(update_attendance)
         self.assertEqual(update_attendance.state, False)
-        TODO NO ESTA DEVOLVIENDO FALSE CUANDO DEBERIA HACERLO YA QUE EFECTIVAMENTE LO CAMBIA
-
-
+        
         # Verificación no se haya creado una nueva asistencia
         attendances_count = Attendance.query.filter_by(
             student_id = self.students[0].id,
             course_id = self.course.id,
-            day=datetime.now().strftime('%Y-%m-%d')
+            day=today
         ).count()
         self.assertEqual(attendances_count, 1)
 
