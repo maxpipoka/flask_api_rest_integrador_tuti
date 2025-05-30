@@ -6,6 +6,7 @@ import sys
 import os
 import unittest
 import uuid
+import time
 
 # Agregado del directorio 'src' al PYTHONPATH
 sys.path.append(os.path.abspath(os.path.join(
@@ -161,6 +162,11 @@ class TestAttendance(TestCase):
         db.session.commit()
         initial_attendance_id = initial_attendance.id
 
+        print(' ')
+        print('Impresion db.session previa: ')
+        print(db.session)
+        print(' ')
+
         response = self.client.post('/asistencias', json={
             'state': False,
             'course_id': self.course.id,
@@ -168,10 +174,18 @@ class TestAttendance(TestCase):
             'active': True
         }, headers=self.headers)
 
+        # time.sleep(0.5) # Pausa para retrasar la consulta y evitar conflictos de tiempo
+
+        print(' ')
+        print('Impresion db.session post: ')
+        print(db.session)
+        print(' ')
+        
         # Verificacion de respuesta exitosa
         self.assertEqual(response.status_code, 201)
 
         db.session.refresh(initial_attendance)
+        db.session.commit()
 
         # Verificacion asistencia original este cambiada a AUSENTE
         update_attendance_after_change = db.session.query(Attendance).filter(
@@ -238,6 +252,38 @@ class TestAttendance(TestCase):
         # Verificacion que respuesta tenga la asistencia actualizada
         self.assertEqual(response.json['state'], True)
         self.assertEqual(response.json['id'], initial_attendance_id)
+
+
+    def test_sqlalchemy_refresh_in_memory(self):
+        # Crear y comitear una asistencia
+        attendance = Attendance(
+            state=True,
+            course_id=self.course.id,
+            student_id=self.students[0].id,
+            active=True,
+            day=datetime.now().strftime('%Y-%m-%d')
+        )
+        db.session.add(attendance)
+        db.session.commit()
+        attendance_id = attendance.id
+
+        # Simular un cambio en otra "sesión" o contexto
+        # Esto podría ser una nueva consulta o modificar el objeto existente y comitear
+        # Opción 1: Nueva consulta (simulando otro contexto)
+        other_session_attendance = db.session.query(Attendance).get(attendance_id)
+        other_session_attendance.state = False
+        db.session.commit() # Comitear el cambio simulado
+
+        # Opción 2: Modificar el objeto existente y comitear (si el objeto still attached)
+        # attendance.state = False
+        # db.session.commit()
+
+
+        # En la sesión original del test, intentar refrescar el objeto
+        db.session.refresh(attendance)
+
+        # Verificar el estado del objeto refrescado
+        self.assertEqual(attendance.state, False)
 
 
 if __name__ == '__main__':
