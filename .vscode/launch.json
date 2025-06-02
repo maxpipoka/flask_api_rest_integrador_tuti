@@ -4,6 +4,9 @@
     // Para más información, visite: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
+
+
         {
             "name": "Debug test_toggle_attendance_from_present_to_absent",
             "type": "debugpy",
@@ -11,6 +14,27 @@
             "module": "unittest",
             "args": [
                 "tests.test_endpoints_attendances.TestAttendance.test_toggle_attendance_from_present_to_absent"
+            ],
+            "justMyCode": false
+        },
+
+        {
+            "name": "Debug test_save_attendance",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "unittest",
+            "args": [
+                "tests.test_endpoints_attendances.TestAttendance.test_save_attendance"
+            ],
+            "justMyCode": false
+        },
+        {
+            "name": "Debug test_save_attendance_logic",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "unittest",
+            "args": [
+                "tests.bussiness_logic.test_attendance_logic.TestAttendanceLogic.test_save_attendance"
             ],
             "justMyCode": false
         }

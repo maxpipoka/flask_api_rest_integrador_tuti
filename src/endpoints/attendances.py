@@ -4,6 +4,7 @@ from flask import Blueprint, request, jsonify
 
 from sqlalchemy import func, Date, distinct
 
+from bussiness_logic.attendance_logic import AttendanceLogic
 from src.utils.decorators import token_required
 
 from ..models.models import Attendance, Course, Student, db
@@ -236,7 +237,7 @@ def delete_attendance(id):
 @bp.route('/asistencias', methods=['POST'])
 @token_required
 def save_attendance():
-    new_attendance = None
+
     founded_attendance = None
 
     if not request.json:
@@ -252,64 +253,12 @@ def save_attendance():
         return jsonify({'message':'Content-Type must be application/json'}), 415
     
 
-    current_date = datetime.now().date()
+    attendance = AttendanceLogic()
+    new_attendance = attendance.save_attendance(attendance_data=request.json)
 
-    # Toggle de estado de asistencia si ya exite para dia y alumno específicos
-    try:
-        founded_attendance = Attendance.query.filter(
-            db.cast(Attendance.day, db.Date) == current_date).filter(
-            Attendance.student_id == request.json['student_id']).filter(
-            Attendance.course_id == request.json['course_id']).first()
+    return jsonify(new_attendance), 201
 
-        if founded_attendance:
-            print('Encontrada anterior')
-            print(founded_attendance.state)
-            
-            print('Cambiando!')
-            founded_attendance.state = request.json['state']
-            print(founded_attendance.state)
 
-            db.session.commit()
-
-            print('201 - Asistencia modificada')
-            print(founded_attendance)
-
-            return jsonify(founded_attendance.as_dict()), 201
-    except Exception as e:
-        print(f'Error en consulta: {str(e)}')
-    
-    try:
-        new_attendance = Attendance(
-            course_id = request.json['course_id'],
-            student_id = request.json['student_id'],
-            state = request.json['state'],
-            active = request.json['active'],
-            day = current_date
-        )
-
-    except KeyError as e:
-        print('400 -' f'Missing field: {e.args[0]}')
-        return jsonify({'message1': f'Missing field: {e.args[0]}'}), 400
-    
-    except Exception as e:
-        print('400 -' f'Error: {str(e)}')
-        return jsonify({'message2': f'Error: {str(e)}'}), 400
-    
-    except:
-        print('400 - No se puede crear la instancia')
-        return jsonify({'message3':'No se puede crear la instancia'}), 400
-    
-    db.session.add(new_attendance)
-
-    try:
-        # Confirmacion de las operaciones creadas en la sesion
-        db.session.commit()
-        print('201 - Asistencia creada')
-        return jsonify(new_attendance.as_dict()), 201
-    
-    except Exception as e:
-        print(f'400 - No se puede commit: {str(e)}')
-        return jsonify({'message': 'No se puede commit'}), 400
     
 
 # Definicion endpoint edicion asistencia
