@@ -5,6 +5,7 @@ from flask import Blueprint, request, jsonify
 from sqlalchemy import func, Date, distinct
 
 from bussiness_logic.attendance_logic import AttendanceLogic
+
 from src.utils.decorators import token_required
 
 from ..models.models import Attendance, Course, Student, db
@@ -15,21 +16,13 @@ bp= Blueprint('asistencias', __name__)
 @bp.route('/asistencias', methods=['GET'])
 @token_required
 def get_attendances():
-    
-    try:
-        all_attendances = Attendance.query.filter(Attendance.active == True).order_by(Attendance.id)
 
-    except:
-        print('404 - No se pueden obtener las asistencias')
-        return jsonify({'message':'No se pueden obtener las asistencias'}), 404
-    
-    if not all_attendances:
-        print('400 - No se pueden obtener las asistencias')
-        return jsonify({'message':'No se pueden obtener las asistencias'}), 400
-    
-    serialized_attendances = [attendance.as_dict() for attendance in all_attendances]
+    attendance = AttendanceLogic()
 
-    print('200 - Asistencias obtenidas')
+    active_attendances = attendance.get_attendances()
+    
+    serialized_attendances = [attendance.as_dict() for attendance in active_attendances]
+
     return jsonify(serialized_attendances), 200
 
 
@@ -38,20 +31,12 @@ def get_attendances():
 @token_required
 def get_inactive_attendances():
     
-    try:
-        all_attendances = Attendance.query.filter(Attendance.active == False).order_by(Attendance.id)
+    attendance = AttendanceLogic()
 
-    except:
-        print('404 - No se pueden obtener las asistencias')
-        return jsonify({'message':'No se pueden obtener las asistencias'}), 404
+    inactive_attendances = attendance.get_inactive_attendances()
     
-    if not all_attendances:
-        print('400 - No se pueden obtener las asistencias')	
-        return jsonify({'message':'No se pueden obtener las asistencias'}), 400
-    
-    serialized_attendances = [attendance.as_dict() for attendance in all_attendances]
+    serialized_attendances = [attendance.as_dict() for attendance in inactive_attendances]
 
-    print('200 - Asistencias inactivas obtenidas')
     return jsonify(serialized_attendances), 200
 
 
@@ -60,148 +45,48 @@ def get_inactive_attendances():
 @token_required
 def get_attendance_by_id(id):
 
-    try:
-        founded_attendance = db.session.get(Attendance, id)
+    attendance = AttendanceLogic()
 
-    except:
-        print('404 - No se pudo obtener la asistencia')
-        return jsonify({'message':'No se pudo obtener la asistencia'}), 404
-    
-    if not founded_attendance:
-        print('400 - No se pudo obtener la asistencia')
-        return jsonify({'message':'No se pudo obtener la asistencia'}), 400
+    founded_attendance = attendance.get_attendance_by_id(id)
     
     serialized_attendance = [founded_attendance.as_dict()]
 
-    print('200 - Asistencia por id obtenida')
     return jsonify(serialized_attendance),200
 
 # Definicion endpoint obtencion de asistencias por id de alumno
 @bp.route('/asistencias/alumno/<int:id>', methods=['GET'])
 @token_required
 def get_attendances_by_student_id(id):
-    # Obtener los parámetros de consulta 'start' y 'end'
-    start_date = request.args.get('start')
-    end_date = request.args.get('end')
-
-    print(f'Start date: {start_date}, End date: {end_date}')
-
-    try:
-        # Construir la consulta base
-        query = Attendance.query.filter(Attendance.student_id == id)
-        print(query)
-
-        # Filtrar por fecha de inicio si se proporciona
-        if start_date:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d')  # Asegúrate de que el formato sea el correcto
-            query = query.filter(Attendance.day >= start_date)
-            print(f'Query sin el start {query}')
-
-        # Filtrar por fecha de finalización si se proporciona
-        if end_date:
-            end_date = datetime.strptime(end_date, '%Y-%m-%d')  # Asegúrate de que el formato sea el correcto
-            query = query.filter(Attendance.day <= end_date)
-            print(f'Query sin el end {query}')
-
-        # Obtener las asistencias filtradas
-        founded_attendances = query.order_by(Attendance.day.asc()).all()
-        print(founded_attendances)
-
-    except Exception as e:
-        print(f'404 - No se pudo obtener las asistencias: {e}')
-        return jsonify({'message': 'No se pudo obtener las asistencias'}), 404
     
-    if not founded_attendances:
-        print('400 - No se encontraron asistencias')
-        return jsonify({'message': 'No se encontraron asistencias'}), 400
+    attendance = AttendanceLogic()
+
+    founded_attendances = attendance.get_attendances_by_student_id(id, request_data=request.json)
     
     serialized_attendances = [attendance.as_dict() for attendance in founded_attendances]
 
-    print('200 - Asistencias por id de alumno obtenidas')
     return jsonify(serialized_attendances), 200
 
 # Definicion endpoint para cerra asistencia de un curso en un dia
-@bp.route('/asistencias/cerrar/<int:id>', methods=['POST'])
+@bp.route('/asistencias/cerrar/<int:id>', methods=['POST']) 
 @token_required
 def close_attendance(id):
 
-    current_date = datetime.now().date()
-    attendances_id = []
+    attendance = AttendanceLogic()
 
-    try:
-        founded_course = db.session.get(Course, id)
-        all_attendances = Attendance.query.filter(
-             db.cast(Attendance.day, db.Date) == current_date).filter(
-            Attendance.course_id==id
-            )
-        
-        for attendance in all_attendances:
-            attendances_id.append(attendance.student_id)
+    close_attendance = attendance.close_attendance(course_id=id)
 
-    except:
-        print('404 - No se pudo obtener el curso y asistencias')
-        return jsonify({'message':'No se pudo obtener el curso y asistencias'}), 404
-    
-    try:
-        for student in founded_course.students:
-            if student.id not in attendances_id:
-                new_attendance = Attendance(
-                    course_id = id,
-                    student_id = student.id,
-                    state = False,
-                    active = True,
-                    day = current_date
-                )
-
-                db.session.add(new_attendance)
-        
-        db.session.commit()
-
-        print('200 - Asistencia cerrada')
-        return jsonify({'message':'Asistencia cerrada'}), 200
-    
-    except:
-        print('400 - No se pudo cerrar la asistencia')
-        return jsonify({'message':'No se pudo comprobar la asistencia'}), 400
+    return jsonify(close_attendance), 200
 
 
 # Definicion endpoint obtencion de asistencias de un dia y un curso
 @bp.route('/asistencias/revision/', methods=['POST'])
 @token_required
 def get_attendace_by_day_and_course():
-    course_id = request.json['course_id']
-    date_to_search = request.json['date_to_search']
-    founded_attendances = None
-    attendances_response = []
 
-    if not course_id or not date_to_search:
-        print('400 - No se recibio course_id o date_to_search')
-        return jsonify({'message': 'No se recibio course_id o date_to_search'}), 400
+    attendance = AttendanceLogic()
+
+    attendance_response = attendance.get_attendance_by_day_and_course(course_id=request.json['course_id'], date_to_search=request.json['date_to_search'])
     
-    try:
-        founded_attendances = Attendance.query.filter(
-            Attendance.course_id == course_id).filter(
-            db.cast(Attendance.day, db.Date) == date_to_search).all()
-
-    except:
-        print('400 - No se pudo buscar las asistencias')
-        return jsonify({'message':'No se pudo buscar las asistencias'}), 400
-    
-    if not founded_attendances:
-        print('400 - No se obtuvieron asistencias')
-        return jsonify({'message':'No se obtuvieron asistencias'}), 400
-    
-    if founded_attendances:
-        for attendance in founded_attendances:
-            attendance_dict = {}
-            temp_student = db.session.get(Student, attendance.student_id)
-            attendance_dict['names'] = temp_student.names
-            attendance_dict['surnames'] = temp_student.surnames
-            attendance_dict['state'] = attendance.state
-
-            attendances_response.append(attendance_dict)
-
-    print('200 - Asistencias de 1 dia y 1 curso obtenidas')
     return jsonify(attendances_response), 200
 
 
@@ -210,26 +95,12 @@ def get_attendace_by_day_and_course():
 @token_required
 def delete_attendance(id):
 
-    try:
-        founded_attendance = db.session.get(Attendance, id)
+    attendance= AttendanceLogic()
 
-    except:
-        print('404 - No se pudo obtener la asistencia')
-        return jsonify({'message':'No se pudo obtener la asistencia'}), 404
-    
-    try:
-        founded_attendance.active = False
-        founded_attendance.updated_at = datetime.now()
-        db.session.commit()
+    deleted_attendance = attendance.delete_attendance(id_attendance=id)
 
-    except Exception as e:
-        db.session.rollback() # Revertir la transacción en caso de error
-        print(f'400 - No se pudo borrar la asistencia - {str(e)}')
-        return jsonify({'message':'No se pudo borrar la asistencia'}), 400
-    
     serialized_attendance = [founded_attendance.as_dict()]
 
-    print('200 - Asistencia borrada')
     return jsonify(serialized_attendance), 200
 
 
@@ -237,8 +108,6 @@ def delete_attendance(id):
 @bp.route('/asistencias', methods=['POST'])
 @token_required
 def save_attendance():
-
-    founded_attendance = None
 
     if not request.json:
         print('400 - JSON data is missing or invalid')
@@ -252,65 +121,78 @@ def save_attendance():
         print('415 - Content-Type must be application/json')
         return jsonify({'message':'Content-Type must be application/json'}), 415
     
+    try:
+        attendance = AttendanceLogic()
+        new_attendance = attendance.save_attendance(attendance_data=request.json)
 
-    attendance = AttendanceLogic()
-    new_attendance = attendance.save_attendance(attendance_data=request.json)
-
-    return jsonify(new_attendance), 201
-
-
+        return jsonify(new_attendance), 201
     
+    except ValueError as e:
+        # Manejar error si la asistencia no fue encontrada o datos de actualización inválidos
+        print(f"Validation or Not Found Error: {e}") # Loggear el error
+        # Si el mensaje de error de la lógica indica que no se encontró, devuelve 404
+        if f"Attendance record with ID {id} not found" in str(e):
+            return jsonify({'message': str(e)}), 404 # Not Found
+        else:
+            # Para otros errores de validación, devuelve 400
+            return jsonify({'message': str(e)}), 400 # Bad Request
+
+    except SQLAlchemyError as e:
+        # Manejar errores de base de datos
+        print(f"Database Error: {e}") # Loggear el error
+        return jsonify({'message': 'Database error: Could not update attendance.'}), 500 # Internal Server Error
+
+    except Exception as e:
+        # Manejar otros errores inesperados
+        print(f"Internal Server Error: {e}") # Loggear el error interno
+        return jsonify({'message': 'An internal server error occurred.'}), 500
+
 
 # Definicion endpoint edicion asistencia
 @bp.route('/asistencias/<int:id>', methods=['PATCH'])
 @token_required
 def update_attendance(id):
 
-    try:
-        founded_attendance = db.session.get(Attendance, id)
-
-    except:
-        print('404 - No se puede obtener la asistencia')
-        return jsonify({'message': 'No se puede obtener la asistencia'}), 404
-    
-    if not founded_attendance:
-        print('400 - No se puede obtener la asistencia a editar')
-        return jsonify({'message': 'No se puede obtener la asistencia a editar'}), 400
-    
-    try:
-        data = request.get_json()
-    except:
+    if not request.json:
         print('400 - JSON data is missing or invalid')
-        return jsonify({'message': 'JSON data is missing or invalid'}), 400
+        return jsonify({'message':'JSON data is missing of invalid'}), 400
     
+    if not request.is_json:
+        print('400 - JSON data is missing or invalid')
+        return jsonify({'message':'JSON data is missing of invalid'}), 400
+    
+    if request.content_type != 'application/json':
+        print('415 - Content-Type must be application/json')
+        return jsonify({'message':'Content-Type must be application/json'}), 415
+
     try:
-        updated = False
+        attendance_data = request.json
+        attendance = AttendanceLogic()
 
-        if 'state' in data:
-            founded_attendance.state = data['state']
-            updated = True
-        if 'day' in data:
-            founded_attendance.day = data['day']
-            updated = True
-        if 'active' in data:
-            founded_attendance.active = data['active']
-            updated = True
+        updated_attendance = attendance.update_attendance(
+            id_attendance = id, attendance_data= attendance_data)
+    
+        return jsonify(update_attendance.as_dict()), 200
+    
+    except ValueError as e:
+        # Manejar error si la asistencia no fue encontrada o datos de actualización inválidos
+        print(f"Validation or Not Found Error: {e}") # Loggear el error
+        # Si el mensaje de error de la lógica indica que no se encontró, devuelve 404
+        if f"Attendance record with ID {id} not found" in str(e):
+            return jsonify({'message': str(e)}), 404 # Not Found
+        else:
+            # Para otros errores de validación, devuelve 400
+            return jsonify({'message': str(e)}), 400 # Bad Request
 
-        if updated:
-            founded_attendance.updated_at = datetime.now()
-
-        db.session.commit()
-        print('201 - Asistencia modificada')
-        return jsonify({'message': 'success'}), 201
+    except SQLAlchemyError as e:
+        # Manejar errores de base de datos
+        print(f"Database Error: {e}") # Loggear el error
+        return jsonify({'message': 'Database error: Could not update attendance.'}), 500 # Internal Server Error
 
     except Exception as e:
-        db.session.rollback() # Reversion transaccion
-        print('500 - Error al modificar los campos de la asistencia: ' + str(e))
-        return jsonify({'message':'Error al modificar los campos de la asistencia: ' + str(e)}), 500
-    
-    serialized_attendance = founded_attendance.as_dict()
-
-    return jsonify(serialized_attendance), 200
+        # Manejar otros errores inesperados
+        print(f"Internal Server Error: {e}") # Loggear el error interno
+        return jsonify({'message': 'An internal server error occurred.'}), 500
 
 
 # Definicion endpoint obtencion de fechas disponibles por curso
@@ -318,19 +200,10 @@ def update_attendance(id):
 @token_required
 def get_available_dates_by_course(course_id):
     try:
-        # Obtener las fechas únicas directamente desde la base de datos
-        unique_dates = (
-            db.session.query(func.distinct(func.cast(Attendance.day, Date)))
-            .filter(Attendance.course_id == course_id)
-            .order_by(func.cast(Attendance.day, Date).desc())  # Orden descendente
-            .all()
-        )
-        
-        # Extraer las fechas de la tupla devuelta por la consulta
-        unique_dates = [date[0] for date in unique_dates]
+        attendance = AttendanceLogic()
         
         # Convertir las fechas a formato string para la respuesta JSON
-        serialized_dates = [date.strftime('%Y-%m-%d') for date in unique_dates]
+        serialized_dates = attendance.get_available_dates_by_course(course_id=course_id)
         
         print('200 - Fechas disponibles obtenidas')
         return jsonify(serialized_dates), 200
