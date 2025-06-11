@@ -32,18 +32,15 @@ class AttendanceLogic:
         
         except ValueError as e:
             #Captura de error si no se encuentran asistencias activas
-            db.session.rollback()
             raise ValueError(f"Validation Error: {e}") from e
         
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
-            db.session.rollback()
             raise SQLAlchemyError(f"Database error while fetching attendances: {e}") from e
             
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
-            db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
     
     def get_inactive_attendances(self) -> list[Attendance]:
@@ -69,13 +66,11 @@ class AttendanceLogic:
         
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
-            db.session.rollback()
             raise SQLAlchemyError(f"Database error while fetching attendances: {e}") from e
             
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
-            db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
 
     def get_attendance_by_id(self, id:int) -> Attendance:
@@ -103,13 +98,11 @@ class AttendanceLogic:
 
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
-            db.session.rollback()
             raise SQLAlchemyError(f"Database error while fetching attendances: {e}") from e
             
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
-            db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
     def get_attendances_by_student_id(self, id:int, request_data:dict[str, Any]) -> list[Attendance]:
         """
@@ -152,13 +145,11 @@ class AttendanceLogic:
 
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
-            db.session.rollback()
             raise SQLAlchemyError(f"Database error while fetching attendances: {e}") from e
 
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
-            db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
 
     def close_attendance(self, course_id: int) -> None:
@@ -227,7 +218,7 @@ class AttendanceLogic:
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
             db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
 
     def get_attendance_by_day_and_course(self, course_id:int, date_to_search:str) -> list[Attendance]:
@@ -281,13 +272,11 @@ class AttendanceLogic:
 
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
-            db.session.rollback()
             raise SQLAlchemyError(f"Database error while fetching attendances: {e}") from e
             
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
-            db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
 
     def delete_attendance(self, id_attendance: int) -> Attendance:
@@ -319,7 +308,7 @@ class AttendanceLogic:
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
             db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
 
     def save_attendance(self, attendance_data: dict[str, Any]) -> Attendance:
@@ -350,7 +339,7 @@ class AttendanceLogic:
 
             if founded_attendance:
                 if 'state' not in attendance_data:
-                    raise ValueError("Missiong 'state' field for updating attendance")
+                    raise ValueError("Missing 'state' field for updating attendance")
                 
                 founded_attendance.state = attendance_data['state']
 
@@ -376,9 +365,10 @@ class AttendanceLogic:
             try:
 
                 required_data = ['student_id', 'course_id', 'state', 'active']
-                for field in required_data:
-                    if field not in attendance_data:
-                        raise ValueError(f"Missiong required field for creation: {field}")
+                missing = [field for field in required_data if field not in attendance_data]
+                if missing:
+                    raise ValueError(f"Missing required fields for creation: {', '.join(missing)}")
+                
                 new_attendance = Attendance(
                     course_id = attendance_data['course_id'],
                     student_id = attendance_data['student_id'],
@@ -406,7 +396,7 @@ class AttendanceLogic:
                 if isinstance(e, SQLAlchemyError):
                     raise SQLAlchemyError(f"Database error during creation: {e}") from e
                 else:
-                    raise Exception(f"An unexpected error occurred during creation: {e}") from e
+                    raise Exception(f"An unexpected error ocurred during creation: {e}") from e
         
         raise Exception("Attendance save/toggle logic did not return a result.")
     
@@ -467,7 +457,7 @@ class AttendanceLogic:
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
             db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
 
     def get_available_dates_by_course(self, course_id: int):
@@ -503,11 +493,9 @@ class AttendanceLogic:
         
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
-            db.session.rollback()
             raise SQLAlchemyError(f"Database error while fetching attendances: {e}") from e
             
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
-            db.session.rollback()
-            raise Exception(f"An unexpected error occurred while fetching attendances: {e}") from e
+            raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 

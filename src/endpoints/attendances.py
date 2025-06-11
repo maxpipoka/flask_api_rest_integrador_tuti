@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from bussiness_logic.attendance_logic import AttendanceLogic
 
-from src.utils.decorators import token_required
+from src.utils.decorators import token_required, require_json
 
 bp = Blueprint("asistencias", __name__)
 
@@ -108,27 +108,14 @@ def delete_attendance(id):
 
     deleted_attendance = attendance_logic.delete_attendance(id_attendance=id)
 
-    serialized_attendance = [deleted_attendance.as_dict()]
-
-    return jsonify(serialized_attendance), 200
+    return jsonify(deleted_attendance), 200
 
 
 # Definicion endpoint creacion asistencia
 @bp.route("/asistencias", methods=["POST"])
 @token_required
+@require_json
 def save_attendance():
-
-    if not request.json:
-        print("400 - JSON data is missing or invalid")
-        return jsonify({"message": "JSON data is missing of invalid"}), 400
-
-    if not request.is_json:
-        print("400 - JSON data is missing or invalid")
-        return jsonify({"message": "JSON data is missing of invalid"}), 400
-
-    if request.content_type != "application/json":
-        print("415 - Content-Type must be application/json")
-        return jsonify({"message": "Content-Type must be application/json"}), 415
 
     try:
         attendance_logic = AttendanceLogic()
@@ -140,11 +127,7 @@ def save_attendance():
         # Manejar error si la asistencia no fue encontrada o datos de actualización inválidos
         print(f"Validation or Not Found Error: {e}")  # Loggear el error
         # Si el mensaje de error de la lógica indica que no se encontró, devuelve 404
-        if f"Attendance record with ID {id} not found" in str(e):
-            return jsonify({"message": str(e)}), 404  # Not Found
-        else:
-            # Para otros errores de validación, devuelve 400
-            return jsonify({"message": str(e)}), 400  # Bad Request
+        return jsonify({"message": str(e)}), 400  # Bad Request
 
     except SQLAlchemyError as e:
         # Manejar errores de base de datos
@@ -163,19 +146,8 @@ def save_attendance():
 # Definicion endpoint edicion asistencia
 @bp.route("/asistencias/<int:id>", methods=["PATCH"])
 @token_required
+@require_json
 def update_attendance(id):
-
-    if not request.json:
-        print("400 - JSON data is missing or invalid")
-        return jsonify({"message": "JSON data is missing of invalid"}), 400
-
-    if not request.is_json:
-        print("400 - JSON data is missing or invalid")
-        return jsonify({"message": "JSON data is missing of invalid"}), 400
-
-    if request.content_type != "application/json":
-        print("415 - Content-Type must be application/json")
-        return jsonify({"message": "Content-Type must be application/json"}), 415
 
     try:
         attendance_data = request.json
@@ -185,7 +157,7 @@ def update_attendance(id):
             id_attendance=id, attendance_data=attendance_data
         )
 
-        return jsonify(updated_attendance.as_dict()), 200
+        return jsonify(updated_attendance), 200
 
     except ValueError as e:
         # Manejar error si la asistencia no fue encontrada o datos de actualización inválidos

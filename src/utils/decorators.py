@@ -19,3 +19,14 @@ def token_required(f):
         return f(*args, **kwargs)
     
     return decorated
+
+
+def require_json(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if request.content_type != "application/json":
+            return jsonify({"message": "Content-Type must be application/json"}), 415
+        if not request.is_json:
+            return jsonify({"message": "JSON data is missing or invalid"}), 400
+        return f(*args, **kwargs)
+    return decorated
