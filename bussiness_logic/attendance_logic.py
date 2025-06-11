@@ -1,25 +1,40 @@
 from datetime import datetime
-from typing import Any, list
+from typing import Any, list, Optional
 
-from src.models.models import Attendance, db
+from src.models.models import Attendance, Course, Student, db
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm.exc import FlushError, UnmappedInstanceError
+from sqlalchemy import func, Date
 
 
 class AttendanceLogic:
 
     def get_attendances(self) -> list[Attendance]:
         """
-        Get all attendance data from the database.
+        Get all the active attendances data from the database.
         Returns:
             List of Attendance objects.
+        Raises:
+            ValueError: If no active attendances are found.
+            SQLAlchemyError: If a database error occurs during the query.
+            Exception: For any other unexpected errors.
         """
+
         try:
             all_attendances = Attendance.query.filter(
                 Attendance.active == True
                 ).order_by(Attendance.id).all()
+            
+            if not all_attendances:
+                raise ValueError(f"No active attendances found in the database.")
 
             return all_attendances
+        
+        except ValueError as e:
+            #Captura de error si no se encuentran asistencias activas
+            db.session.rollback()
+            raise ValueError(f"Validation Error: {e}") from e
+        
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
             db.session.rollback()
@@ -36,13 +51,22 @@ class AttendanceLogic:
         Get all the inactive attendances data from the database.
         Returns:
             List of Attendance objects.
+        Raises:
+            ValueError: If no inactive attendances are found.
+            SQLAlchemyError: If a database error occurs during the query.
+            Exception: For any other unexpected errors.
         """
+
         try:
             all_inactive_attendances = Attendance.query.filter(
                 Attendance.active == False
                 ).order_by(Attendance.id).all()
 
+            if not all_inactive_attendances:
+                raise ValueError(f"No inactive attendances found in the database.")
+            
             return all_inactive_attendances
+        
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
             db.session.rollback()
@@ -56,17 +80,24 @@ class AttendanceLogic:
 
     def get_attendance_by_id(self, id:int) -> Attendance:
         """
-        Get an specific attendance from the database filtered by an id.
+        Get a specific attendance by its id from the database.
         Args:
-            id: Id of the attendance.
+            id: Integer value with the attendance id.
         Returns:
             Attendance object.
+        Raises:
+            ValueError: If the attendance with the given id is not found.
+            SQLAlchemyError: If a database error occurs during the query.
+            Exception: For any other unexpected errors.
         """
 
         try:
             attendance = Attendance.query.filter(
                 Attendance.id == id
                 ).first()
+            
+            if not attendance:
+                raise ValueError(f"Attendance with id {id} not found in the database.")
 
             return attendance
 
@@ -82,12 +113,16 @@ class AttendanceLogic:
 
     def get_attendances_by_student_id(self, id:int, request_data:dict[str, Any]) -> list[Attendance]:
         """
-        Get the specific student's attendances filtered by it id.
+        Get a list of attendances for a specific student by their id from the database.
         Args:
             id: Integer value with the student id.
-            request_data: Dictionary with the request data.
+            request_data: Dictionary containing 'start' and 'end' date strings in YYYY-MM-DD format.
         Returns:
-            List of Attendance objects.
+            List of Attendance objects. Returns an empty list if no attendances are found.
+        Raises:
+            ValueError: If required input data is missing or invalid.
+            SQLAlchemyError: If a database error occurs during the query.
+            Exception: For any other unexpected errors.
         """
 
         start_date = request_data.get('start')
@@ -95,6 +130,15 @@ class AttendanceLogic:
 
         try:
             query = Attendance.query.filter(Attendance.student_id == id)
+
+            if not query:
+                raise ValueError(f"No attendances found for student with id {id}.")
+            
+            if not start_date:
+                raise ValueError("Missing required input: start_date")
+            
+            if not end_date:
+                raise ValueError("Missing required input: end_date")
 
             if start_date:
                 start_date = datetime.strptime(start_date, '%Y-%m-%d')
@@ -104,9 +148,7 @@ class AttendanceLogic:
                 end_date = datetime.strptime(end_date, '%Y-%m-%d')
                 query = query.filter(Attendance.day <= end_date)
             
-            founded_attendances = query.order_by(Attendance.day.asc()).all()
-
-            return founded_attendances
+            return query.order_by(Attendance.day.asc()).all()
 
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
@@ -190,12 +232,12 @@ class AttendanceLogic:
 
     def get_attendance_by_day_and_course(self, course_id:int, date_to_search:str) -> list[Attendance]:
         """
-        Get a list of attendances for specific course and date from the database.
+        Get attendances for a specific course on a specific date.
         Args:
             course_id: Integer value with the course id.
-            date_to_search: String value with the date to search (YYYY-MM-DD format recommended).
+            date_to_search: String value with the date to search in YYYY-MM-DD format.
         Returns:
-            List of Attendance objects. Returns an empty list if no attendances are found.
+            List of dictionaries containing student names, surnames, and attendance state.
         Raises:
             ValueError: If required input data is missing or invalid.
             SQLAlchemyError: If a database error occurs during the query.
@@ -213,6 +255,7 @@ class AttendanceLogic:
         except ValueError:
             raise ValueError("Invalid date_to_search format. Please use YYYY-MM-DD.")
         
+        attendances_response = []
 
         try:
             founded_attendances = Attendance.query.filter(
@@ -221,6 +264,9 @@ class AttendanceLogic:
                     db.cast(Attendance.day, db.Date) == date_to_search
                 ).all()
 
+            if not founded_attendances:
+                raise ValueError(f"No attendances found for course {course_id} on date {date_to_search}.")
+            
             if founded_attendances:
                 for attendance in founded_attendances:
                     attendance_dict = {}
@@ -255,6 +301,9 @@ class AttendanceLogic:
 
         try:
             founded_attendance = db.session.get(Attendance, id_attendance)
+
+            if not founded_attendance:
+                raise ValueError(f"Attendance record with ID {id_attendance} not found.")
 
             founded_attendance.active = False
             founded_attendance.updated_at = datetime.now()
@@ -358,15 +407,6 @@ class AttendanceLogic:
                     raise SQLAlchemyError(f"Database error during creation: {e}") from e
                 else:
                     raise Exception(f"An unexpected error occurred during creation: {e}") from e
-            try:
-                # Confirmacion de las operaciones creadas en la sesion
-                db.session.commit()
-                print('201 - Asistencia creada')
-                return new_attendance
-            
-            except Exception as e:
-                print(f'400 - No se puede commit: {str(e)}')
-                return {'message': 'No se puede commit'}
         
         raise Exception("Attendance save/toggle logic did not return a result.")
     
@@ -386,7 +426,7 @@ class AttendanceLogic:
         """
 
         try:
-            founded_attendance = Optional[Attendance] = db.session.get(Attendance, id_attendance)
+            founded_attendance = db.session.get(Attendance, id_attendance)
 
             if not founded_attendance:
                 raise ValueError(f"Attendance record with ID {id_attendance} not found.")
@@ -431,6 +471,17 @@ class AttendanceLogic:
 
 
     def get_available_dates_by_course(self, course_id: int):
+        """
+        Get all unique attendance dates for a specific course.
+        Args:
+            course_id: Integer value with the course id.
+        Returns:
+            List of unique dates in YYYY-MM-DD format.
+        Raises:
+            ValueError: If no attendance dates are found for the course.
+            SQLAlchemyError: If a database error occurs during the query.
+            Exception: For any other unexpected errors.
+        """
 
         try:
             unique_dates = (
@@ -439,6 +490,9 @@ class AttendanceLogic:
                 .order_by(func.cast(Attendance.day, Date).desc())  # Orden descendente
                 .all()
             )
+
+            if not unique_dates:
+                raise ValueError(f"No attendance dates found for course with ID {course_id}.")
 
             unique_dates = [date[0] for date in unique_dates]
 
