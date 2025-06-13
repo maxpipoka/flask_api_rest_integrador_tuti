@@ -1,10 +1,11 @@
 from datetime import datetime
-from typing import Any, list, Optional
+from typing import Any, Optional
 
-from src.models.models import Attendance, Course, Student, db
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm.exc import FlushError, UnmappedInstanceError
 from sqlalchemy import func, Date
+
+from src.models.models import Attendance, Course, Student, db
 
 
 class AttendanceLogic:

@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import Blueprint, request, jsonify
 
 from src.utils.decorators import token_required
+from bussiness_logic.course_logic import CourseLogic
 
 from ..models.models import Course, Student, db
 
@@ -13,18 +14,11 @@ bp = Blueprint('cursos', __name__)
 @token_required
 def get_courses():
 
-    try:
-        all_courses = Course.query.order_by(Course.level, Course.year, Course.division)
+    course_logic = CourseLogic()
 
-    except:
-        return jsonify({'message':'No se pueden obtener los cursos'}), 404
-    
-    if not all_courses:
-        return jsonify({'message':'No se pueden obtener los cursos'}), 400
-    
-    serialized_courses = [course.as_dict() for course in all_courses]
+    all_courses = course_logic.get_courses()
 
-    return jsonify(serialized_courses), 200
+    return jsonify(all_courses), 200
 
 
 # Definicion endpoint que obtiene todos los cursos bajo el control
