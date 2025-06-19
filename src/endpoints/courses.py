@@ -2,6 +2,8 @@ from datetime import datetime
 
 from flask import Blueprint, request, jsonify
 
+from sqlalchemy import SQLAlchemyError
+
 from src.utils.decorators import token_required
 from bussiness_logic.course_logic import CourseLogic
 
@@ -14,11 +16,22 @@ bp = Blueprint('cursos', __name__)
 @token_required
 def get_courses():
 
-    course_logic = CourseLogic()
+    try:
 
-    all_courses = course_logic.get_courses()
+        course_logic = CourseLogic()
 
-    return jsonify(all_courses), 200
+        all_courses = course_logic.get_courses()
+
+        return jsonify(all_courses), 200
+    
+    except ValueError as e:
+        return jsonify({'message': f'Error retrieving courses: {str(e)}'}), 404
+    
+    except Exception as e:
+        return jsonify({'message': f'Error retrieving courses: {str(e)}'}), 500
+    
+    except SQLAlchemyError as e:
+        return jsonify({'message': f'Database error: {str(e)}'}), 500
 
 
 # Definicion endpoint que obtiene todos los cursos bajo el control
@@ -26,39 +39,51 @@ def get_courses():
 @bp.route('/cursos/preceptor/<int:preceptor_id>', methods=['GET'])
 @token_required
 def get_courses_by_preceptor(preceptor_id):
+
+    if not preceptor_id:
+        return jsonify({'message':'El id del preceptor es invalido'}), 400
     
     try:
-        founded_courses = Course.query.filter(Course.associated_user == preceptor_id).filter(Course.active == True).filter(Course.current == True).order_by(Course.level, Course.year, Course.division)
+        course_logic = CourseLogic()
 
-    except:
-        return jsonify({'message':'No se puede obtener los cursos'}), 404
-    
-    if not founded_courses:
-        return jsonify({'message':'No se encontraron cursos'}), 404
-    
-    
-    serialized_courses = [course.as_dict() for course in founded_courses]
+        founded_courses = course_logic.get_courses_by_preceptor(preceptor_id)
 
-    return jsonify(serialized_courses), 200
+        return jsonify(founded_courses), 200
 
+    except ValueError as e:
+        return jsonify({'message': f'Error retrieving courses: {str(e)}'}), 404
+    
+    except SQLAlchemyError as e:
+        return jsonify({'message': f'Database error: {str(e)}'}), 500
+    
+    except Exception as e:
+        return jsonify({'message': f'Error retrieving courses: {str(e)}'}), 500
+    
 
 # Definicion endpoint obtiene un solo curso filtrado por id
 @bp.route('/cursos/<id>', methods=['GET'])
 @token_required
 def get_course_by_id(id):
+
+    if not id:
+        return jsonify({'message':'El id del curso es invalido'}), 400
     
     try:
-        founded_course = db.session.get(Course, id)
+        course_logic = CourseLogic()
 
-    except:
-        return jsonify({'message': 'No se pudo obtener el curso'}), 404
-    
-    if not founded_course:
-        return jsonify({'message':'El curso no existe'}), 404
-    
-    serialized_course = founded_course.as_dict()
+        founded_course = course_logic.get_course_by_id(id)
 
-    return jsonify(serialized_course), 200
+        return jsonify(founded_course), 200
+
+    except ValueError as e:
+        return jsonify({'message': f'Error retrieving course: {str(e)}'}), 404
+    
+    except SQLAlchemyError as e:
+        return jsonify({'message': f'Database error: {str(e)}'}), 500
+    
+    except Exception as e:
+        return jsonify({'message': f'Error retrieving course: {str(e)}'}), 500
+        
 
 
 # Definicion endpoint 'borra' un curso, cambio del activo
@@ -66,24 +91,25 @@ def get_course_by_id(id):
 @token_required
 def delete_course(id):
 
+    if not id:
+        return jsonify({'message':'El id del curso es invalido'}), 400
+
     try:
-        founded_course = db.session.get(Course, id)
+        course_logic = CourseLogic()
 
-    except:
-        return jsonify({'message':'No se pudo obtener el curso'}), 404
+        founded_course = course_logic.delete_course(id)
+
+        return jsonify({'message': founded_course}), 201
+
+    except ValueError as e:
+        return jsonify({'message': f'Error retrieving course: {str(e)}'}), 404
     
-    try:
-        founded_course.active = False
-        founded_course.updated_at = datetime.now()
-        db.session.commit()
-
-    except:
-        db.session.rollback()  # Revertir la transacción en caso de error
-        return jsonify({'message':'No se pudo borrar el curso'}), 404
+    except SQLAlchemyError as e:
+        return jsonify({'message': f'Database error: {str(e)}'}), 500
     
-    serialized_course = [founded_course.as_dict()]
-
-    return jsonify(serialized_course), 201
+    except Exception as e:
+        return jsonify({'message': f'Error retrieving course: {str(e)}'}), 500
+    
 
 
 # Definicion endpoint asignacion de alumno al curso
