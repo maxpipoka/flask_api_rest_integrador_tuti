@@ -2,7 +2,7 @@
 from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.models.models import Course, db
+from src.models.models import Course, Student, db
 
 class CourseLogic:
 
@@ -107,7 +107,15 @@ class CourseLogic:
 
     def delete_course(self, id: int) -> Course:
         """
-
+        Deletes a course by its ID, marking it as inactive.
+        Args:
+            id (int): The ID of the course to be deleted.
+        Returns:
+            Course: The updated course object with active set to False.
+        Raises:
+            ValueError: If the course does not exist or there is an error retrieving it.
+            SQLAlchemyError: If there is a database error.
+            Exception: For any other exceptions that occur.
         
         """
         
@@ -121,20 +129,98 @@ class CourseLogic:
             return founded_course
         
         except ValueError as e:
+            db.session.rollback()
             raise ValueError(f"Error retrieving course: {str(e)}")
         
         except SQLAlchemyError as e:
+            db.session.rollback()
             raise SQLAlchemyError(f"Database error: {str(e)}")
         
         except Exception as e:
+            db.session.rollback()
             raise Exception(f"Error retrieving course: {str(e)}")
 
 
-    def asociate_student_to_course(self):
-        pass
+    def asociate_student_to_course(self, course_id: int, student_id: int) -> dict[str]:
+        """
+        Associates a student with a course.
+        Args:
+            course_id (int): The ID of the course.
+            student_id (int): The ID of the student.
+        Returns:
+            None
+        Raises:
+            ValueError: If the course or student does not exist or there is an error retrieving them.
+            SQLAlchemyError: If there is a database error.
+            Exception: For any other exceptions that occur.
+        """
+        
+        try:
+            founded_student = db.session.get(Student, student_id)
+            founded_course = db.session.get(Course, course_id)
 
-    def save_course(self):
-        pass
+            if not founded_student or not founded_course:
+                raise ValueError("Course or Student does not exist")
+
+            founded_course.students.append(founded_student)
+            db.session.commit()
+            return {"message": "Student associated to course successfully"}
+
+        except ValueError as e:
+            db.session.rollback()
+            raise ValueError(f"Error associating student to course: {str(e)}")
+        
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            raise SQLAlchemyError(f"Database error: {str(e)}")
+        
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(f"Error associating student to course: {str(e)}")
+        
+
+    def save_course(self, course_data: dict) -> Course:
+        """
+        Saves a new course to the database.
+        Args:
+            course_data (dict): A dictionary containing course data.
+        Returns:
+            Course: The newly created course object.
+        Raises:
+            ValueError: If the course data is invalid or there is an error saving it.
+            SQLAlchemyError: If there is a database error.
+            Exception: For any other exceptions that occur.
+        """
+
+        try:
+            if not course_data:
+                raise ValueError("Course data is missing or invalid")
+
+            new_course = Course(
+                level=course_data.get('level'),
+                year=course_data.get('year'),
+                division=course_data.get('division'),
+                associated_user=course_data.get('associated_user'),
+                active=True,
+                current=True
+            )
+
+            db.session.add(new_course)
+            db.session.commit()
+
+            return new_course.as_dict()
+        
+        except ValueError as e:
+            db.session.rollback()
+            raise ValueError(f"Error saving course: {str(e)}")
+        
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            raise SQLAlchemyError(f"Database error: {str(e)}")
+        
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(f"Error saving course: {str(e)}")
 
     def update_course(self):
         pass
