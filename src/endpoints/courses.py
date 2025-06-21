@@ -193,8 +193,15 @@ def asociate_student_to_course(course_id, student_id):
 @bp.route('/cursos', methods=['POST'])
 @token_required
 def save_course():
-
-    new_course = None
+    """
+    Endpoint to create a new course.
+    Returns:
+        JSON response with the created course or an error message.
+    Raises:
+        ValueError: If the course data is invalid or there is an error saving it. 
+        SQLAlchemyError: If there is a database error.
+        Exception: For any other exceptions that occur.
+    """
 
     if not request.json:
         return jsonify({'message':'JSON data is missing of invalid'}), 400
