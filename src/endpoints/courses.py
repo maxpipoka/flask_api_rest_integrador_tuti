@@ -226,59 +226,37 @@ def save_course():
 @bp.route('/cursos/<id>', methods=['PATCH'])
 @token_required
 def update_course(id):
-
+    """
+    Endpoint to update an existing course by its ID.
+    Args:
+        id (int): The ID of the course to update.
+    Returns:
+        JSON response with the updated course or an error message.
+    Raises:
+        ValueError: If the course does not exist or there is an error retrieving it.
+        SQLAlchemyError: If there is a database error.
+        Exception: For any other exceptions that occur.
+    """
+    
+    if not id:
+        return jsonify({'message':'El id del curso es invalido'}), 400
+    
+    if not request.json:
+        return jsonify({'message':'JSON data is missing of invalid'}), 400
+    
     try:
-        founded_course = db.session.get(Course, id)
 
-    except Exception as error:
-        return jsonify({'message': f'No se puede obtener el curso - {str(error)}'}), 404
+        course_logic = CourseLogic()
+
+        updated_course = course_logic.update_course(id_course= id, course_data= request.json)
+        return jsonify(updated_course), 200
     
-    if not founded_course:
-        return jsonify({'message': 'No se puede obtener el curso'}), 404
+    except ValueError as e:
+        return jsonify({'message': f'Error updating course: {str(e)}'}), 404
     
-    try:
-        data = request.get_json()
-
-    except Exception as error:
-        return jsonify({'message':f'No hay informacipon para actualizar el curso - {str(error)}'}), 400
+    except SQLAlchemyError as e:
+        return jsonify({'message': f'Database error: {str(e)}'}), 500
     
-    try:
-        updated = False
-
-        if 'level' in data:
-            founded_course.level = data['level']
-            updated = True
-
-        if 'division' in data:
-            founded_course.division = data['division']
-            updated = True
-
-        if 'year' in data:
-            founded_course.year = data['year']
-            updated = True
-
-        if 'current' in data:
-            founded_course.current = data['current']
-            updated = True
-
-        if 'active' in data:
-            founded_course.active = data['active']
-            updated = True
-
-        if 'associated_user' in data:
-            founded_course.associated_user = data['associated_user']
-            updated = True
-
-        if updated:
-            founded_course.updated_at = datetime.now()
-
-
-        db.session.commit()
-
-    except Exception as error:
-        db.session.rollback() # Reversion transaccion
-        return jsonify({'message':'Error al modificar los campos del curso: ' + str(error)}), 500
+    except Exception as e:
+        return jsonify({'message': f'Error updating course: {str(e)}'}), 500
     
-    serialized_course = founded_course.as_dict()
-
-    return jsonify(serialized_course), 201

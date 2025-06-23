@@ -208,7 +208,7 @@ class CourseLogic:
             db.session.add(new_course)
             db.session.commit()
 
-            return new_course.as_dict()
+            return new_course
         
         except ValueError as e:
             db.session.rollback()
@@ -222,6 +222,61 @@ class CourseLogic:
             db.session.rollback()
             raise Exception(f"Error saving course: {str(e)}")
 
-    def update_course(self):
-        pass
+    def update_course(self, course_data: dict[str, str], id_course: int) -> Course:
+        """
+        Updates an existing course in the database.
+        Args:
+            course_data (dict): A dictionary containing the updated course data.
+            id_course (int): The ID of the course to be updated.
+        Returns:
+            Course: The updated course object.
+        Raises:
+            ValueError: If the course data is invalid or there is an error updating it.
+            SQLAlchemyError: If there is a database error.
+            Exception: For any other exceptions that occur.
+        
+        """
+
+        try:
+            founded_course = db.session.get(Course, id_course)
+
+            if not founded_course:
+                raise ValueError("Course does not exist")
+            
+            updated = False
+
+            if 'level' in course_data:
+                founded_course.level = course_data['level']
+                updated = True
+
+            if 'division' in course_data:
+                founded_course.division = course_data['division']
+                updated = True  
+            
+            if 'year' in course_data:
+                founded_course.year = course_data['year']
+                updated = True
+
+            if 'associated_user' in course_data:
+                founded_course.associated_user = course_data['associated_user']
+                updated = True
+            
+            if updated:
+                founded_course.updated_at = datetime.now()
+            
+            db.session.commit()
+
+            return founded_course
+        
+        except ValueError as e:
+            db.session.rollback()
+            raise ValueError(f"Error updating course: {str(e)}")
+        
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            raise SQLAlchemyError(f"Database error: {str(e)}")
+        
+        except Exception as e:
+            db.session.rollback()
+            raise Exception(f"Error updating course: {str(e)}")
 

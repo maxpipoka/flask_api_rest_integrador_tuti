@@ -28,8 +28,12 @@ class AttendanceLogic:
             
             if not all_attendances:
                 raise ValueError(f"No active attendances found in the database.")
+            
+            serialized_attendances = [
+                attendance.as_dict() for attendance in all_attendances
+            ]
 
-            return all_attendances
+            return serialized_attendances
         
         except ValueError as e:
             #Captura de error si no se encuentran asistencias activas
@@ -63,6 +67,10 @@ class AttendanceLogic:
             if not all_inactive_attendances:
                 raise ValueError(f"No inactive attendances found in the database.")
             
+            serialized_inactive_attendances = [
+                attendance.as_dict() for attendance in all_inactive_attendances
+            ]
+            
             return all_inactive_attendances
         
         except SQLAlchemyError as e:
@@ -72,6 +80,10 @@ class AttendanceLogic:
         except Exception as e:
             #Capturar cualquier otra excepcion inesperada
             raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
+        
+        except ValueError as e:
+            #Captura de error si no se encuentran asistencias inactivas
+            raise ValueError(f"Validation Error: {e}") from e
 
 
     def get_attendance_by_id(self, id:int) -> Attendance:
@@ -96,6 +108,10 @@ class AttendanceLogic:
                 raise ValueError(f"Attendance with id {id} not found in the database.")
 
             return attendance
+        
+        except ValueError as e:
+            #Captura de error si la asistencia no es encontrada
+            raise ValueError(f"Validation Error: {e}") from e
 
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
@@ -142,7 +158,13 @@ class AttendanceLogic:
                 end_date = datetime.strptime(end_date, '%Y-%m-%d')
                 query = query.filter(Attendance.day <= end_date)
             
-            return query.order_by(Attendance.day.asc()).all()
+            ordered_attendances = query.order_by(Attendance.day.asc()).all()
+
+            serialized_attendances = [
+                attendance.as_dict() for attendance in ordered_attendances
+            ]
+
+            return serialized_attendances
 
         except SQLAlchemyError as e:
             #Captura de errores específicos de SQLAlchemy durante la consulta
@@ -153,7 +175,7 @@ class AttendanceLogic:
             raise Exception(f"An unexpected error ocurred while fetching attendances: {e}") from e
 
 
-    def close_attendance(self, course_id: int) -> None:
+    def close_attendance(self, course_id: int) -> dict[str, str]:
         """
         Close the attendance for a specific course.
         Args:
