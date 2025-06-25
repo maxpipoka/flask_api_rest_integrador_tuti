@@ -1,7 +1,5 @@
 from flask import Blueprint, request, jsonify
 
-from sqlalchemy.exc import SQLAlchemyError
-
 from bussiness_logic.attendance_logic import AttendanceLogic
 
 from src.utils.decorators import token_required, require_json, handle_api_exceptions
@@ -29,7 +27,6 @@ def get_attendances():
     active_attendances = attendance_logic.get_attendances()
 
     return jsonify(active_attendances), 200
-    
 
 
 # Definicion endpoint obtiene las asistencias inactivas
@@ -52,7 +49,6 @@ def get_inactive_attendances():
     inactive_attendances = attendance_logic.get_inactive_attendances()
 
     return jsonify(inactive_attendances), 200
-    
 
 
 # Definicion endpoint obtencion una asistencia por id
@@ -61,7 +57,7 @@ def get_inactive_attendances():
 @handle_api_exceptions(default_message="Error retrieving attendances")
 def get_attendance_by_id(id):
     """
-    Endpoint to retrieve a specific attendance by its ID.   
+    Endpoint to retrieve a specific attendance by its ID.
     Args:
         id (int): The ID of the attendance to retrieve.
     Returns:
@@ -74,7 +70,7 @@ def get_attendance_by_id(id):
 
     if not id:
         return jsonify({"message": "El id de la asistencia es invalido"}), 400
-    
+
     attendance_logic = AttendanceLogic()
 
     founded_attendance = attendance_logic.get_attendance_by_id(id)
@@ -101,7 +97,7 @@ def get_attendances_by_student_id(id):
 
     if "start" not in request.args or "end" not in request.args:
         return jsonify({"message": "Missing required date filters"}), 400
-    
+
     if not id:
         return jsonify({"message": "El id del alumno es invalido"}), 400
 
@@ -131,10 +127,9 @@ def close_attendance(id):
         Exception: For any other exceptions that occur.
     """
 
-
     if not id:
         return jsonify({"message": "El id del curso es invalido"}), 400
-    
+
     attendance_logic = AttendanceLogic()
 
     close_attendance = attendance_logic.close_attendance(course_id=id)
@@ -158,10 +153,10 @@ def get_attendace_by_day_and_course():
     """
     if "course_id" not in request.json or "date_to_search" not in request.json:
         return jsonify({"message": "Missing required parameters"}), 400
-    
+
     if not request.json["course_id"] or not request.json["date_to_search"]:
         return jsonify({"message": "Invalid course_id or date_to_search"}), 400
-    
+
     attendance_logic = AttendanceLogic()
 
     attendances_response = attendance_logic.get_attendance_by_day_and_course(
@@ -218,7 +213,6 @@ def save_attendance():
     return jsonify(new_attendance), 201
 
 
-
 # Definicion endpoint edicion asistencia
 @bp.route("/asistencias/<int:id>", methods=["PATCH"])
 @token_required
@@ -237,16 +231,14 @@ def update_attendance(id):
         Exception: For any other exceptions that occur.
     """
 
-
     attendance_data = request.json
     attendance_logic = AttendanceLogic()
 
     updated_attendance = attendance_logic.update_attendance(
         id_attendance=id, attendance_data=attendance_data
     )
-# 
+    #
     return jsonify(updated_attendance), 200
-
 
 
 # Definicion endpoint obtencion de fechas disponibles por curso
@@ -265,7 +257,6 @@ def get_available_dates_by_course(course_id):
         SQLAlchemyError: If there is a database error.
         Exception: For any other exceptions that occur.
     """
-
 
     attendance_logic = AttendanceLogic()
 
