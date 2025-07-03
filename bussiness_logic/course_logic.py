@@ -242,26 +242,15 @@ class CourseLogic:
             if not founded_course:
                 raise ValueError("Course does not exist")
             
-            updated = False
-
-            if 'level' in course_data:
-                founded_course.level = course_data['level']
-                updated = True
-
-            if 'division' in course_data:
-                founded_course.division = course_data['division']
-                updated = True  
+            if not course_data:
+                raise ValueError("No data provided for update")
             
-            if 'year' in course_data:
-                founded_course.year = course_data['year']
-                updated = True
-
-            if 'associated_user' in course_data:
-                founded_course.associated_user = course_data['associated_user']
-                updated = True
+            for key, value in course_data.items():
+                if key not in ['level', 'division', 'year', 'associated_user']:
+                    raise ValueError(f"Invalid field for update: {key}")
+                setattr(founded_course, key, value)
             
-            if updated:
-                founded_course.updated_at = datetime.now()
+            founded_course.updated_at = datetime.now()
             
             db.session.commit()
 

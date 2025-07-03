@@ -1,4 +1,5 @@
 
+from datetime import datetime
 from src.models.models import Student, db
 
 from src.utils.decorators import handle_logic_exceptions
@@ -124,6 +125,71 @@ class StudentLogic:
         db.session.commit()
 
         return new_student
+    
+
+    @handle_logic_exceptions(default_message="Error updating student")
+    def update_student(self, id: int, student_data: dict[str, any]) -> Student:
+        """
+        Updates an existing student in the database.
+        Args:
+            id (int): The ID of the student to update.
+            student_data (dict): A dictionary containing updated student data.
+        Returns:
+            Student: The updated student object.
+        Raises:
+            ValueError: If the student with the given ID is not found or if no data is provided for update.
+        """
+        
+        founded_student = db.session.get(Student, id)
+
+        if not founded_student:
+            raise ValueError(f'Student with ID {id} not found')
+        
+        if not student_data:
+            raise ValueError('No data provided for update')
+
+        for key, value in student_data.items():
+            setattr(founded_student, key, value)
+
+        founded_student.updated_at = datetime.now()
+
+        db.session.commit()
+
+        return founded_student
+    
+
+    @handle_logic_exceptions(default_message="Error associating student with tutor")
+    def associate_tutor_with_student(self, student_id: int, tutor_id: int) -> dict[str, any]:
+        """
+        Associates a tutor with a student by their IDs.
+        Args:
+            student_id (int): The ID of the student to associate with the tutor.
+            tutor_id (int): The ID of the tutor to associate with the student.
+        Returns:
+            dict: A dictionary containing a success message.
+        Raises:
+            ValueError: If the student or tutor with the given IDs is not found, or if the tutor is already associated with the student.
+            
+        """
+         
+        
+        student = db.session.get(Student, student_id)
+
+        if not student:
+            raise ValueError(f'Student with ID {student_id} not found')
+        
+        tutor = db.session.get(Student, tutor_id)
+
+        if not tutor:
+            raise ValueError(f'Tutor with ID {tutor_id} not found')
+        
+        if tutor_id in student.tutors:
+            raise ValueError(f'Tutor with ID {tutor_id} is already associated with student {student_id}')
+        
+        student.tutors.append(tutor)
+        db.session.commit()
+
+        return {"message": "Relacion entre alumno y tutor establecida con éxito"}
 
          
   
