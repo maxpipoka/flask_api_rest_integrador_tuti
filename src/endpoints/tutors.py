@@ -78,7 +78,7 @@ def delete_tutor(id):
 # Definicion endpoint creacion tutor
 @bp.route('/tutores', methods=['POST'])
 @token_required
-def save_turor():
+def save_tutor():
     new_tutor = None
 
     if not request.json:
