@@ -6,11 +6,13 @@ from flask import Response, Blueprint, request, jsonify
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
-from src.utils.decorators import token_required
+from src.utils.decorators import handle_logic_exceptions, token_required, require_json
 
 from ..models.models import Tutor, db
 
 from ..models.schemas import TutorSchema
+
+from bussiness_logic.tutor_logic import TutorLogic
 
 bp = Blueprint('tutores', __name__)
 
@@ -21,100 +23,95 @@ tutors_schema = TutorSchema(many=True)
 # Definicion endpoint obtiene todos los tutores activos
 @bp.route('/tutores', methods=['GET'])
 @token_required
+@handle_logic_exceptions(default_message="Error al obtener los tutores activos")
 def get_tutors():
-    try:
-        all_tutors = Tutor.query.filter(Tutor.active == True).order_by(Tutor.id)
-    except:
-        return jsonify({"message": "No se puede obtener los tutores"}), 404
+    """
+    Endpoint para obtener todos los tutores activos.
+    Returns:
+        JSON: Una lista de tutores activos.
+    Raises:
+        ValueError: Si no se encuentran tutores activos.
+        SQLAlchemyError: Si hay un error al consultar la base de datos.
+        Exception: Para cualquier otra excepción que ocurra.
+    """
     
-    if not all_tutors:
-        return jsonify({"message": "No se pueden obtener los tutores"}), 400
+    tutor_logic = TutorLogic()
+
+    all_active_tutors = tutor_logic.get_tutors()
+
+    return jsonify(all_active_tutors), 200
     
-    serialized_tutors = [tutor.as_dict() for tutor in all_tutors]
-
-
-    return jsonify(serialized_tutors), 200
 
 
 # Definición endpoint obtiene un solo tutor filtrado por id
 @bp.route('/tutores/<id>', methods=['GET'])
 @token_required
 def get_tutor_by_id(id):
-    try:
-        founded_tutor = db.session.get(Tutor, id)
-    except:
-        return jsonify({"message":"No se puede obtener el tutor"}), 400
-    
-    serialized_tutor = founded_tutor.as_dict()
+    """
+    Endpoint para obtener un tutor por su ID.
+    Args:
+        id (int): El ID del tutor a obtener.
+    Returns:
+        JSON: Un diccionario que representa el tutor encontrado.
+    Raises:
+        ValueError: Si no se encuentra el tutor con el ID proporcionado.
+        SQLAlchemyError: Si hay un error al consultar la base de datos.
+        Exception: Para cualquier otra excepción que ocurra.
+    """
 
-    return jsonify(serialized_tutor), 200
+    tutor_logic = TutorLogic()
+
+    founded_tutor = tutor_logic.get_tutor_by_id(id)
+
+    return jsonify(founded_tutor.as_dict()), 200
 
 
 # Definicion endpoint que borra un tutor, cambia el activo
 @bp.route('/tutores/<id>', methods=['DELETE'])
 @token_required
+@handle_logic_exceptions(default_message="Error al eliminar el tutor")
 def delete_tutor(id):
-    try:
-        founded_tutor = db.session.get(Tutor, id)
-    except:
-        return jsonify({"message": "No se puede obtener el tutor"}), 404
-    
-    try:
-        founded_tutor.active = False
-        founded_tutor.updated_at = datetime.now()
-        db.session.commit()
-        
-    except:
-        db.session.rollback()  # Revertir la transacción en caso de error
-        return jsonify({"message":"No se pudo borrar el tutor"}), 400
-    
-    serialized_tutor = tutor_schema.dump(founded_tutor)
+    """ Endpoint para eliminar un tutor por su ID.
+    Args:
+        id (int): El ID del tutor a eliminar.
+    Returns:
+        JSON: Un mensaje de éxito o error.
+    Raises:
+        ValueError: Si no se encuentra el tutor con el ID proporcionado.
+        SQLAlchemyError: Si hay un error al consultar la base de datos.
+        Exception: Para cualquier otra excepción que ocurra.
+    """
 
-    response_data = json.dumps(serialized_tutor, ensure_ascii=False)
+    tutor_logic = TutorLogic()
 
-    return jsonify(response_data), 200
+    tutor_to_delete = tutor_logic.delete_tutor(id)
+
+    return jsonify(tutor_to_delete.as_dict()), 200
 
 
 # Definicion endpoint creacion tutor
 @bp.route('/tutores', methods=['POST'])
 @token_required
+@require_json
+@handle_logic_exceptions(default_message="Error al guardar el tutor")
 def save_tutor():
-    new_tutor = None
+    """
+    Endpoint para crear un nuevo tutor.
+    Returns:
+        JSON: El tutor creado.
+    Raises:
+        ValueError: Si hay un error al crear el tutor o si los datos son inválidos
+        SQLAlchemyError: Si hay un error al consultar la base de datos.
+        Exception: Para cualquier otra excepción que ocurra.
+    """
 
-    if not request.json:
-        return jsonify({'message': 'JSON data is missing or invalid'}), 400
+    tutor_logic = TutorLogic()
 
-    try:
-        new_tutor = Tutor(
-            dni= request.json['dni'],
-            names= request.json['names'],
-            surnames= request.json['surnames'],
-            address= request.json['address'],
-            email= request.json['email'],
-            active=request.json.get('active')
-            )
-    except KeyError as error:
-        return jsonify({'message': f'Missing field: {error.args[0]}'}), 400
+    new_tutor = tutor_logic.save_tutor(tutor_data=request.json)
 
-    except Exception as error:
-        return jsonify({'message':f'No se puede crear la instancia - {str(error)}'}), 400
+    return jsonify(new_tutor.as_dict()), 201
+
     
-    try:
-        db.session.add(new_tutor)
-    except Exception as error:
-        return jsonify({'message':f'No se pudo ADD tutor - {str(error)}'}), 400
-    
-    try:
-        #Confirmacion de las operaciones creadas en la sesion
-        db.session.commit()
-        return jsonify({'message':'Success'}), 201
-    
-    except IntegrityError as error:
-        db.session.rollback()
-        if isinstance(error.orig, UniqueViolation):
-            return jsonify({'message':'El DNI ya existe en la base de datos'}), 400
-        
-        return jsonify({'message':f'Error de integridad - {str(error)}'}), 400
     
 # Deficion endpoint edicion tutor
 @bp.route('/tutores/<id>', methods=['PATCH'])

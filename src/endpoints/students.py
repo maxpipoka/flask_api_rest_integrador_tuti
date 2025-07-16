@@ -31,7 +31,7 @@ def get_students():
 
     student_logic = StudentLogic()
 
-    all_active_students = student_logic.get_studentes
+    all_active_students = student_logic.get_studentes()
 
     return jsonify(all_active_students), 200
 
