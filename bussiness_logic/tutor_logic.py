@@ -117,8 +117,35 @@ class TutorLogic:
         return new_tutor
 
 
-    
-    def update_tutor(self):
+    @handle_logic_exceptions(default_message="Error al actualizar el tutor")
+    def update_tutor(self, id: int, tutor_data: dict[str, any]) -> Tutor:
+        """
+        Actualiza un tutor existente en la base de datos.
+        Args:
+            id (int): El ID del tutor a actualizar.
+            tutor_data (dict): Un diccionario que contiene los datos actualizados del tutor.
+        Returns:
+            Tutor: El tutor actualizado.
+        Raises:
+            ValueError: Si no se encuentra el tutor con el ID proporcionado o si no se proporciona información para actualizar.
+            SQLAlchemyError: Si hay un error al consultar la base de datos.
+            Exception: Para cualquier otra excepción que ocurra.
+        """
+        
+        founded_tutor = db.session.get(Tutor, id)
+
+        if not founded_tutor:
+            raise ValueError(f"El tutor con ID {id} no fue encontrado")
+        
+        if not tutor_data:
+            raise ValueError("No se proporcionó información para actualizar")
+
+        for key, value in tutor_data.items():
+            setattr(founded_tutor, key, value)
+
+        db.session.commit()
+
+        return founded_tutor
 
 
 
