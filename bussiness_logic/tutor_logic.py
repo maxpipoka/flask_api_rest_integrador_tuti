@@ -1,6 +1,7 @@
 
 
 
+from datetime import datetime
 from typing import List
 from src.models.models import Tutor, db
 
@@ -118,7 +119,36 @@ class TutorLogic:
 
 
     
-    def update_tutor(self):
+    def update_tutor(self, id_tutor: int, tutor_data: dict[str, any]) -> Tutor:
+        """
+        Actualiza un tutor existente en la base de datos.
+        Args:
+            id_tutor (int): El ID del tutor a actualizar.
+            tutor_data (dict): Un diccionario que contiene los datos del tutor a actualizar.
+        Returns:
+            Tutor: El tutor actualizado.
+        Raises:
+            ValueError: Si no se encuentra el tutor con el ID proporcionado o si hay un error al actualizar.
+            SQLAlchemyError: Si hay un error al consultar la base de datos.
+            Exception: Para cualquier otra excepción que ocurra.
+        """
+        
+        tutor_to_update = db.session.get(Tutor, id_tutor)
+
+        if not tutor_to_update:
+            raise ValueError(f"No se encuentra el tutor con el ID {id_tutor}")
+            
+        if not tutor_data:
+            raise ValueError("No hay datos para actualizar el tutor")
+
+        for key, value in tutor_data.items():
+            setattr(tutor_to_update, key, value)
+
+        tutor_to_update.updated_at = datetime.now()
+
+        db.session.commit()
+
+        return tutor_to_update
 
 
 

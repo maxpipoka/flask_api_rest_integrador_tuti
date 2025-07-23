@@ -116,58 +116,27 @@ def save_tutor():
 # Deficion endpoint edicion tutor
 @bp.route('/tutores/<id>', methods=['PATCH'])
 @token_required
+@require_json
+@handle_logic_exceptions(default_message="Error al actualizar el tutor")
 def update_tutor(id):
-    try:
-        founded_tutor = db.session.get(Tutor, id)
+    """
+    Endpoint para actualizar un tutor por su ID.
+    Args:
+        id (int): El ID del tutor a actualizar.
+    Returns:
+        JSON: El tutor actualizado.
+    Raises:
+        ValueError: Si no se encuentra el tutor con el ID proporcionado o si no se
+        hay datos para actualizar.
+        SQLAlchemyError: Si hay un error al consultar la base de datos.
+        Exception: Para cualquier otra excepción que ocurra.
+    """
+
+    if not id:
+        return jsonify({"message": "ID del tutor es requerido"}), 400
+    
+    tutor_logic = TutorLogic()
+
+    tutor_to_update = tutor_logic.update_tutor(id, tutor_data=request.json)
         
-    except:
-        return jsonify({"message":"No se pudo obtener el tutor"}), 404
-    
-    if not founded_tutor:
-        return jsonify({"message":"No se pudo obtener el tutor"}), 404
-    
-    try:
-        data = request.get_json()
-    except:
-        return jsonify({"message":"No hay información para actualizar el tutor"}), 400
-    
-    try:
-        updated = False
-
-        if 'names' in data:
-            founded_tutor.names = data['names']
-            updated = True
-
-        if 'surnames' in data:
-            founded_tutor.surnames = data['surnames']
-            updated = True
-
-        if 'address' in data:
-            founded_tutor.address = data['address']
-            updated = True
-
-        if 'email' in data and data['email']:
-            founded_tutor.email = data['email']
-            updated = True
-
-        if 'active' in data:
-            founded_tutor.active = data['active']
-            updated = True
-
-        if 'student_id' in data:
-            founded_tutor.student_id = data['student_id']
-            updated = True
-
-        if updated:
-            founded_tutor.updated_at = datetime.now()
-
-        db.session.commit()
-    except Exception as e:
-        db.session.rollback()  # Revertir la transacción en caso de error
-        return jsonify({"message": "Error al modificar los campos del tutor: " + str(e)}), 500
-    
-    serialized_tutor = tutor_schema.dump(founded_tutor)
-
-    # response_data = json.dumps(serialized_tutor, ensure_ascii=False)
-
-    return jsonify(serialized_tutor), 201
+    return jsonify(tutor_to_update), 201
