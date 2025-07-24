@@ -6,7 +6,7 @@ from flask import Response, Blueprint, request, jsonify
 from sqlalchemy.exc import IntegrityError
 from psycopg2.errors import UniqueViolation
 
-from src.utils.decorators import handle_logic_exceptions, token_required, require_json
+from src.utils.decorators import handle_logic_exceptions, token_required, require_json, handle_api_exceptions
 
 from ..models.models import Tutor, db
 
@@ -23,7 +23,7 @@ tutors_schema = TutorSchema(many=True)
 # Definicion endpoint obtiene todos los tutores activos
 @bp.route('/tutores', methods=['GET'])
 @token_required
-@handle_logic_exceptions(default_message="Error al obtener los tutores activos")
+@handle_api_exceptions(default_message="Error al obtener los tutores activos")
 def get_tutors():
     """
     Endpoint para obtener todos los tutores activos.
@@ -69,7 +69,7 @@ def get_tutor_by_id(id):
 # Definicion endpoint que borra un tutor, cambia el activo
 @bp.route('/tutores/<id>', methods=['DELETE'])
 @token_required
-@handle_logic_exceptions(default_message="Error al eliminar el tutor")
+@handle_api_exceptions(default_message="Error al eliminar el tutor")
 def delete_tutor(id):
     """ Endpoint para eliminar un tutor por su ID.
     Args:
@@ -93,7 +93,7 @@ def delete_tutor(id):
 @bp.route('/tutores', methods=['POST'])
 @token_required
 @require_json
-@handle_logic_exceptions(default_message="Error al guardar el tutor")
+@handle_api_exceptions(default_message="Error al guardar el tutor")
 def save_tutor():
     """
     Endpoint para crear un nuevo tutor.
@@ -117,7 +117,7 @@ def save_tutor():
 @bp.route('/tutores/<id>', methods=['PATCH'])
 @token_required
 @require_json
-@handle_logic_exceptions(default_message="Error al actualizar el tutor")
+@handle_api_exceptions(default_message="Error al actualizar el tutor")
 def update_tutor(id):
     """
     Endpoint para actualizar un tutor por su ID.

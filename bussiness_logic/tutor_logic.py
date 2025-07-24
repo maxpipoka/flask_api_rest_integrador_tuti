@@ -118,7 +118,7 @@ class TutorLogic:
         return new_tutor
 
 
-    
+    @handle_logic_exceptions(default_message="Error al actualizar el tutor")    
     def update_tutor(self, id_tutor: int, tutor_data: dict[str, any]) -> Tutor:
         """
         Actualiza un tutor existente en la base de datos.
@@ -132,7 +132,7 @@ class TutorLogic:
             SQLAlchemyError: Si hay un error al consultar la base de datos.
             Exception: Para cualquier otra excepción que ocurra.
         """
-        
+
         tutor_to_update = db.session.get(Tutor, id_tutor)
 
         if not tutor_to_update:
