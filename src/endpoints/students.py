@@ -73,7 +73,7 @@ def get_student_by_id(id):
 
     if not id:
         return jsonify({"message": "ID del alumno es requerido"}), 400
-    
+
     student_logic = StudentLogic()
 
     founded_student = student_logic.get_student_by_id(id)
@@ -123,7 +123,7 @@ def save_student():
     """
 
     student_logic = StudentLogic()
-    
+
     new_student = student_logic.save_student(student_data=request.json)
 
     return jsonify(new_student), 201
@@ -138,7 +138,7 @@ def update_student(id):
     """
     Endpoint to update an existing student by their ID.
     Args:
-        id (int): The ID of the student to update. 
+        id (int): The ID of the student to update.
     Returns:
         JSON: The updated student object if successful.
     Raises:
@@ -149,18 +149,19 @@ def update_student(id):
 
     if not id:
         return jsonify({"message": "ID del alumno es requerido"}), 400
-    
+
     student_logic = StudentLogic()
 
     updated_student = student_logic.update_student(id, student_data=request.json)
 
     return jsonify(updated_student), 200
 
+
 # Definición endpoint para asociar tutores al alumno
 @bp.route("/alumnos/<int:alumno_id>/tutores/<int:tutor_id>", methods=["POST"])
 @token_required
 @handle_logic_exceptions(default_message="Error al asociar el tutor con el estudiante")
-def associate_tutor_with_student(alumno_id, tutor_id):
+def associate_tutor_with_student(student_id, tutor_id):
     """
     Endpoint to associate a tutor with a student.
     Args:
@@ -174,14 +175,13 @@ def associate_tutor_with_student(alumno_id, tutor_id):
         Exception: For any other exceptions that occur.
     """
 
-    if not alumno_id or not tutor_id:
+    if not student_id or not tutor_id:
         return jsonify({"message": "ID del alumno y del tutor son requeridos"}), 400
-    
+
     student_logic = StudentLogic()
 
     associated_student = student_logic.associate_tutor_with_student(
-        student_id=alumno_id,
-        tutor_id=tutor_id
+        student_id=student_id, tutor_id=tutor_id
     )
 
     return jsonify(associated_student), 200

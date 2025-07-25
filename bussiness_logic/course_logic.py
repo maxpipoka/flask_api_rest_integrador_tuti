@@ -3,6 +3,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from src.models.models import Course, Student, db
 
+
 class CourseLogic:
 
     def get_courses(self) -> list[Course]:
@@ -17,24 +18,25 @@ class CourseLogic:
         """
 
         try:
-            all_courses = Course.query.order_by(Course.level, Course.year, Course.division)
+            all_courses = Course.query.order_by(
+                Course.level, Course.year, Course.division
+            )
 
             if not all_courses:
                 raise ValueError("No courses found")
 
             serialized_courses = [course.as_dict() for course in all_courses]
-            
+
             return serialized_courses
-        
+
         except ValueError as e:
             raise ValueError(f"Error retrieving courses: {str(e)}")
-        
+
         except SQLAlchemyError as e:
             raise SQLAlchemyError(f"Database error: {str(e)}")
-        
+
         except Exception as e:
             raise Exception(f"Error retrieving courses: {str(e)}")
-        
 
     def get_courses_by_preceptor(self, preceptor_id: int) -> list[Course]:
         """
@@ -53,12 +55,12 @@ class CourseLogic:
             founded_courses = Course.query.filter(
                 Course.associated_user == preceptor_id,
                 Course.active == True,
-                Course.current == True
+                Course.current == True,
             ).order_by(Course.level, Course.year, Course.division)
 
             if not founded_courses:
                 raise ValueError("No courses found for the specified preceptor")
-            
+
             serialized_courses = [course.as_dict() for course in founded_courses]
 
             return serialized_courses
@@ -69,10 +71,8 @@ class CourseLogic:
             raise SQLAlchemyError(f"Database error: {str(e)}")
         except Exception as e:
             raise Exception(f"Error retrieving courses: {str(e)}")
-        
 
-
-    def get_course_by_id(self, id_course: int ) -> Course:
+    def get_course_by_id(self, id_course: int) -> Course:
         """
         Retrieves a course by its ID.
         Args:
@@ -90,17 +90,17 @@ class CourseLogic:
 
             if not founded_course:
                 raise ValueError("Course does not exist")
-            
+
             serialized_course = founded_course.as_dict()
 
             return serialized_course
-        
+
         except ValueError as e:
             raise ValueError(f"Error retrieving course: {str(e)}")
-        
+
         except SQLAlchemyError as e:
             raise SQLAlchemyError(f"Database error: {str(e)}")
-        
+
         except Exception as e:
             raise Exception(f"Error retrieving course: {str(e)}")
 
@@ -115,9 +115,9 @@ class CourseLogic:
             ValueError: If the course does not exist or there is an error retrieving it.
             SQLAlchemyError: If there is a database error.
             Exception: For any other exceptions that occur.
-        
+
         """
-        
+
         try:
             founded_course = db.session.get(Course)
 
@@ -126,19 +126,18 @@ class CourseLogic:
             db.session.commit()
 
             return founded_course
-        
+
         except ValueError as e:
             db.session.rollback()
             raise ValueError(f"Error retrieving course: {str(e)}")
-        
+
         except SQLAlchemyError as e:
             db.session.rollback()
             raise SQLAlchemyError(f"Database error: {str(e)}")
-        
+
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Error retrieving course: {str(e)}")
-
 
     def asociate_student_to_course(self, course_id: int, student_id: int) -> dict[str]:
         """
@@ -153,7 +152,7 @@ class CourseLogic:
             SQLAlchemyError: If there is a database error.
             Exception: For any other exceptions that occur.
         """
-        
+
         try:
             founded_student = db.session.get(Student, student_id)
             founded_course = db.session.get(Course, course_id)
@@ -168,15 +167,14 @@ class CourseLogic:
         except ValueError as e:
             db.session.rollback()
             raise ValueError(f"Error associating student to course: {str(e)}")
-        
+
         except SQLAlchemyError as e:
             db.session.rollback()
             raise SQLAlchemyError(f"Database error: {str(e)}")
-        
+
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Error associating student to course: {str(e)}")
-        
 
     def save_course(self, course_data: dict) -> Course:
         """
@@ -196,27 +194,27 @@ class CourseLogic:
                 raise ValueError("Course data is missing or invalid")
 
             new_course = Course(
-                level=course_data.get('level'),
-                year=course_data.get('year'),
-                division=course_data.get('division'),
-                associated_user=course_data.get('associated_user'),
+                level=course_data.get("level"),
+                year=course_data.get("year"),
+                division=course_data.get("division"),
+                associated_user=course_data.get("associated_user"),
                 active=True,
-                current=True
+                current=True,
             )
 
             db.session.add(new_course)
             db.session.commit()
 
             return new_course
-        
+
         except ValueError as e:
             db.session.rollback()
             raise ValueError(f"Error saving course: {str(e)}")
-        
+
         except SQLAlchemyError as e:
             db.session.rollback()
             raise SQLAlchemyError(f"Database error: {str(e)}")
-        
+
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Error saving course: {str(e)}")
@@ -233,7 +231,7 @@ class CourseLogic:
             ValueError: If the course data is invalid or there is an error updating it.
             SQLAlchemyError: If there is a database error.
             Exception: For any other exceptions that occur.
-        
+
         """
 
         try:
@@ -241,30 +239,29 @@ class CourseLogic:
 
             if not founded_course:
                 raise ValueError("Course does not exist")
-            
+
             if not course_data:
                 raise ValueError("No data provided for update")
-            
+
             for key, value in course_data.items():
-                if key not in ['level', 'division', 'year', 'associated_user']:
+                if key not in ["level", "division", "year", "associated_user"]:
                     raise ValueError(f"Invalid field for update: {key}")
                 setattr(founded_course, key, value)
-            
+
             founded_course.updated_at = datetime.now()
-            
+
             db.session.commit()
 
             return founded_course
-        
+
         except ValueError as e:
             db.session.rollback()
             raise ValueError(f"Error updating course: {str(e)}")
-        
+
         except SQLAlchemyError as e:
             db.session.rollback()
             raise SQLAlchemyError(f"Database error: {str(e)}")
-        
+
         except Exception as e:
             db.session.rollback()
             raise Exception(f"Error updating course: {str(e)}")
-
