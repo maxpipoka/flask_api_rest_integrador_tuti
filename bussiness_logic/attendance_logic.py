@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import func, Date
 
@@ -9,7 +10,7 @@ from src.models.models import Attendance, Course, Student, db
 
 class AttendanceLogic:
 
-    @handle_logic_exceptions(default_message="Error al obtener las asistencias activas")
+    @handle_logic_exceptions(default_message="Error retrieving attendances")
     def get_attendances(self) -> list[Attendance]:
         """
         Get all the active attendances data from the database.
@@ -37,7 +38,7 @@ class AttendanceLogic:
         return serialized_attendances
 
     @handle_logic_exceptions(
-        default_message="Error al obtener las asistencias inactivas"
+        default_message="Error retrieving inactive attendances"
     )
     def get_inactive_attendances(self) -> list[Attendance]:
         """
@@ -65,7 +66,7 @@ class AttendanceLogic:
 
         return serialized_inactive_attendances
 
-    @handle_logic_exceptions(default_message="Error al obtener los tutores activos")
+    @handle_logic_exceptions(default_message="Error retrieving attendance by ID")
     def get_attendance_by_id(self, id: int) -> Attendance:
         """
         Get a specific attendance by its id from the database.
@@ -86,7 +87,7 @@ class AttendanceLogic:
 
         return attendance
 
-    @handle_logic_exceptions(default_message="Error al obtener los tutores activos")
+    @handle_logic_exceptions(default_message="Error retrieving attendances by student ID")
     def get_attendances_by_student_id(
         self, id: int, request_data: dict[str, Any]
     ) -> list[Attendance]:
@@ -133,7 +134,7 @@ class AttendanceLogic:
 
         return serialized_attendances
 
-    @handle_logic_exceptions(default_message="Error al cerrar la asistencia")
+    @handle_logic_exceptions(default_message="Error closing attendance")
     def close_attendance(self, course_id: int) -> dict[str, str]:
         """
         Close the attendance for a specific course.
@@ -189,7 +190,7 @@ class AttendanceLogic:
             )
         return {"message": "Attendance closed successfully"}
 
-    @handle_logic_exceptions(default_message="Error al obtener los tutores activos")
+    @handle_logic_exceptions(default_message="Error retrieving attendance by day and course")
     def get_attendance_by_day_and_course(
         self, course_id: int, date_to_search: str
     ) -> list[Attendance]:
@@ -242,7 +243,7 @@ class AttendanceLogic:
 
         return attendances_response
 
-    @handle_logic_exceptions(default_message="Error al eliminar la asistencia")
+    @handle_logic_exceptions(default_message="Error deleting attendance")
     def delete_attendance(self, id_attendance: int) -> Attendance:
         """
         Delete an attendance from the database.
@@ -263,7 +264,7 @@ class AttendanceLogic:
 
         return founded_attendance
 
-    @handle_logic_exceptions(default_message="Error al guardar la asistencia")
+    @handle_logic_exceptions(default_message="Error saving attendance")
     def save_attendance(self, attendance_data: dict[str, Any]) -> Attendance:
         """
         Save or toggle attendance data to the database.
@@ -323,7 +324,7 @@ class AttendanceLogic:
         db.session.commit()
         return new_attendance
 
-    @handle_logic_exceptions(default_message="Error al actualizar la asistencia.")
+    @handle_logic_exceptions(default_message="Error updating attendance.")
     def update_attendance(
         self, id_attendance: int, attendance_data: dict[str, Any]
     ) -> Attendance:
@@ -370,7 +371,7 @@ class AttendanceLogic:
         db.session.commit()
         return founded_attendance
 
-    @handle_logic_exceptions(default_message="Error al obtener las fechas disponibles.")
+    @handle_logic_exceptions(default_message="Error retrieving available dates.")
     def get_available_dates_by_course(self, course_id: int):
         """
         Get all unique attendance dates for a specific course.

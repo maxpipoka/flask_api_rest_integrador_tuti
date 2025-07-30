@@ -8,7 +8,7 @@ from src.utils.security import generate_token
 
 class AuthLogic:
 
-    @handle_logic_exceptions(default_message="Error al realizar el login")
+    @handle_logic_exceptions(default_message="Error logging in user")
     def login_user(self, login_data: dict[str, Any]) -> dict[str, Any]:
 
         founded_user = User.query.filter(
@@ -33,7 +33,7 @@ class AuthLogic:
             "token": token,
         }
 
-    @handle_logic_exceptions(default_message="Error al registrar el usuario")
+    @handle_logic_exceptions(default_message="Error registering user")
     def register_user(self, user_data: dict[str, Any]) -> dict[str, Any]:
 
         new_user = User(

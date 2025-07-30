@@ -8,7 +8,7 @@ bp = Blueprint("usuarios", __name__)
 
 @bp.route("/usuarios", methods=["GET"])
 @token_required
-@handle_api_exceptions(default_message="Error al obtener los usuarios")
+@handle_api_exceptions(default_message="Error retrieving users")
 def get_users():
     """
     Gets all active users.
@@ -29,7 +29,7 @@ def get_users():
 
 @bp.route("/usuarios/<id>", methods=["GET"])
 @token_required
-@handle_api_exceptions(default_message="Error al obtener el usuario por ID")
+@handle_api_exceptions(default_message="Error retrieving user by ID")
 def get_user_by_id(id):
     """
     Gets a user by their ID.
@@ -59,7 +59,7 @@ def get_user_by_id(id):
 @bp.route("/usuarios", methods=["POST"])
 @token_required
 @require_json
-@handle_api_exceptions(default_message="Error al registrar el usuario")
+@handle_api_exceptions(default_message="Error registering user")
 def save_user():
     """
     Saves a new user to the database.
@@ -85,7 +85,7 @@ def save_user():
 @bp.route("/usuarios/<id>", methods=["PATCH"])
 @token_required
 @require_json
-@handle_api_exceptions(default_message="Error al actualizar el usuario")
+@handle_api_exceptions(default_message="Error updating user")
 def update_user(id):
     """
     Updates an existing user.
@@ -115,7 +115,7 @@ def update_user(id):
 # eliminacion usuario
 @bp.route("/usuarios/<id>", methods=["DELETE"])
 @token_required
-@handle_api_exceptions(default_message="Error al eliminar el usuario")
+@handle_api_exceptions(default_message="Error deleting user")
 def delete_user(id):
     """
     Deletes a user by their ID.

@@ -16,7 +16,7 @@ tutors_schema = TutorSchema(many=True)
 # Definicion endpoint obtiene todos los tutores activos
 @bp.route("/tutores", methods=["GET"])
 @token_required
-@handle_api_exceptions(default_message="Error al obtener los tutores activos")
+@handle_api_exceptions(default_message="Error retrieving tutors")
 def get_tutors():
     """
     Endpoint to get all active tutors.
@@ -61,7 +61,7 @@ def get_tutor_by_id(id):
 # Definicion endpoint que borra un tutor, cambia el activo
 @bp.route("/tutores/<id>", methods=["DELETE"])
 @token_required
-@handle_api_exceptions(default_message="Error al eliminar el tutor")
+@handle_api_exceptions(default_message="Error deleting tutor")
 def delete_tutor(id):
     """
     Endpoint to delete a tutor by their ID.
@@ -86,7 +86,7 @@ def delete_tutor(id):
 @bp.route("/tutores", methods=["POST"])
 @token_required
 @require_json
-@handle_api_exceptions(default_message="Error al guardar el tutor")
+@handle_api_exceptions(default_message="Error saving tutor")
 def save_tutor():
     """
     Endpoint to create a new tutor.
@@ -109,7 +109,7 @@ def save_tutor():
 @bp.route("/tutores/<id>", methods=["PATCH"])
 @token_required
 @require_json
-@handle_api_exceptions(default_message="Error al actualizar el tutor")
+@handle_api_exceptions(default_message="Error updating tutor")
 def update_tutor(id):
     """
     Endpoint to update a tutor by their ID.

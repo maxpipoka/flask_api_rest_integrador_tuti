@@ -19,7 +19,7 @@ tutors_schema = TutorSchema(many=True)
 # Definicion endpoint obtiene todos los alumnos ACTIVOS
 @bp.route("/alumnos", methods=["GET"])
 @token_required
-@handle_logic_exceptions(default_message="Error al obtener los estudiantes activos")
+@handle_logic_exceptions(default_message="Error getting active students")
 def get_students():
     """
     Endpoint to get all active students.
@@ -39,7 +39,7 @@ def get_students():
 # Definicion endpoint obtiene todos los alumnos, ACTIVOS e INACTIVOS
 @bp.route("/alumnos/todos", methods=["GET"])
 @token_required
-@handle_logic_exceptions(default_message="Error al obtener todos los estudiantes")
+@handle_logic_exceptions(default_message="Error getting all students")
 def get_all_students():
     """
     Endpoint to get all students, both active and inactive.
@@ -59,7 +59,7 @@ def get_all_students():
 # Definicion endpoint obtiene un solo alumno filtrado por id
 @bp.route("/alumnos/<id>", methods=["GET"])
 @token_required
-@handle_logic_exceptions(default_message="Error al obtener el alumno")
+@handle_logic_exceptions(default_message="Error getting student")
 def get_student_by_id(id):
     """
     Endpoint to get a student by their ID.
@@ -84,7 +84,7 @@ def get_student_by_id(id):
 # Definicion endpoint 'borra' un alumno, cambia el activo
 @bp.route("/alumnos/<id>", methods=["DELETE"])
 @token_required
-@handle_logic_exceptions(default_message="Error al eliminar el alumno")
+@handle_logic_exceptions(default_message="Error deleting student")
 def detele_student(id):
     """
     Endpoint to delete a student by their ID.
@@ -110,7 +110,7 @@ def detele_student(id):
 @bp.route("/alumnos", methods=["POST"])
 @token_required
 @require_json
-@handle_logic_exceptions(default_message="Error al crear el alumno")
+@handle_logic_exceptions(default_message="Error creating student")
 def save_student():
     """
     Endpoint to create a new student.
@@ -133,7 +133,7 @@ def save_student():
 @bp.route("/alumnos/<id>", methods=["PATCH"])
 @token_required
 @require_json
-@handle_logic_exceptions(default_message="Error al actualizar el alumno")
+@handle_logic_exceptions(default_message="Error updating student")
 def update_student(id):
     """
     Endpoint to update an existing student by their ID.
@@ -160,7 +160,7 @@ def update_student(id):
 # Definición endpoint para asociar tutores al alumno
 @bp.route("/alumnos/<int:alumno_id>/tutores/<int:tutor_id>", methods=["POST"])
 @token_required
-@handle_logic_exceptions(default_message="Error al asociar el tutor con el estudiante")
+@handle_logic_exceptions(default_message="Error associating tutor with student")
 def associate_tutor_with_student(student_id, tutor_id):
     """
     Endpoint to associate a tutor with a student.

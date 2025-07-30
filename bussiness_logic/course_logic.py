@@ -7,7 +7,7 @@ from src.models.models import Course, Student, db
 
 class CourseLogic:
 
-    @handle_logic_exceptions(default_message="Error al obtener los cursos.")
+    @handle_logic_exceptions(default_message="Error retrieving courses.")
     def get_courses(self) -> list[Course]:
         """
         Retrieves all courses from the database, ordered by level, year, and division.
@@ -29,7 +29,7 @@ class CourseLogic:
         return serialized_courses
 
     @handle_logic_exceptions(
-        default_message="Error al obtener los cursos del preceptor."
+        default_message="Error retrieving courses by preceptor."
     )
     def get_courses_by_preceptor(self, preceptor_id: int) -> list[Course]:
         """
@@ -57,7 +57,7 @@ class CourseLogic:
 
         return serialized_courses
 
-    @handle_logic_exceptions(default_message="Error al obtener el curso.")
+    @handle_logic_exceptions(default_message="Error retrieving course by ID.")
     def get_course_by_id(self, id_course: int) -> Course:
         """
         Retrieves a course by its ID.
@@ -80,7 +80,7 @@ class CourseLogic:
 
         return serialized_course
 
-    @handle_logic_exceptions(default_message="Error al borrar el curso.")
+    @handle_logic_exceptions(default_message="Error deleting course.")
     def delete_course(self, id: int) -> Course:
         """
         Deletes a course by its ID, marking it as inactive.
@@ -104,7 +104,7 @@ class CourseLogic:
         return founded_course
 
     @handle_logic_exceptions(
-        default_message="Error al asociar el estudiante con el curso."
+        default_message="Error associating student with course."
     )
     def asociate_student_to_course(self, course_id: int, student_id: int) -> dict[str]:
         """
@@ -130,7 +130,7 @@ class CourseLogic:
         db.session.commit()
         return {"message": "Student associated to course successfully"}
 
-    @handle_logic_exceptions(default_message="Error al guardar el curso.")
+    @handle_logic_exceptions(default_message="Error saving course.")
     def save_course(self, course_data: dict) -> Course:
         """
         Saves a new course to the database.
@@ -161,7 +161,7 @@ class CourseLogic:
 
         return new_course
 
-    @handle_logic_exceptions(default_message="Error al actualizar el curso.")
+    @handle_logic_exceptions(default_message="Error updating course.")
     def update_course(self, course_data: dict[str, str], id_course: int) -> Course:
         """
         Updates an existing course in the database.

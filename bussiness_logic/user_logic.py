@@ -4,7 +4,7 @@ from src.utils.decorators import handle_logic_exceptions
 
 class UserLogic:
 
-    @handle_logic_exceptions(default_message="Error al obtener los usuarios")
+    @handle_logic_exceptions(default_message="Error retrieving users.")
     def get_users(self) -> list[User]:
         """
         Retrieves all users from the database.
@@ -24,7 +24,7 @@ class UserLogic:
 
         return serialized_users
 
-    @handle_logic_exceptions(default_message="Error al obtener el usuario por ID")
+    @handle_logic_exceptions(default_message="Error retrieving user by ID.")
     def get_user_by_id(self, id: int) -> User:
         """
         Retrieves a user by their ID.
@@ -45,7 +45,7 @@ class UserLogic:
 
         return user
 
-    @handle_logic_exceptions(default_message="Error al registrar el usuario")
+    @handle_logic_exceptions(default_message="Error saving user.")
     def save_user(self, user_data: dict) -> User:
         """
         Saves a new user to the database.
@@ -79,7 +79,7 @@ class UserLogic:
 
         return new_user
 
-    @handle_logic_exceptions(default_message="Error al actualizar el usuario")
+    @handle_logic_exceptions(default_message="Error updating user.")
     def update_user(self, id_user: int, user_data: dict) -> User:
         """
         Updates a user in the database.
@@ -108,6 +108,7 @@ class UserLogic:
 
         return user_to_update
 
+    @handle_logic_exceptions(default_message="Error deleting user.")
     def delete_user(self, id_user: int) -> User:
         """
         Deletes a user from the database by marking them as inactive.

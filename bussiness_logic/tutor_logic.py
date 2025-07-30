@@ -7,7 +7,7 @@ from src.utils.decorators import handle_logic_exceptions
 
 class TutorLogic:
 
-    @handle_logic_exceptions(default_message="Error al obtener los tutores activos")
+    @handle_logic_exceptions(default_message="Error retrieving tutors.")
     def get_tutors(self) -> List[Tutor]:
         """
         Retrieves all active tutors from the database.
@@ -29,7 +29,7 @@ class TutorLogic:
 
         return seriealized_active_tutors
 
-    @handle_logic_exceptions(default_message="Error al obtener el tutor por ID")
+    @handle_logic_exceptions(default_message="Error retrieving tutor by ID.")
     def get_tutor_by_id(self, id: int) -> dict[str, any]:
         """
         Retrieves a tutor by their ID.
@@ -50,7 +50,7 @@ class TutorLogic:
 
         return founded_tutor
 
-    @handle_logic_exceptions(default_message="Error al eliminar el tutor")
+    @handle_logic_exceptions(default_message="Error deleting tutor.")
     def delete_tutor(self, id: int) -> Tutor:
         """
         Deletes a tutor by their ID.
@@ -75,7 +75,7 @@ class TutorLogic:
 
         return tutor_to_delete
 
-    @handle_logic_exceptions(default_message="Error al guardar el tutor")
+    @handle_logic_exceptions(default_message="Error saving tutor.")
     def save_tutor(self, tutor_data: dict[str, any]) -> Tutor:
         """
         Saves a new tutor to the database.
@@ -112,7 +112,7 @@ class TutorLogic:
 
         return new_tutor
 
-    @handle_logic_exceptions(default_message="Error al actualizar el tutor")
+    @handle_logic_exceptions(default_message="Error updating tutor.")
     def update_tutor(self, id_tutor: int, tutor_data: dict[str, any]) -> Tutor:
         """
         Updates an existing tutor in the database.
