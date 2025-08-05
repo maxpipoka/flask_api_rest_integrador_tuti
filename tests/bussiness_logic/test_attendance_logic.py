@@ -11,6 +11,13 @@ from src.models.models import Attendance, Course, Student, User
 class TestAttendanceLogic(TestCase):
 
     def setUp(self):
+
+        self.app = app
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+
+        self.client = self.app.test_client()
+
         db.create_all()
 
         # Agrega datos de prueba
@@ -95,6 +102,7 @@ class TestAttendanceLogic(TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
+        self.app_context.pop()
 
     def get_auth_token(self):
         response = self.client.post(
@@ -108,17 +116,22 @@ class TestAttendanceLogic(TestCase):
     def test_save_attendance(self):
         # Example test case for attendance logic
 
-        expected = {"active": True, "course_id": 2, "state": True, "student_id": 6}
+        expected = {
+            "active": True, 
+            "course_id": self.course2.id, 
+            "state": True, 
+            "student_id": self.student2.id
+        }
 
         attendance_data = {
             "active": True,
-            "course_id": 2,
+            "course_id": self.course2.id,
             "state": True,
-            "student_id": 6,
+            "student_id": self.student2.id,
         }
 
         attendance = AttendanceLogic()
 
-        with app.app_context():
-            actual = attendance.save_attendance(attendance_data=attendance_data)
-            self.assertEqual(expected, actual)  # Replace with actual test logic
+
+        actual = attendance.save_attendance(attendance_data=attendance_data)
+        self.assertEqual(expected, actual)  # Replace with actual test logic
