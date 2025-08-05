@@ -322,7 +322,7 @@ class AttendanceLogic:
 
         db.session.add(new_attendance)
         db.session.commit()
-        return new_attendance
+        return new_attendance.as_dict()
 
     @handle_logic_exceptions(default_message="Error updating attendance.")
     def update_attendance(
