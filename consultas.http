@@ -161,15 +161,15 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzUyNDc4N
 
 #################### USUARIOS ################
 
-POST http://127.0.0.1:5000/auth/register
+POST https://flask-api-rest-integrador-tuti.vercel.app/auth/register
 Content-Type: application/json
 
 {
-    "username": "marcelo",
-    "password": "passmarcelo",
-    "fullname": "Marcelo Gomez",
-    "rol": "Preceptor",
-    "access_level": 3
+    "username": "admin",
+    "password": "passadmin",
+    "fullname": "Administrador del sistema",
+    "rol": "Administrador",
+    "access_level": 1
 }
 
 ### Login

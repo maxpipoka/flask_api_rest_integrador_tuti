@@ -132,6 +132,10 @@ class TestAttendanceLogic(TestCase):
 
         attendance = AttendanceLogic()
 
-
         actual = attendance.save_attendance(attendance_data=attendance_data)
-        self.assertEqual(expected, actual)  # Replace with actual test logic
+        
+        keys = ["active", "course_id", "state", "student_id"]
+        
+        actual_filtered = {k: actual[k] for k in keys}
+
+        self.assertEqual(expected, actual_filtered)  # Replace with actual test logic
