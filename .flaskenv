@@ -1,2 +1,3 @@
 FLASK_APP=src/app.py
+PYTHONPATH=.
 FLASK_DEBUG=1
