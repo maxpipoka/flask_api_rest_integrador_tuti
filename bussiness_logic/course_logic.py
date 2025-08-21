@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from ..src.utils.decorators import handle_logic_exceptions
+from src.utils.decorators import handle_logic_exceptions
 
-from ..src.models.models import Course, Student, db
+from src.models.models import Course, Student, db
 
 
 class CourseLogic:

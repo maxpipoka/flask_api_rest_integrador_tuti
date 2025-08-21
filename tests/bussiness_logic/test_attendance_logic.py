@@ -1,20 +1,32 @@
+import sys
+import os
 from datetime import datetime
 import uuid
-from ...src.app import app, db
-
 from unittest import TestCase
 
-from ...bussiness_logic.attendance_logic import AttendanceLogic
-from ...src.models.models import Attendance, Course, Student, User
+# Importacion de la factory
+from src import create_app
 
+from bussiness_logic.attendance_logic import AttendanceLogic
+from src.models.models import Attendance, Course, Student, User
+
+#Inclusion del directorio al path para test individuales
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 class TestAttendanceLogic(TestCase):
 
     def setUp(self):
 
-        self.app = app
+        self.app = create_app({
+            'TESTING': True,
+            'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory',
+            'SECRET_KEY': 'clave_test'
+        })
         self.app_context = self.app.app_context()
         self.app_context.push()
+
+        from src import db
+        self.db = db
 
         self.client = self.app.test_client()
 

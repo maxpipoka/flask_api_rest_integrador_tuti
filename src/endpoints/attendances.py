@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify
 
-from ...bussiness_logic.attendance_logic import AttendanceLogic
+from bussiness_logic.attendance_logic import AttendanceLogic
 
-from ...src.utils.decorators import token_required, require_json, handle_api_exceptions
+from ..utils.decorators import token_required, require_json, handle_api_exceptions
 
 bp = Blueprint("asistencias", __name__)
 

@@ -1,8 +1,8 @@
 from flask import Blueprint, jsonify, request
 
-from ...src.utils.decorators import token_required, handle_api_exceptions
+from ..utils.decorators import token_required, handle_api_exceptions
 
-from ...bussiness_logic.auth_logic import AuthLogic
+from bussiness_logic.auth_logic import AuthLogic
 
 bp = Blueprint("auth", __name__)
 

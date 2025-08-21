@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
-from ...bussiness_logic.user_logic import UserLogic
-from ...src.utils.decorators import handle_api_exceptions, require_json, token_required
+from bussiness_logic.user_logic import UserLogic
+from ..utils.decorators import handle_api_exceptions, require_json, token_required
 
 bp = Blueprint("usuarios", __name__)
 

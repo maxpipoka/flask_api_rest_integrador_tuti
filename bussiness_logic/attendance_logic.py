@@ -3,9 +3,9 @@ from typing import Any
 
 from sqlalchemy import func, Date
 
-from ..src.utils.decorators import handle_logic_exceptions
+from src.utils.decorators import handle_logic_exceptions
 
-from ..src.models.models import Attendance, Course, Student, db
+from src.models.models import Attendance, Course, Student, db
 
 
 class AttendanceLogic:

@@ -3,7 +3,7 @@ from datetime import datetime
 from dataclasses import dataclass
 from sqlalchemy.orm import relationship
 
-db = SQLAlchemy()
+from .. import db
 
 # Tabla intermedia para la relación muchos a muchos
 students_tutors = db.Table(
