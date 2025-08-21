@@ -1,11 +1,11 @@
 from datetime import datetime
 import uuid
-from src.app import app, db
+from ...src.app import app, db
 
 from unittest import TestCase
 
-from bussiness_logic.attendance_logic import AttendanceLogic
-from src.models.models import Attendance, Course, Student, User
+from ...bussiness_logic.attendance_logic import AttendanceLogic
+from ...src.models.models import Attendance, Course, Student, User
 
 
 class TestAttendanceLogic(TestCase):
