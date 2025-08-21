@@ -1,8 +1,8 @@
 from datetime import datetime
 from typing import List
-from src.models.models import Tutor, db
+from ..src.models.models import Tutor, db
 
-from src.utils.decorators import handle_logic_exceptions
+from ..src.utils.decorators import handle_logic_exceptions
 
 
 class TutorLogic:

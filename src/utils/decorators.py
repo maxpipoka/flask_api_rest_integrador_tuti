@@ -3,7 +3,7 @@ from flask import request, jsonify
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from src.utils.security import decode_token
+from .security import decode_token
 
 
 def token_required(f):

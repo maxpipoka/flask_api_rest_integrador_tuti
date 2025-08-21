@@ -1,10 +1,10 @@
 from flask import Blueprint, request, jsonify
 
-from src.utils.decorators import token_required, require_json, handle_api_exceptions
+from ...src.utils.decorators import token_required, require_json, handle_api_exceptions
 
 from ..models.schemas import TutorSchema
 
-from bussiness_logic.tutor_logic import TutorLogic
+from ...bussiness_logic.tutor_logic import TutorLogic
 
 bp = Blueprint("tutores", __name__)
 

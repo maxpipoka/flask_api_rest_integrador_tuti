@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 
-from src.utils.decorators import token_required, handle_api_exceptions
-from bussiness_logic.course_logic import CourseLogic
+from ...src.utils.decorators import token_required, handle_api_exceptions
+from ...bussiness_logic.course_logic import CourseLogic
 
 bp = Blueprint("cursos", __name__)
 

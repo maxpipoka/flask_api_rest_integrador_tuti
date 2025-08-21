@@ -1,7 +1,7 @@
 from datetime import datetime
-from src.models.models import Student, db
+from ..src.models.models import Student, db
 
-from src.utils.decorators import handle_logic_exceptions
+from ..src.utils.decorators import handle_logic_exceptions
 
 
 class StudentLogic:

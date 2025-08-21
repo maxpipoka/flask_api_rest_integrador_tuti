@@ -1,9 +1,9 @@
 from typing import Any
 
-from src.utils.decorators import handle_logic_exceptions
+from ..src.utils.decorators import handle_logic_exceptions
 
-from src.models.models import User, db
-from src.utils.security import generate_token
+from ..src.models.models import User, db
+from ..src.utils.security import generate_token
 
 
 class AuthLogic:

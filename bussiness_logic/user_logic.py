@@ -1,5 +1,5 @@
-from src.models.models import User, db
-from src.utils.decorators import handle_logic_exceptions
+from ..src.models.models import User, db
+from ..src.utils.decorators import handle_logic_exceptions
 
 
 class UserLogic:
