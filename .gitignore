@@ -26,3 +26,4 @@ bussiness_logic/__pycache__/__init__.cpython-311.pyc
 bussiness_logic/__pycache__/__init__.cpython-311.pyc
 src/__pycache__/__init__.cpython-311.pyc
 tests/__pycache__/__init__.cpython-311.pyc
+instance/:memory
