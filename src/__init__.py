@@ -38,6 +38,8 @@ def create_app(test_config=None):
     except OSError:
         pass
 
+    print(f"DEBUG: app.config['SQLALCHEMY_DATABASE_URI'] antes de db.init_app: {app.config.get('SQLALCHEMY_DATABASE_URI')}")
+
     # Inicializa las extensiones con la aplicación (AHORA sí se les pasa la app)
     db.init_app(app)
     migrate.init_app(app)

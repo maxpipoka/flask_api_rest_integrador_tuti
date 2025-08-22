@@ -9,6 +9,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'una_clave_super_secreta_por_defecto') # ¡
 
 # Configuración de la base de datos
 SQLALCHEMY_DATABASE_URI = os.getenv('DB_URI', 'sqlite:///proyecto.db') # Usa tu variable de entorno o un valor por defecto
+print(f"DEBUG: SQLALCHEMY_DATABASE_URI cargado: {SQLALCHEMY_DATABASE_URI}")
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_ECHO = os.getenv('SQLALCHEMY_ECHO', 'False').lower() in ('true', '1') # Configurable desde .env
 
