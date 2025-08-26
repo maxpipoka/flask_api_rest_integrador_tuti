@@ -85,7 +85,7 @@ class AttendanceLogic:
         if not attendance:
             raise ValueError(f"Attendance with id {id} not found in the database.")
 
-        return attendance
+        return attendance.as_dict()
 
     @handle_logic_exceptions(default_message="Error retrieving attendances by student ID")
     def get_attendances_by_student_id(
