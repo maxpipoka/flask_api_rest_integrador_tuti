@@ -36,3 +36,7 @@ tests/__pycache__/test_endpoints_tutors.cpython-311.pyc
 tests/__pycache__/test_endpoints_students.cpython-311.pyc
 tests/__pycache__/test_endpoints_courses.cpython-311.pyc
 instance/test_db.sqlite
+src/__pycache__/app.cpython-311.pyc
+tests/bussiness_logic/__pycache__/test_attendance_logic.cpython-311.pyc
+tests/__pycache__/test_endpoints_attendances.cpython-311.pyc
+tests/bussiness_logic/__pycache__/test_attendance_logic.cpython-311.pyc
