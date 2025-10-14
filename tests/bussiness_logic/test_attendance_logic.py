@@ -178,6 +178,10 @@ class TestAttendanceLogic(TestCase):
         
         self.assertTrue(ids_in_db.issubset(ids_returned))
 
+    def test_get_all_attendances(self):
+
+        
+
     def test_get_attendance_by_id(self):
 
         attendance_data = {
